@@ -1,0 +1,106 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body, html {
+    height: 100%;
+    font-family: 'Segoe UI', sans-serif;
+    color: #ffffff;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Vidéo de fond */
+.background-video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -2;
+}
+
+/* Overlay sombre */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(120deg, rgba(0,0,0,0.7), rgba(0,0,0,0.6));
+    z-index: -1;
+}
+
+/* Conteneur principal */
+.container {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+}
+
+/* Titre principal */
+.header h1 {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    color: #f8f9fa;
+    letter-spacing: 2px;
+}
+
+/* Slogan */
+.header p {
+    font-size: 1.2rem;
+    margin-bottom: 40px;
+    color: #e0e0e0;
+}
+
+/* Boutons */
+.buttons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+}
+
+.btn {
+    padding: 15px 30px;
+    font-size: 1rem;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-primary {
+    background-color: #007BFF;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #495057;
+    transform: scale(1.05);
+}
+
+/* Pied de page */
+.footer {
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
+    text-align: center;
+    color: #aaa;
+    font-size: 0.9rem;
+}

@@ -8,6 +8,7 @@
         <class>com.agence.agencevoiture.entity.Voiture</class>
 
         <properties>
+            <property name="jakarta.persistence.schema-generation.database.action" value="create" />
             <property name="jakarta.persistence.jdbc.driver" value="org.mariadb.jdbc.Driver"/>
             <property name="jakarta.persistence.jdbc.url" value="jdbc:mariadb://localhost:3306/Gestion_agence_voiture"/>
             <property name="jakarta.persistence.jdbc.user" value="root"/>
