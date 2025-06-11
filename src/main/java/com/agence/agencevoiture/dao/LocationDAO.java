@@ -1,7 +1,7 @@
 package com.agence.agencevoiture.dao;
 
 
-import com.agence.agencevoiture.entity.Reservation;
+import com.agence.agencevoiture.entity.Location;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Persistence;
 import org.eclipse.persistence.jpa.JpaEntityManagerFactory;
@@ -9,46 +9,46 @@ import org.eclipse.persistence.jpa.JpaEntityManagerFactory;
 
 import java.util.List;
 
-public class ReservationDAO {
+public class LocationDAO {
 
     private static final JpaEntityManagerFactory emf = (JpaEntityManagerFactory) Persistence.createEntityManagerFactory("pu");
 
-    public void creerReservation(Reservation reservation){
+    public void creerLocation(Location location){
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
-        em.persist(reservation);
+        em.persist(location);
         em.getTransaction().commit();
         em.close();
     }
 
-    public Reservation trouverReservation(Long id_reservation){
+    public Location trouverLocation(Long id_reservation){
         EntityManager em = emf.createEntityManager();
-        Reservation reservation = em.find(Reservation.class, id_reservation);
+        Location location = em.find(Location.class, id_reservation);
         em.close();
-        return  reservation;
+        return location;
     }
 
-    public void supprimerReservation(Reservation reservation){
+    public void supprimerLocation(Location location){
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
-        reservation = em.merge(reservation);
-        em.remove(reservation);
+        location = em.merge(location);
+        em.remove(location);
         em.getTransaction().commit();
         em.close();
 
     }
 
-    public List<Reservation> trouverTous(){
+    public List<Location> trouverTous(){
         EntityManager em = emf.createEntityManager();
-        List<Reservation> reservations = em.createQuery("select r from Reservation r", Reservation.class).getResultList();
+        List<Location> locations = em.createQuery("select r from Location r", Location.class).getResultList();
         em.close();
-        return reservations;}
+        return locations;}
 
-    public void MiseAJour(Reservation reservation) {
+    public void MiseAJour(Location location) {
 
      EntityManager em = emf.createEntityManager();
      em.getTransaction().begin();
-     em.merge(reservation);
+     em.merge(location);
      em.getTransaction().commit();
      em.close();
     }

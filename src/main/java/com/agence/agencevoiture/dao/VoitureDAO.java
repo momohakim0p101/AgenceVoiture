@@ -23,7 +23,7 @@ public class VoitureDAO {
             em.close();
         }
 
-        public Voiture trouverVoiture(String immatriculation){
+        public  Voiture trouverVoiture(String immatriculation){
             EntityManager em = emf.createEntityManager();
             Voiture voiture = em.find(Voiture.class, immatriculation);
             em.close();

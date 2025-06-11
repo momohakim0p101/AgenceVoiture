@@ -6,7 +6,7 @@ import java.util.Date;
 
 @Entity
 @Table(name="reservation")
-public class Reservation {
+public class Location {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_reservation")
@@ -37,11 +37,11 @@ public class Reservation {
     @OneToOne(mappedBy = "reservation", cascade = CascadeType.ALL)
     private Facture facture;
 
-    public Reservation() {
+    public Location() {
 
     }
 
-    public Reservation(Long idReservation, Date dateDebut, Date dateFin, double montantTotal, String statut, Client client, Voiture voiture, Facture facture) {
+    public Location(Long idReservation, Date dateDebut, Date dateFin, double montantTotal, String statut, Client client, Voiture voiture, Facture facture) {
         this.idReservation = idReservation;
         this.dateDebut = dateDebut;
         this.dateFin = dateFin;

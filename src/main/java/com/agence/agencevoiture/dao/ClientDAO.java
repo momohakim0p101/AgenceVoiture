@@ -51,6 +51,15 @@ public class ClientDAO {
           em.getTransaction().commit();
           em.close();
     }
+    public List<Client> rechercherParNom(String nom) {
+        EntityManager em = emf.createEntityManager();
+        List<Client> clients = em.createQuery("SELECT c FROM Client c WHERE LOWER(c.nom) LIKE LOWER(:nom)", Client.class)
+                .setParameter("nom", "%" + nom + "%")
+                .getResultList();
+        em.close();
+        return clients;
+    }
+
 }
 
 

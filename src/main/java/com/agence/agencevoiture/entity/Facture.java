@@ -27,15 +27,15 @@ public class Facture {
 
     @OneToOne
     @JoinColumn(name = "id_reservation")
-    private Reservation reservation;
+    private Location location;
 
-    public Facture(Long idFacture, Date dateEmission, double montant, String signatureClient, String signatureGestionnaire, Reservation reservation) {
+    public Facture(Long idFacture, Date dateEmission, double montant, String signatureClient, String signatureGestionnaire, Location location) {
         this.idFacture = idFacture;
         this.dateEmission = dateEmission;
         this.montant = montant;
         this.signatureClient = signatureClient;
         this.signatureGestionnaire = signatureGestionnaire;
-        this.reservation = reservation;
+        this.location = location;
     }
 
     public Facture() {
@@ -84,12 +84,12 @@ public class Facture {
         this.signatureGestionnaire = signatureGestionnaire;
     }
 
-    public Reservation getReservation() {
-        return reservation;
+    public Location getReservation() {
+        return location;
     }
 
-    public void setReservation(Reservation reservation) {
-        this.reservation = reservation;
+    public void setReservation(Location location) {
+        this.location = location;
     }
 
     @Override
@@ -100,7 +100,7 @@ public class Facture {
                 ", montant=" + montant +
                 ", signatureClient='" + signatureClient + '\'' +
                 ", signatureGestionnaire='" + signatureGestionnaire + '\'' +
-                ", reservation=" + reservation +
+                ", reservation=" + location +
                 '}';
     }
 }

@@ -40,7 +40,7 @@ public class Voiture {
     private boolean disponible = true;
 
     @OneToMany(mappedBy = "voiture")
-    private List<Reservation> reservations;
+    private List<Location> locations;
 
     @OneToMany(mappedBy = "voiture")
     private List<Avis> avis;
@@ -48,7 +48,7 @@ public class Voiture {
 
 
 
-    public Voiture(String immatriculation, int nombrePlaces, String marque, String modele, Date dateMiseEnCirculation, double kilometrage, String typeCarburant, String categorie, double prixLocationJour, boolean disponible, List<Reservation> reservations, List<Avis> avis) {
+    public Voiture(String immatriculation, int nombrePlaces, String marque, String modele, Date dateMiseEnCirculation, double kilometrage, String typeCarburant, String categorie, double prixLocationJour, boolean disponible, List<Location> locations, List<Avis> avis) {
         this.immatriculation = immatriculation;
         this.nombrePlaces = nombrePlaces;
         this.marque = marque;
@@ -59,7 +59,7 @@ public class Voiture {
         this.categorie = categorie;
         this.prixLocationJour = prixLocationJour;
         this.disponible = disponible;
-        this.reservations = reservations;
+        this.locations = locations;
         this.avis = avis;
     }
 
@@ -147,12 +147,12 @@ public class Voiture {
         this.disponible = disponible;
     }
 
-    public List<Reservation> getReservations() {
-        return reservations;
+    public List<Location> getReservations() {
+        return locations;
     }
 
-    public void setReservations(List<Reservation> reservations) {
-        this.reservations = reservations;
+    public void setReservations(List<Location> locations) {
+        this.locations = locations;
     }
 
     public List<Avis> getAvis() {
@@ -176,7 +176,7 @@ public class Voiture {
                 ", categorie='" + categorie + '\'' +
                 ", prixLocationJour=" + prixLocationJour +
                 ", disponible=" + disponible +
-                ", reservations=" + reservations +
+                ", reservations=" + locations +
                 ", avis=" + avis +
                 '}';
     }

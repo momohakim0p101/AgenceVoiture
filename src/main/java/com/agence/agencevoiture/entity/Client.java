@@ -30,7 +30,7 @@ public class Client {
     @Column(name = "telephone", unique = true)
     private String telephone;
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
-    private List<Reservation> reservation;
+    private List<Location> location;
 
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
     private List<Avis> reviews;
@@ -40,7 +40,7 @@ public class Client {
 
     }
 
-    public Client(String cin, String prenom, String nom, String sexe, String adresse, String email, String telephone, List<Reservation> reservation, List<Avis> reviews) {
+    public Client(String cin, String prenom, String nom, String sexe, String adresse, String email, String telephone, List<Location> location, List<Avis> reviews) {
         this.cin = cin;
         this.prenom = prenom;
         this.nom = nom;
@@ -48,7 +48,7 @@ public class Client {
         this.adresse = adresse;
         this.email = email;
         this.telephone = telephone;
-        this.reservation = reservation;
+        this.location = location;
         this.reviews = reviews;
     }
 
@@ -108,12 +108,12 @@ public class Client {
         this.telephone = telephone;
     }
 
-    public List<Reservation> getReservation() {
-        return reservation;
+    public List<Location> getReservation() {
+        return location;
     }
 
-    public void setReservation(List<Reservation> reservation) {
-        this.reservation = reservation;
+    public void setReservation(List<Location> location) {
+        this.location = location;
     }
 
     public List<Avis> getReviews() {
@@ -134,7 +134,7 @@ public class Client {
                 ", adresse='" + adresse + '\'' +
                 ", email='" + email + '\'' +
                 ", telephone='" + telephone + '\'' +
-                ", reservation=" + reservation +
+                ", reservation=" + location +
                 ", reviews=" + reviews +
                 '}';
     }
