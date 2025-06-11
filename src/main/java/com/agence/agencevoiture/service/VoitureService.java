@@ -72,9 +72,12 @@ public class VoitureService {
         return voitureDAO.trouverTous();
     }
 
+
+
     public List<Voiture> listerVoituresDisponibles() {
         return voitureDAO.trouverTous().stream()
                 .filter(Voiture::isDisponible)
-                .toList();
+                .collect(Collectors.toList());
     }
+
 }
