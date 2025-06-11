@@ -4,6 +4,7 @@ import com.agence.agencevoiture.dao.VoitureDAO;
 import com.agence.agencevoiture.entity.Voiture;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class VoitureService {
     private final VoitureDAO voitureDAO;
@@ -30,10 +31,15 @@ public class VoitureService {
         }
     }
 
-    public Voiture rechercherParImmatriculation(String immat) {
-        if (immat == null || immat.isEmpty()) return null;
-        return voitureDAO.trouverVoiture(immat);
+    public List<Voiture> rechercherParCriteres(String marque, String carburant, String categorie) {
+        return voitureDAO.trouverTous().stream()
+                .filter(v -> (marque == null || v.getMarque().equalsIgnoreCase(marque)))
+                .filter(v -> (carburant == null || v.getTypeCarburant().equalsIgnoreCase(carburant)))
+                .filter(v -> (categorie == null || v.getCategorie().equalsIgnoreCase(categorie)))
+                .collect(Collectors.toList());
+
     }
+
 
     public boolean supprimerVoiture(String immat) {
         Voiture voiture = voitureDAO.trouverVoiture(immat);
