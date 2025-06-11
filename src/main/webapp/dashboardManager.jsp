@@ -67,7 +67,7 @@
         <div class="user-profile">
             <img src="${pageContext.request.contextPath}/images/profile.jpg" alt="Profile">
             <div class="user-info">
-                <span class="user-name">${sessionScope.manager.prenom} ${sessionScope.manager.nom}</span>
+                <span class="user-name">${sessionScope.gestionnaire.prenom} ${sessionScope.gestionnaire.nom}</span>
                 <span class="user-role">Gestionnaire</span>
             </div>
             <button class="logout-btn" title="Déconnexion" id="logoutBtn">
