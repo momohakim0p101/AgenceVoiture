@@ -34,7 +34,7 @@ public class Location {
     @JoinColumn(name = "immatriculation_voiture", referencedColumnName = "immatriculation")
     private Voiture voiture;
 
-    @OneToOne(mappedBy = "reservation", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "location", cascade = CascadeType.ALL)
     private Facture facture;
 
     public Location() {
@@ -121,7 +121,7 @@ public class Location {
 
     @Override
     public String toString() {
-        return "Reservation{" +
+        return "Location{" +
                 "idReservation=" + idReservation +
                 ", dateDebut=" + dateDebut +
                 ", dateFin=" + dateFin +

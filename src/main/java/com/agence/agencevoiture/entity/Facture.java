@@ -100,7 +100,7 @@ public class Facture {
                 ", montant=" + montant +
                 ", signatureClient='" + signatureClient + '\'' +
                 ", signatureGestionnaire='" + signatureGestionnaire + '\'' +
-                ", reservation=" + location +
+                ", location=" + location +
                 '}';
     }
 }
