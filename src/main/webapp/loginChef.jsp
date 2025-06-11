@@ -11,7 +11,7 @@
   <h2>Connexion Chef d'Agence</h2>
   <form action="LoginServlet" method="post">
     <input type="hidden" name="role" value="chef">
-    <input type="text" name="username" placeholder="Nom d'utilisateur" required>
+    <input type="text" name="identifiant" placeholder="Nom d'utilisateur" required>
     <input type="password" name="password" placeholder="Mot de passe" required>
     <button type="submit">Se connecter</button>
     <p class="info-message">${requestScope.error}</p>

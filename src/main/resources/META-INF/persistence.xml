@@ -8,6 +8,9 @@
         <class>com.agence.agencevoiture.entity.Voiture</class>
 
         <properties>
+            <property name="eclipselink.logging.level" value="FINE"/>
+            <property name="eclipselink.logging.level.sql" value="FINE"/>
+            <property name="eclipselink.logging.parameters" value="true"/>
             <property name="eclipselink.target-database" value="org.eclipse.persistence.platform.database.MySQLPlatform"/>
             <property name="jakarta.persistence.schema-generation.database.action" value="create" />
             <property name="jakarta.persistence.jdbc.driver" value="org.mariadb.jdbc.Driver"/>

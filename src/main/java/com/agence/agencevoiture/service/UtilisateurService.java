@@ -16,11 +16,12 @@ public class UtilisateurService {
 
         try {
             TypedQuery<Utilisateur> query = em.createQuery(
-                    "SELECT u FROM Utilisateur u WHERE u.identifiant = :identifiant AND u.motDePasse = :motDePasse AND u.role = :role",
+                    "SELECT u FROM Utilisateur u WHERE LOWER(u.identifiant) = LOWER(:identifiant) AND u.motDePasse = :motDePasse AND LOWER(u.role) = LOWER(:role)",
                     Utilisateur.class
-            );            query.setParameter("identifiant", identifiant);
+            );
+            query.setParameter("identifiant", identifiant);
             query.setParameter("motDePasse", motDePasse);
-            query.setParameter("role", role.toUpperCase());
+            query.setParameter("role", role);
 
             return query.getSingleResult();
         } catch (NoResultException e){
