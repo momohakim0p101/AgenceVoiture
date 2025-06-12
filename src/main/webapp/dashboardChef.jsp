@@ -30,24 +30,6 @@
             </a>
         </li>
         <li>
-            <a href="${pageContext.request.contextPath}/manager/voitures">
-                <i class="fas fa-car"></i>
-                <span>Gestion Voitures</span>
-            </a>
-        </li>
-        <li>
-            <a href="${pageContext.request.contextPath}/manager/clients">
-                <i class="fas fa-users"></i>
-                <span>Gestion Clients</span>
-            </a>
-        </li>
-        <li>
-            <a href="${pageContext.request.contextPath}/manager/locations">
-                <i class="fas fa-file-contract"></i>
-                <span>Locations</span>
-            </a>
-        </li>
-        <li>
             <a href="${pageContext.request.contextPath}/manager/recherche">
                 <i class="fas fa-search"></i>
                 <span>Recherche Avancée</span>

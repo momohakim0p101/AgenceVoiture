@@ -36,7 +36,7 @@
             </a>
         </li>
         <li>
-            <a href="${pageContext.request.contextPath}/manager/clients">
+            <a href="${pageContext.request.contextPath}/GestionClient.jsp">
                 <i class="fas fa-users"></i>
                 <span>Gestion Clients</span>
             </a>
