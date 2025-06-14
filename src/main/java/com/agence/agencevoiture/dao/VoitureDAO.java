@@ -4,6 +4,7 @@ import com.agence.agencevoiture.entity.Voiture;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Persistence;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
 import org.eclipse.persistence.jpa.JpaEntityManagerFactory;
 
 
@@ -53,4 +54,19 @@ public class VoitureDAO {
             em.getTransaction().commit();
             em.close();
         }
+
+    public List<Object[]> trouverVoituresTopLoueés(int topN) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            String jpql = "SELECT v, COUNT(l) AS nbLocations " +
+                    "FROM Voiture v JOIN v.locations l " +
+                    "GROUP BY v " +
+                    "ORDER BY nbLocations DESC";
+            TypedQuery<Object[]> query = em.createQuery(jpql, Object[].class);
+            query.setMaxResults(topN);
+            return query.getResultList();
+        } finally {
+            em.close();
+        }
+    }
 }

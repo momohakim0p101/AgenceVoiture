@@ -21,7 +21,7 @@ public class Client {
     @Column(name = "sexe", length = 1)
     private String sexe;
 
-    @Column(name = "addresse")
+    @Column(name = "adresse")
     private String adresse;
 
     @Column(name = "email", unique = true)

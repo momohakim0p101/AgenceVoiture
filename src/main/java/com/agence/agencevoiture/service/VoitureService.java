@@ -2,6 +2,8 @@ package com.agence.agencevoiture.service;
 
 import com.agence.agencevoiture.dao.VoitureDAO;
 import com.agence.agencevoiture.entity.Voiture;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -79,5 +81,18 @@ public class VoitureService {
                 .filter(Voiture::isDisponible)
                 .collect(Collectors.toList());
     }
+    public boolean changerDisponibilite(String immat, boolean disponible) {
+        Voiture voiture = voitureDAO.trouverVoiture(immat);
+        if (voiture == null) return false;
+        voiture.setDisponible(disponible);
+        try {
+            voitureDAO.miseAJour(voiture);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 
 }

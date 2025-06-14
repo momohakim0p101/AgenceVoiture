@@ -1,164 +1,131 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: hakim01
-  Date: 06/06/2025
-  Time: 10:24
-  To change this template use File | Settings | File Templates.
---%>
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.util.*, com.agence.agencevoiture.entity.*" %>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Gestionnaire - Agence de Location</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="./css/dashboard.css">
+    <meta charset="UTF-8" />
+    <title>Dashboard Chef d'Agence</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        /* Ajoute ici ton CSS personnalisé */
+        body { font-family: 'Roboto', sans-serif; margin:0; background:#f5f5f5; }
+        .sidebar { width: 220px; background:#222; height: 100vh; position: fixed; color: white; }
+        .sidebar-header { padding: 20px; font-size: 1.5em; text-align:center; background:#111; }
+        .sidebar-menu { list-style:none; padding:0; margin:0; }
+        .sidebar-menu li a { color:#bbb; display:flex; align-items:center; padding:15px 20px; text-decoration:none; }
+        .sidebar-menu li a.active, .sidebar-menu li a:hover { background:#444; color:#fff; }
+        .sidebar-menu i { margin-right:10px; }
+        .main-content { margin-left: 220px; padding: 20px; }
+        .top-nav { background:#fff; padding: 10px 20px; display:flex; justify-content:flex-end; align-items:center; box-shadow: 0 1px 5px rgba(0,0,0,0.1); }
+        .top-nav .user-profile { display:flex; align-items:center; gap:10px; }
+        .top-nav img { border-radius:50%; width:35px; height:35px; }
+        .dashboard-cards { display:flex; gap:20px; margin:20px 0; flex-wrap: wrap; }
+        .card { background:#fff; flex: 1 1 200px; padding:20px; border-radius:8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: relative; }
+        .card .card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; }
+        .card .card-title { font-weight: 500; font-size: 1.1em; }
+        .card .card-icon { font-size: 1.5em; padding: 8px; border-radius: 50%; color:#fff; }
+        .card-icon.info { background:#17a2b8; }
+        .card-icon.success { background:#28a745; }
+        .card-icon.warning { background:#ffc107; color:#212529; }
+        .card-icon.danger { background:#dc3545; }
+        .card .card-value { font-size: 2.2em; font-weight: 700; }
+        .section-title { font-size: 1.3em; margin: 30px 0 10px; color: #333; }
+        table { width: 100%; border-collapse: collapse; background:#fff; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        th, td { padding: 12px 15px; border-bottom: 1px solid #ddd; text-align: left; }
+        th { background: #f8f9fa; }
+    </style>
 </head>
 <body>
 
+<!-- Sidebar -->
 <aside class="sidebar">
-    <div class="sidebar-header">
-        <h3><i class="fas fa-car"></i> <span>Agence Location</span></h3>
-    </div>
+    <div class="sidebar-header"><i class="fas fa-car"></i> Chef d'Agence</div>
     <ul class="sidebar-menu">
-        <li>
-            <a href="#" class="active">
-                <i class="fas fa-tachometer-alt"></i>
-                <span>Dashboard</span>
-            </a>
-        </li>
-        <li>
-            <a href="${pageContext.request.contextPath}/manager/recherche">
-                <i class="fas fa-search"></i>
-                <span>Recherche Avancée</span>
-            </a>
-        </li>
+        <li><a href="#" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+        <li><a href="#"><i class="fas fa-car"></i> Gestion Voitures</a></li>
+        <li><a href="#"><i class="fas fa-users"></i> Gestion Clients</a></li>
+        <li><a href="#"><i class="fas fa-file-contract"></i> Locations</a></li>
+        <li><a href="#"><i class="fas fa-chart-line"></i> Statistiques</a></li>
     </ul>
 </aside>
 
 <!-- Main Content -->
 <main class="main-content">
-    <!-- Top Navigation -->
     <div class="top-nav">
-        <div class="search-bar">
-            <i class="fas fa-search"></i>
-            <input type="text" id="globalSearch" placeholder="Rechercher voiture, client...">
-        </div>
         <div class="user-profile">
-            <img src="${pageContext.request.contextPath}/images/profile.jpg" alt="Profile">
-            <div class="user-info">
-                <span class="user-name">${sessionScope.gestionnaire.prenom} ${sessionScope.gestionnaire.nom}</span>
-                <span class="user-role">Chef</span>
+            <img src="https://randomuser.me/api/portraits/men/45.jpg" alt="Profile" />
+            <div>
+                <div><strong>Chef d'Agence</strong></div>
+                <div>Jean Dupont</div>
             </div>
-            <button class="logout-btn" title="Déconnexion" id="logoutBtn">
-                <a href="LogoutServlet"><i class="fas fa-sign-out-alt"></i></a>
-            </button>
         </div>
     </div>
 
-    <!-- Dashboard Cards -->
     <div class="dashboard-cards">
         <div class="card">
             <div class="card-header">
+                <span class="card-title">Total Voitures</span>
+                <div class="card-icon info"><i class="fas fa-car"></i></div>
+            </div>
+            <div class="card-value"><%= request.getAttribute("totalVoitures") %></div>
+        </div>
+        <div class="card">
+            <div class="card-header">
                 <span class="card-title">Voitures Disponibles</span>
-                <div class="card-icon blue">
-                    <i class="fas fa-car"></i>
-                </div>
+                <div class="card-icon success"><i class="fas fa-check-circle"></i></div>
             </div>
-            <div class="card-value" id="availableCarsCount">0</div>
-            <div class="card-footer">
-                <i class="fas fa-info-circle"></i> Dernière mise à jour: <span id="lastUpdateTime"></span>
-            </div>
+            <div class="card-value"><%= request.getAttribute("voituresDispo") %></div>
         </div>
         <div class="card">
             <div class="card-header">
-                <span class="card-title">Voitures Louées</span>
-                <div class="card-icon red">
-                    <i class="fas fa-car-side"></i>
-                </div>
+                <span class="card-title">Voitures en Location</span>
+                <div class="card-icon warning"><i class="fas fa-car-side"></i></div>
             </div>
-            <div class="card-value" id="rentedCarsCount">0</div>
-            <div class="card-footer">
-                <i class="fas fa-info-circle"></i> En cours cette semaine
-            </div>
+            <div class="card-value"><%= request.getAttribute("voituresEnLocation") %></div>
         </div>
         <div class="card">
             <div class="card-header">
-                <span class="card-title">Clients Actifs</span>
-                <div class="card-icon green">
-                    <i class="fas fa-users"></i>
-                </div>
+                <span class="card-title">Bilan (FCFA)</span>
+                <div class="card-icon danger"><i class="fas fa-money-bill-wave"></i></div>
             </div>
-            <div class="card-value" id="activeClientsCount">0</div>
-            <div class="card-footer">
-                <i class="fas fa-info-circle"></i> Total clients
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-header">
-                <span class="card-title">Revenu du Mois</span>
-                <div class="card-icon yellow">
-                    <i class="fas fa-euro-sign"></i>
-                </div>
-            </div>
-            <div class="card-value" id="monthlyRevenue">€0</div>
-            <div class="card-footer">
-                <i class="fas fa-info-circle"></i> Objectif: €15,000
-            </div>
+            <div class="card-value"><%= request.getAttribute("bilan") %></div>
         </div>
     </div>
 
-    <!-- Recent Activity Section -->
-    <h3 class="section-title"><i class="fas fa-clock"></i> Locations Récentes</h3>
-    <div class="activity-table">
-        <table id="recentRentalsTable">
-            <thead>
-            <tr>
-                <th>Client</th>
-                <th>Voiture</th>
-                <th>Date Début</th>
-                <th>Date Fin</th>
-                <th>Montant</th>
-                <th>Statut</th>
-                <th>Actions</th>
-            </tr>
-            </thead>
-            <tbody>
-            <!-- Les données seront chargées via JavaScript -->
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Return Car Modal -->
-    <div class="modal" id="returnCarModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Enregistrer le retour</h3>
-                <button class="close-modal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <form id="returnCarForm">
-                    <div class="form-group">
-                        <label for="returnKilometers">Nouveau kilométrage</label>
-                        <input type="number" id="returnKilometers" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="returnNotes">Notes (dommages, etc.)</label>
-                        <textarea id="returnNotes" class="form-control" rows="3"></textarea>
-                    </div>
-                    <input type="hidden" id="rentalId">
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary close-modal">Annuler</button>
-                <button class="btn btn-primary" id="confirmReturnBtn">Enregistrer</button>
-            </div>
-        </div>
-    </div>
+    <h3 class="section-title"><i class="fas fa-clock"></i> Locations en cours</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Client</th>
+            <th>Voiture</th>
+            <th>Montant (FCFA)</th>
+            <th>Jours</th>
+        </tr>
+        </thead>
+        <tbody>
+        <%
+            List<Location> locations = (List<Location>) request.getAttribute("locations");
+            if (locations != null && !locations.isEmpty()) {
+                for (Location l : locations) {
+        %>
+        <tr>
+            <td><%= l.getClient().getNom() %></td>
+            <td><%= l.getVoiture().getImmatriculation() %></td>
+            <td><%= l.getMontantTotal() %></td>
+            <td><%= l.getJours() %></td>
+        </tr>
+        <%
+            }
+        } else {
+        %>
+        <tr><td colspan="4" style="text-align:center;">Aucune location en cours</td></tr>
+        <%
+            }
+        %>
+        </tbody>
+    </table>
 </main>
 
-<script src="./js/dashboard.js"></script>
 </body>
 </html>

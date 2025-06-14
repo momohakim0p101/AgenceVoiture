@@ -1,405 +1,253 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: hakim01
-  Date: 06/06/2025
-  Time: 10:24
-  To change this template use File | Settings | File Templates.
---%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Gestionnaire - Agence de Location</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <link rel="stylesheet" href="./css/dashboard.css">
-  <link rel="stylesheet" href="./css/GestionClient.css">
-
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Gestion Voitures - Agence de Location</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link rel="stylesheet"  href="./css/dashboard.css">
+    <link rel="stylesheet" href="./css/GestionClient.css">
 </head>
 <body>
-
-<!-- Sidebar Navigation (identique au dashboard) -->
 <aside class="sidebar">
-  <div class="sidebar-header">
-    <h3><i class="fas fa-car"></i> <span>Agence Location</span></h3>
-  </div>
-  <ul class="sidebar-menu">
-    <li>
-      <a href="${pageContext.request.contextPath}/dashboardManager.jsp">
-        <i class="fas fa-tachometer-alt"></i>
-        <span>Dashboard</span>
-      </a>
-    </li>
-    <li>
-      <a href="${pageContext.request.contextPath}/GestionVoiture.jsp">
-        <i class="fas fa-car"></i>
-        <span>Gestion Voitures</span>
-      </a>
-    </li>
-    <li>
-      <a href="${pageContext.request.contextPath}/GestionClient.jsp" class="active">
-        <i class="fas fa-users"></i>
-        <span>Gestion Clients</span>
-      </a>
-    </li>
-    <li>
-      <a href="${pageContext.request.contextPath}/GestionLocation.jsp">
-        <i class="fas fa-file-contract"></i>
-        <span>Locations</span>
-      </a>
-    </li>
-  </ul>
+    <div class="sidebar-header">
+        <h3><i class="fas fa-car"></i> <span>Agence Location</span></h3>
+    </div>
+    <ul class="sidebar-menu">
+        <li><a href="DashboardManager.jsp"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+        <li><a href="GestionVoiture.jsp" class="active"><i class="fas fa-car"></i> <span>Gestion Voitures</span></a></li>
+        <li><a href="GestionClient.jsp"><i class="fas fa-users"></i> <span>Gestion Clients</span></a></li>
+        <li><a href="GestionLocation.jsp"><i class="fas fa-file-contract"></i> <span>Locations</span></a></li>
+    </ul>
 </aside>
 
-<!-- Main Content -->
 <main class="main-content">
-  <!-- Top Navigation (identique) -->
-  <div class="top-nav">
-    <div class="search-bar">
-      <i class="fas fa-search"></i>
-      <input type="text" placeholder="Rechercher une Voiture...">
-    </div>
-    <div class="user-profile">
-      <img src="https://randomuser.me/api/portraits/men/41.jpg" alt="Profile">
-      <div class="user-info">
-        <span class="user-name">${utilisateur.getNom()}</span>
-        <span class="user-role">Gestionnaire</span>
-      </div>
-      <button class="logout-btn" title="Déconnexion">
-        <i class="fas fa-sign-out-alt"></i>
-      </button>
-    </div>
-  </div>
-
-  <!-- Clients Management Section -->
-  <div class="page-header">
-    <h1 class="page-title"><i class="fas fa-users"></i> Gestion des Voitures</h1>
-    <button class="add-client-btn" id="addClientBtn">
-      <i class="fas fa-plus"></i> Ajouter une Voiture
-    </button>
-  </div>
-
-  <div class="clients-table-container">
-    <div class="table-header">
-      <h3>Liste des Voitures</h3>
-      <div class="table-actions">
-        <div class="search-clients">
-          <i class="fas fa-search"></i>
-          <input type="text" placeholder="Rechercher...">
+    <div class="top-nav">
+        <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input type="text" id="globalSearchInput" placeholder="Rechercher une voiture..." />
         </div>
-        <button class="filter-btn">
-          <i class="fas fa-filter"></i> Filtrer
+        <div class="user-profile">
+            <img src="https://randomuser.me/api/portraits/men/41.jpg" alt="Profile" />
+            <div class="user-info">
+                <span class="user-name">Jean Dupont</span>
+                <span class="user-role">Gestionnaire</span>
+            </div>
+            <button class="logout-btn" title="Déconnexion">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="page-header">
+        <h1 class="page-title"><i class="fas fa-car"></i> Gestion des Voitures</h1>
+        <button class="add-client-btn" id="addVoitureBtn">
+            <i class="fas fa-plus"></i> Ajouter une Voiture
         </button>
-      </div>
     </div>
 
-    <table>
-      <thead>
-      <tr>
-        <th>Immatriculation</th>
-        <th>Nombre de places</th>
-        <th>Marque</th>
-        <th>Modèle</th>
-        <th>Kilométrage</th>
-        <th>Date mise en Circulation</th>
-        <th>Type Carburant</th>
-        <th>Catégorie</th>
-        <th>Prix Location / Jour</th>
-        <th>Actions</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr>
-        <td>
-          <div class="client-name">
-            <img src="https://randomuser.me/api/portraits/men/32.jpg" class="client-avatar">
-            <span>Martin Bernard</span>
-          </div>
-        </td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td>
-          <button class="action-btn edit-btn" data-client-id="1">
-            <i class="fas fa-edit"></i> Modifier
-          </button>
-          <button class="action-btn delete-btn" data-client-id="1">
-            <i class="fas fa-trash"></i> Supprimer
-          </button>
-        </td>
-
-
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Add Client Modal -->
-  <div class="modal" id="clientModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 class="modal-title" id="modalTitle">Ajouter une Nouvelle Voiture</h3>
-        <button class="close-modal">&times;</button>
-      </div>
-      <div class="modal-body">
-        <form id="clientForm">
-          <div class="form-row">
-            <div class="form-group">
-              <label for="clientCIN">Immatriculation</label>
-              <input type="text" id="clientCIN" class="form-control" name="immatriculation" required>
+    <div class="clients-table-container">
+        <div class="table-header">
+            <h3>Liste des Voitures</h3>
+            <div class="table-actions">
+                <div class="search-clients">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="tableSearchInput" placeholder="Rechercher..." />
+                </div>
+                <button class="filter-btn">
+                    <i class="fas fa-filter"></i> Filtrer
+                </button>
             </div>
-            <div class="form-group">
-              <label for="clientGender">Catégorie</label>
-              <select id="clientGender" class="form-select" name="categorie" required>
-                <option value="">Catégorie</option>
-                <option value="berline">Berline</option>
-                <option value="suv">SUV</option>
-                <option value="autres">autres</option>
-              </select>
-            </div>
-          </div>
+        </div>
 
-          <div class="form-row">
-            <div class="form-group">
-              <label for="clientFirstName">Modèle</label>
-              <input type="text" id="clientFirstName" name="modele" class="form-control" required>
-            </div>
-            <div class="form-group">
-              <label for="clientLastName">Nombre de place</label>
-              <input type="text" id="clientLastName" class="form-control" required>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="kilo">kilométrage</label>
-            <input type="number" name="kilometrage" id="kilo" class="form-control">
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="clientEmail">Date mise en circulation</label>
-              <input type="date" id="clientEmail" name="datemiseCirculation" class="form-control" required>
-            </div>
-            <div class="form-group">
-              <label for="clientPhone">Disponibilité *</label>
-              <input type="" id="clientPhone" class="form-control" required>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="clientStatus">Statut</label>
-            <select id="clientStatus" class="form-select">
-              <option value="active">Actif</option>
-              <option value="inactive">Inactif</option>
-            </select>
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary close-modal">Annuler</button>
-        <button class="btn btn-primary" id="saveClientBtn">Enregistrer</button>
-      </div>
+        <table id="voituresTable">
+            <thead>
+            <tr>
+                <th>Immatriculation</th>
+                <th>Marque</th>
+                <th>Modèle</th>
+                <th>Places</th>
+                <th>Carburant</th>
+                <th>Catégorie</th>
+                <th>Prix/Jour</th>
+                <th>Disponible</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <c:forEach var="voiture" items="${voitures}">
+                <tr>
+                    <td>${voiture.immatriculation}</td>
+                    <td>${voiture.marque}</td>
+                    <td>${voiture.modele}</td>
+                    <td>${voiture.nombrePlaces}</td>
+                    <td>${voiture.typeCarburant}</td>
+                    <td>${voiture.categorie}</td>
+                    <td>${voiture.prixLocationJour} FCFA</td>
+                    <td>${voiture.disponible ? 'Oui' : 'Non'}</td>
+                    <td>
+                        <button class="action-btn edit-btn" data-voiture-id="${voiture.id}">
+                            <i class="fas fa-edit"></i> Modifier
+                        </button>
+                        <button class="action-btn delete-btn" data-voiture-id="${voiture.id}">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </button>
+                    </td>
+                </tr>
+            </c:forEach>
+            <c:if test="${empty voitures}">
+                <tr><td colspan="9" style="text-align:center;">Aucune voiture trouvée.</td></tr>
+            </c:if>
+            </tbody>
+        </table>
     </div>
-  </div>
 
-  <!-- Delete Confirmation Modal -->
-  <div class="modal" id="deleteModal">
-    <div class="modal-content" style="max-width: 500px;">
-      <div class="modal-header">
-        <h3 class="modal-title">Confirmer la suppression</h3>
-        <button class="close-modal">&times;</button>
-      </div>
-      <div class="modal-body">
-        <p>Êtes-vous sûr de vouloir supprimer ce client? Cette action est irréversible.</p>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary close-modal">Annuler</button>
-        <button class="btn btn-danger" id="confirmDeleteBtn">Supprimer</button>
-      </div>
+    <!-- Modals similaires pour Ajouter/Modifier et Supprimer voiture seront ici -->
+    <!-- Modal d'ajout -->
+    <div class="modal" id="addVoitureModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('addVoitureModal')">&times;</span>
+            <h2>Ajouter une Voiture</h2>
+            <form id="addVoitureForm">
+                <input type="text" name="immatriculation" placeholder="Immatriculation" required />
+                <input type="text" name="marque" placeholder="Marque" required />
+                <input type="text" name="modele" placeholder="Modèle" required />
+                <input type="number" name="nombrePlaces" placeholder="Nombre de places" required />
+                <input type="text" name="typeCarburant" placeholder="Type de carburant" required />
+                <input type="text" name="categorie" placeholder="Catégorie" required />
+                <input type="number" name="prixLocationJour" placeholder="Prix / jour" required />
+                <select name="disponible">
+                    <option value="true">Disponible</option>
+                    <option value="false">Indisponible</option>
+                </select>
+                <button type="submit">Ajouter</button>
+            </form>
+        </div>
     </div>
-  </div>
+
+    <!-- Modal de modification -->
+    <div class="modal" id="editVoitureModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('editVoitureModal')">&times;</span>
+            <h2>Modifier Voiture</h2>
+            <form id="editVoitureForm">
+                <input type="hidden" name="id" id="edit-id" />
+                <input type="text" name="immatriculation" id="edit-immatriculation" required />
+                <input type="text" name="marque" id="edit-marque" required />
+                <input type="text" name="modele" id="edit-modele" required />
+                <input type="number" name="nombrePlaces" id="edit-nombrePlaces" required />
+                <input type="text" name="typeCarburant" id="edit-typeCarburant" required />
+                <input type="text" name="categorie" id="edit-categorie" required />
+                <input type="number" name="prixLocationJour" id="edit-prixLocationJour" required />
+                <select name="disponible" id="edit-disponible">
+                    <option value="true">Disponible</option>
+                    <option value="false">Indisponible</option>
+                </select>
+                <button type="submit">Modifier</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de suppression -->
+    <div class="modal" id="deleteVoitureModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('deleteVoitureModal')">&times;</span>
+            <h2>Supprimer la voiture ?</h2>
+            <p>Voulez-vous vraiment supprimer cette voiture ?</p>
+            <form id="deleteVoitureForm">
+                <input type="hidden" name="id" id="delete-id" />
+                <button type="submit" class="delete-confirm-btn">Oui, supprimer</button>
+                <button type="button" onclick="closeModal('deleteVoitureModal')">Annuler</button>
+            </form>
+        </div>
+    </div>
+
 </main>
+
 <script>
-  // DOM Elements
-  const addClientBtn = document.getElementById('addClientBtn');
-  const clientModal = document.getElementById('clientModal');
-  const deleteModal = document.getElementById('deleteModal');
-  const closeModalBtns = document.querySelectorAll('.close-modal');
-  const saveClientBtn = document.getElementById('saveClientBtn');
-  const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-  const modalTitle = document.getElementById('modalTitle');
-  const clientForm = document.getElementById('clientForm');
+    document.addEventListener("DOMContentLoaded", () => {
+        // Ouvrir modal ajout
+        document.getElementById("addVoitureBtn").addEventListener("click", () => {
+            openModal("addVoitureModal");
+        });
 
-  // Current client being edited/deleted
-  let currentClientId = null;
-  let isEditMode = false;
+        // Soumission formulaire d'ajout
+        document.getElementById("addVoitureForm").addEventListener("submit", (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            fetch("VoitureServlet", {
+                method: "POST",
+                body: formData,
+            })
+                .then(() => location.reload());
+        });
 
-  // Event Listeners
-  addClientBtn.addEventListener('click', openAddClientModal);
-  saveClientBtn.addEventListener('click', saveClient);
-  confirmDeleteBtn.addEventListener('click', deleteClient);
+        // Préremplir et ouvrir modal de modification
+        document.querySelectorAll(".edit-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const id = btn.dataset.voitureId;
+                fetch(`VoitureServlet?action=get&id=${id}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        document.getElementById("edit-id").value = data.id;
+                        document.getElementById("edit-immatriculation").value = data.immatriculation;
+                        document.getElementById("edit-marque").value = data.marque;
+                        document.getElementById("edit-modele").value = data.modele;
+                        document.getElementById("edit-nombrePlaces").value = data.nombrePlaces;
+                        document.getElementById("edit-typeCarburant").value = data.typeCarburant;
+                        document.getElementById("edit-categorie").value = data.categorie;
+                        document.getElementById("edit-prixLocationJour").value = data.prixLocationJour;
+                        document.getElementById("edit-disponible").value = data.disponible;
+                        openModal("editVoitureModal");
+                    });
+            });
+        });
 
-  // Edit/Delete buttons event delegation
-  document.addEventListener('click', function(e) {
-    // Edit button
-    if (e.target.closest('.edit-btn')) {
-      const btn = e.target.closest('.edit-btn');
-      currentClientId = btn.dataset.clientId;
-      isEditMode = true;
-      openEditClientModal(currentClientId);
-    }
+        // Soumission formulaire de modification
+        document.getElementById("editVoitureForm").addEventListener("submit", (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            formData.append("action", "update");
+            fetch("VoitureServlet", {
+                method: "POST",
+                body: formData,
+            })
+                .then(() => location.reload());
+        });
 
-    // Delete button
-    if (e.target.closest('.delete-btn')) {
-      const btn = e.target.closest('.delete-btn');
-      currentClientId = btn.dataset.clientId;
-      openDeleteModal();
-    }
-  });
+        // Ouvrir modal de suppression
+        document.querySelectorAll(".delete-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const id = btn.dataset.voitureId;
+                document.getElementById("delete-id").value = id;
+                openModal("deleteVoitureModal");
+            });
+        });
 
-  // Modal functions
-  function openAddClientModal() {
-    isEditMode = false;
-    modalTitle.textContent = 'Ajouter un Nouveau Client';
-    clientForm.reset();
-    openModal(clientModal);
-  }
-
-  function openEditClientModal(clientId) {
-    // In a real app, you would fetch client data from your backend
-    // Here we simulate with dummy data
-    const dummyData = {
-      '1': {
-        cin: 'AB123456',
-        firstName: 'Martin',
-        lastName: 'Bernard',
-        gender: 'M',
-        address: '12 Rue de la Paix, Paris',
-        email: 'martin.bernard@example.com',
-        phone: '0612345678',
-        status: 'active'
-      },
-      '2': {
-        cin: 'CD789012',
-        firstName: 'Sophie',
-        lastName: 'Lambert',
-        gender: 'F',
-        address: '34 Avenue des Champs, Lyon',
-        email: 'sophie.lambert@example.com',
-        phone: '0698765432',
-        status: 'active'
-      }
-    };
-
-    const clientData = dummyData[clientId] || dummyData['1'];
-
-    // Fill the form
-    document.getElementById('clientCIN').value = clientData.cin;
-    document.getElementById('clientFirstName').value = clientData.firstName;
-    document.getElementById('clientLastName').value = clientData.lastName;
-    document.getElementById('clientGender').value = clientData.gender;
-    document.getElementById('clientAddress').value = clientData.address;
-    document.getElementById('clientEmail').value = clientData.email;
-    document.getElementById('clientPhone').value = clientData.phone;
-    document.getElementById('clientStatus').value = clientData.status;
-
-    modalTitle.textContent = 'Modifier Client';
-    openModal(clientModal);
-  }
-
-  function openDeleteModal() {
-    openModal(deleteModal);
-  }
-
-  function openModal(modal) {
-    modal.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-  }
-
-  function closeModal(modal) {
-    modal.style.display = 'none';
-    document.body.style.overflow = 'auto';
-  }
-
-  // Close modals when clicking outside
-  window.addEventListener('click', (e) => {
-    if (e.target.classList.contains('modal')) {
-      closeModal(e.target);
-    }
-  });
-
-  // Close modals with close buttons
-  closeModalBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const modal = btn.closest('.modal');
-      closeModal(modal);
+        // Soumission formulaire suppression
+        document.getElementById("deleteVoitureForm").addEventListener("submit", (e) => {
+            e.preventDefault();
+            const id = document.getElementById("delete-id").value;
+            fetch(`VoitureServlet?action=delete&id=${id}`, {
+                method: "GET"
+            })
+                .then(() => location.reload());
+        });
     });
-  });
 
-  // Form submission
-  function saveClient() {
-    // Validate form
-    if (!clientForm.checkValidity()) {
-      alert('Veuillez remplir tous les champs obligatoires');
-      return;
+    // Fonctions utilitaires
+    function openModal(id) {
+        document.getElementById(id).style.display = "block";
     }
-
-    // Get form data
-    const clientData = {
-      cin: document.getElementById('clientCIN').value,
-      firstName: document.getElementById('clientFirstName').value,
-      lastName: document.getElementById('clientLastName').value,
-      gender: document.getElementById('clientGender').value,
-      address: document.getElementById('clientAddress').value,
-      email: document.getElementById('clientEmail').value,
-      phone: document.getElementById('clientPhone').value,
-      status: document.getElementById('clientStatus').value
-    };
-
-    // In a real app, you would send this to your backend
-    console.log(isEditMode ? 'Updating client:' : 'Adding new client:', clientData);
-
-    // Show success message
-    alert(`Client ${isEditMode ? 'modifié' : 'ajouté'} avec succès!`);
-
-    // Close modal and reset form
-    closeModal(clientModal);
-    clientForm.reset();
-
-    // In a real app, you would refresh the client list
-  }
-
-  function deleteClient() {
-    // In a real app, you would send a delete request to your backend
-    console.log('Deleting client with ID:', currentClientId);
-
-    // Show success message
-    alert('Client supprimé avec succès!');
-
-    // Close modal
-    closeModal(deleteModal);
-
-    // In a real app, you would remove the client from the table or refresh the list
-  }
-
-  // Search functionality
-  document.querySelector('.search-bar input').addEventListener('input', (e) => {
-    const searchTerm = e.target.value.toLowerCase();
-    // Implement search logic here
-    console.log('Searching clients for:', searchTerm);
-  });
-
-  document.querySelector('.search-clients input').addEventListener('input', (e) => {
-    const searchTerm = e.target.value.toLowerCase();
-    // Implement table search logic here
-    console.log('Filtering table for:', searchTerm);
-  });
+    function closeModal(id) {
+        document.getElementById(id).style.display = "none";
+    }
 </script>
+
 </body>
 </html>

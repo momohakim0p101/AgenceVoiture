@@ -1,21 +1,46 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: hakim01
-  Date: 06/06/2025
-  Time: 10:24
-  To change this template use File | Settings | File Templates.
---%>
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.util.*, java.math.BigDecimal, java.text.DecimalFormat" %>
+<%@ page import="com.agence.agencevoiture.entity.*" %>
+
+<%
+    DecimalFormat df = new DecimalFormat("#,###");
+
+    Utilisateur utilisateur = (Utilisateur) request.getAttribute("utilisateur");
+    if (utilisateur == null) {
+        utilisateur = (Utilisateur) session.getAttribute("utilisateur");
+    }
+
+    Long totalVoituresAttr = (Long) request.getAttribute("totalVoitures");
+    long totalVoitures = totalVoituresAttr != null ? totalVoituresAttr : 0L;
+
+    List<Location> locationsEnCours = (List<Location>) request.getAttribute("locationsEnCours");
+    if (locationsEnCours == null) {
+        locationsEnCours = new ArrayList<>();
+    }
+
+    List<Voiture> voituresDisponibles = (List<Voiture>) request.getAttribute("voituresDisponibles");
+    if (voituresDisponibles == null) {
+        voituresDisponibles = new ArrayList<>();
+    }
+
+    BigDecimal revenuMois = (BigDecimal) request.getAttribute("revenuMois");
+    if (revenuMois == null) {
+        revenuMois = BigDecimal.ZERO;
+    }
+
+    int nbVoituresDispo = voituresDisponibles.size();
+    int nbVoituresLouees = locationsEnCours.size();
+%>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Gestionnaire - Agence de Location</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="./css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
+
 <body>
 
 <aside class="sidebar">
@@ -23,160 +48,149 @@
         <h3><i class="fas fa-car"></i> <span>Agence Location</span></h3>
     </div>
     <ul class="sidebar-menu">
-        <li>
-            <a href="#" class="active">
-                <i class="fas fa-tachometer-alt"></i>
-                <span>Dashboard</span>
-            </a>
-        </li>
-        <li>
-            <a href="${pageContext.request.contextPath}/manager/voitures">
-                <i class="fas fa-car"></i>
-                <span>Gestion Voitures</span>
-            </a>
-        </li>
-        <li>
-            <a href="${pageContext.request.contextPath}/GestionClient.jsp">
-                <i class="fas fa-users"></i>
-                <span>Gestion Clients</span>
-            </a>
-        </li>
-        <li>
-            <a href="${pageContext.request.contextPath}/manager/locations">
-                <i class="fas fa-file-contract"></i>
-                <span>Locations</span>
-            </a>
-        </li>
-        <li>
-            <a href="${pageContext.request.contextPath}/manager/recherche">
-                <i class="fas fa-search"></i>
-                <span>Recherche Avancée</span>
-            </a>
-        </li>
+        <li><a href="${pageContext.request.contextPath}/DashboardManager.jsp" class="active"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+        <li><a href="${pageContext.request.contextPath}/GestionVoiture.jsp"><i class="fas fa-car"></i> <span>Gestion Voitures</span></a></li>
+        <li><a href="${pageContext.request.contextPath}/GestionClient.jsp"><i class="fas fa-users"></i> <span>Gestion Clients</span></a></li>
+        <li><a href="${pageContext.request.contextPath}/GestionLocation.jsp"><i class="fas fa-file-contract"></i> <span>Locations</span></a></li>
+        <li><a href="#"><i class="fas fa-search"></i> <span>Recherche Avancée</span></a></li>
+        <li><a href="#"><i class="fas fa-chart-line"></i> <span>Statistiques</span></a></li>
     </ul>
 </aside>
 
-<!-- Main Content -->
 <main class="main-content">
-    <!-- Top Navigation -->
     <div class="top-nav">
         <div class="search-bar">
             <i class="fas fa-search"></i>
-            <input type="text" id="globalSearch" placeholder="Rechercher voiture, client...">
+            <input type="text" id="searchInput" placeholder="Rechercher voiture, client...">
         </div>
+
         <div class="user-profile">
-            <img src="${pageContext.request.contextPath}/images/profile.jpg" alt="Profile">
+            <img src="https://randomuser.me/api/portraits/men/41.jpg" alt="Profile">
             <div class="user-info">
-                <span class="user-name">${sessionScope.gestionnaire.prenom} ${sessionScope.gestionnaire.nom}</span>
-                <span class="user-role">Gestionnaire</span>
+                <% if (utilisateur != null) { %>
+                <span class="user-name"><%= utilisateur.getNom() %></span>
+                <span class="user-role"><%= utilisateur.getRole() %></span>
+                <% } else { %>
+                <span class="user-name">Utilisateur non connecté</span>
+                <span class="user-role">Rôle inconnu</span>
+                <% } %>
             </div>
-            <button class="logout-btn" title="Déconnexion" id="logoutBtn">
-                <i class="fas fa-sign-out-alt"></i>
+            <button class="logout-btn" title="Déconnexion">
+                <a href="<%= request.getContextPath() %>/LogoutServlet"><i class="fas fa-sign-out-alt"></i></a>
             </button>
         </div>
     </div>
 
-    <!-- Dashboard Cards -->
     <div class="dashboard-cards">
         <div class="card">
             <div class="card-header">
                 <span class="card-title">Voitures Disponibles</span>
-                <div class="card-icon blue">
-                    <i class="fas fa-car"></i>
-                </div>
+                <div class="card-icon blue"><i class="fas fa-car"></i></div>
             </div>
-            <div class="card-value" id="availableCarsCount">0</div>
+            <div class="card-value"><%= nbVoituresDispo %></div>
             <div class="card-footer">
-                <i class="fas fa-info-circle"></i> Dernière mise à jour: <span id="lastUpdateTime"></span>
+                <i class="fas fa-arrow-up"></i>
+                <%= totalVoitures > 0 ? (nbVoituresDispo * 100 / totalVoitures) : 0 %>% du parc
             </div>
         </div>
+
         <div class="card">
             <div class="card-header">
                 <span class="card-title">Voitures Louées</span>
-                <div class="card-icon red">
-                    <i class="fas fa-car-side"></i>
-                </div>
+                <div class="card-icon red"><i class="fas fa-car-side"></i></div>
             </div>
-            <div class="card-value" id="rentedCarsCount">0</div>
+            <div class="card-value"><%= nbVoituresLouees %></div>
             <div class="card-footer">
-                <i class="fas fa-info-circle"></i> En cours cette semaine
+                <i class="fas fa-arrow-down"></i>
+                <%= totalVoitures > 0 ? (nbVoituresLouees * 100 / totalVoitures) : 0 %>% du parc
             </div>
         </div>
+
         <div class="card">
             <div class="card-header">
                 <span class="card-title">Clients Actifs</span>
-                <div class="card-icon green">
-                    <i class="fas fa-users"></i>
-                </div>
+                <div class="card-icon green"><i class="fas fa-users"></i></div>
             </div>
-            <div class="card-value" id="activeClientsCount">0</div>
+            <div class="card-value"><%= request.getAttribute("clientsActifs") != null ? request.getAttribute("clientsActifs") : 0 %></div>
             <div class="card-footer">
-                <i class="fas fa-info-circle"></i> Total clients
+                <i class="fas fa-arrow-up"></i>
+                <%= request.getAttribute("pourcentageClientsMois") != null ? request.getAttribute("pourcentageClientsMois") : 0 %>% ce mois
             </div>
         </div>
+
         <div class="card">
             <div class="card-header">
                 <span class="card-title">Revenu du Mois</span>
-                <div class="card-icon yellow">
-                    <i class="fas fa-euro-sign"></i>
-                </div>
+                <div class="card-icon yellow"><i class="fas fa-euro-sign"></i></div>
             </div>
-            <div class="card-value" id="monthlyRevenue">€0</div>
+            <div class="card-value"><%= df.format(revenuMois) %> F CFA</div>
             <div class="card-footer">
-                <i class="fas fa-info-circle"></i> Objectif: €15,000
+                <i class="fas fa-arrow-up"></i> Ce mois
             </div>
         </div>
     </div>
 
-    <!-- Recent Activity Section -->
-    <h3 class="section-title"><i class="fas fa-clock"></i> Locations Récentes</h3>
-    <div class="activity-table">
-        <table id="recentRentalsTable">
-            <thead>
-            <tr>
-                <th>Client</th>
-                <th>Voiture</th>
-                <th>Date Début</th>
-                <th>Date Fin</th>
-                <th>Montant</th>
-                <th>Statut</th>
-                <th>Actions</th>
-            </tr>
-            </thead>
-            <tbody>
-            <!-- Les données seront chargées via JavaScript -->
-            </tbody>
-        </table>
+    <h2 class="section-title"><i class="fas fa-file-contract"></i> Locations en cours</h2>
+
+    <!-- Champ recherche local au tableau -->
+    <div style="margin-bottom: 10px;">
+        <input type="text" id="searchInputTable" placeholder="Filtrer le tableau des locations...">
     </div>
 
-    <!-- Return Car Modal -->
-    <div class="modal" id="returnCarModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Enregistrer le retour</h3>
-                <button class="close-modal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <form id="returnCarForm">
-                    <div class="form-group">
-                        <label for="returnKilometers">Nouveau kilométrage</label>
-                        <input type="number" id="returnKilometers" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="returnNotes">Notes (dommages, etc.)</label>
-                        <textarea id="returnNotes" class="form-control" rows="3"></textarea>
-                    </div>
-                    <input type="hidden" id="rentalId">
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary close-modal">Annuler</button>
-                <button class="btn btn-primary" id="confirmReturnBtn">Enregistrer</button>
-            </div>
-        </div>
-    </div>
+    <table class="activity-table">
+        <thead>
+        <tr>
+            <th>Client</th>
+            <th>Voiture</th>
+            <th>Date début</th>
+            <th>Date fin</th>
+            <th>Montant</th>
+            <th>Statut</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% if (!locationsEnCours.isEmpty()) {
+            for(Location l : locationsEnCours) { %>
+        <tr>
+            <td><%= l.getClient().getPrenom() + " " + l.getClient().getNom() %></td>
+            <td><%= l.getVoiture().getMarque() + " " + l.getVoiture().getModele() %></td>
+            <td><%= l.getDateDebut() %></td>
+            <td><%= l.getDateFin() %></td>
+            <td><%= df.format(l.getMontantTotal()) %> F CFA</td>
+            <td>
+                <button class="action-btn edit-btn"><%= l.getStatut() %></button>
+                <button class="action-btn delete-btn"><i class="fas fa-trash"></i></button>
+            </td>
+        </tr>
+        <%  }
+        } else { %>
+        <tr><td colspan="6" style="text-align:center;">Aucune location en cours</td></tr>
+        <% } %>
+        </tbody>
+    </table>
 </main>
 
-<script src="./js/dashboard.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const input = document.getElementById("searchInputTable");
+        const rows = document.querySelectorAll(".activity-table tbody tr");
+
+        input.addEventListener("input", function () {
+            const filter = input.value.toLowerCase();
+
+            rows.forEach(row => {
+                const client = row.cells[0]?.textContent.toLowerCase() || "";
+                const voiture = row.cells[1]?.textContent.toLowerCase() || "";
+
+                if (client.includes(filter) || voiture.includes(filter)) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        });
+    });
+</script>
+
 </body>
 </html>
