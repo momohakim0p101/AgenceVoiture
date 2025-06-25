@@ -1,6 +1,15 @@
+<%@ page import="com.agence.agencevoiture.entity.Utilisateur" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+
+<%
+    Utilisateur utilisateur = (Utilisateur) request.getAttribute("utilisateur");
+    if (utilisateur == null) {
+        utilisateur = (Utilisateur) session.getAttribute("utilisateur");
+    }
+    // CSRF token example (if CSRF protection is added)
+    String csrfToken = (String) session.getAttribute("csrfToken");
+%>
 
 <!DOCTYPE html>
 <html lang="fr">
@@ -10,8 +19,8 @@
     <title>Gestion Voitures - Agence de Location</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-    <link rel="stylesheet"  href="./css/dashboard.css">
-    <link rel="stylesheet" href="./css/GestionClient.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dashboard.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/GestionClient.css">
 </head>
 <body>
 <aside class="sidebar">
@@ -19,10 +28,10 @@
         <h3><i class="fas fa-car"></i> <span>Agence Location</span></h3>
     </div>
     <ul class="sidebar-menu">
-        <li><a href="DashboardManager.jsp"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
-        <li><a href="GestionVoiture.jsp" class="active"><i class="fas fa-car"></i> <span>Gestion Voitures</span></a></li>
-        <li><a href="GestionClient.jsp"><i class="fas fa-users"></i> <span>Gestion Clients</span></a></li>
-        <li><a href="GestionLocation.jsp"><i class="fas fa-file-contract"></i> <span>Locations</span></a></li>
+        <li><a href="${pageContext.request.contextPath}/DashboardManagerServlet"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+        <li><a href="${pageContext.request.contextPath}/VoitureServlet?action=view" class="active"><i class="fas fa-car"></i> Gestion Voitures</a></li>
+        <li><a href="${pageContext.request.contextPath}/ClientServlet"><i class="fas fa-users"></i> Gestion Clients</a></li>
+        <li><a href="${pageContext.request.contextPath}/GestionLocation.jsp"><i class="fas fa-file-contract"></i> Locations</a></li>
     </ul>
 </aside>
 
@@ -35,18 +44,26 @@
         <div class="user-profile">
             <img src="https://randomuser.me/api/portraits/men/41.jpg" alt="Profile" />
             <div class="user-info">
-                <span class="user-name">Jean Dupont</span>
-                <span class="user-role">Gestionnaire</span>
+                <span class="user-name"><%= utilisateur != null ? utilisateur.getNom() : "Utilisateur non connecté" %></span>
+                <span class="user-role"><%= utilisateur != null ? utilisateur.getRole() : "Rôle inconnu" %></span>
             </div>
-            <button class="logout-btn" title="Déconnexion">
-                <i class="fas fa-sign-out-alt"></i>
-            </button>
+            <form method="get" action="${pageContext.request.contextPath}/LogoutServlet" style="display:inline;">
+                <button class="logout-btn" title="Déconnexion" type="submit">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </form>
         </div>
     </div>
 
+    <c:if test="${not empty param.error}">
+        <div class="alert-error">
+            <p>Erreur : ${param.error}</p>
+        </div>
+    </c:if>
+
     <div class="page-header">
         <h1 class="page-title"><i class="fas fa-car"></i> Gestion des Voitures</h1>
-        <button class="add-client-btn" id="addVoitureBtn">
+        <button class="add-client-btn" onclick="openModal('addVoitureModal')">
             <i class="fas fa-plus"></i> Ajouter une Voiture
         </button>
     </div>
@@ -59,24 +76,14 @@
                     <i class="fas fa-search"></i>
                     <input type="text" id="tableSearchInput" placeholder="Rechercher..." />
                 </div>
-                <button class="filter-btn">
-                    <i class="fas fa-filter"></i> Filtrer
-                </button>
             </div>
         </div>
 
         <table id="voituresTable">
             <thead>
             <tr>
-                <th>Immatriculation</th>
-                <th>Marque</th>
-                <th>Modèle</th>
-                <th>Places</th>
-                <th>Carburant</th>
-                <th>Catégorie</th>
-                <th>Prix/Jour</th>
-                <th>Disponible</th>
-                <th>Actions</th>
+                <th>Immatriculation</th><th>Marque</th><th>Modèle</th><th>Places</th><th>Carburant</th>
+                <th>Catégorie</th><th>Prix/Jour</th><th>Disponible</th><th>Date Mise en Circulation</th><th>Kilométrage</th><th>Actions</th>
             </tr>
             </thead>
             <tbody>
@@ -89,165 +96,204 @@
                     <td>${voiture.typeCarburant}</td>
                     <td>${voiture.categorie}</td>
                     <td>${voiture.prixLocationJour} FCFA</td>
-                    <td>${voiture.disponible ? 'Oui' : 'Non'}</td>
+                    <td><c:choose><c:when test="${voiture.disponible}">Oui</c:when><c:otherwise>Non</c:otherwise></c:choose></td>
+                    <td>${voiture.dateMiseEnCirculation}</td>
+                    <td>${voiture.kilometrage} km</td>
                     <td>
-                        <button class="action-btn edit-btn" data-voiture-id="${voiture.id}">
+                        <button class="action-btn edit-btn" onclick="openEditModal('${voiture.immatriculation}')">
                             <i class="fas fa-edit"></i> Modifier
                         </button>
-                        <button class="action-btn delete-btn" data-voiture-id="${voiture.id}">
+                        <button class="action-btn delete-btn" onclick="openDeleteModal('${voiture.immatriculation}')">
                             <i class="fas fa-trash"></i> Supprimer
                         </button>
                     </td>
                 </tr>
             </c:forEach>
             <c:if test="${empty voitures}">
-                <tr><td colspan="9" style="text-align:center;">Aucune voiture trouvée.</td></tr>
+                <tr><td colspan="11" style="text-align:center;">Aucune voiture trouvée.</td></tr>
             </c:if>
             </tbody>
         </table>
     </div>
 
-    <!-- Modals similaires pour Ajouter/Modifier et Supprimer voiture seront ici -->
-    <!-- Modal d'ajout -->
+    <!-- Modales d'ajout, modification, suppression incluses ici (même structure, mais formulaire avec champ caché CSRF si activé) -->
+
+    <!-- Ajout -->
     <div class="modal" id="addVoitureModal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('addVoitureModal')">&times;</span>
             <h2>Ajouter une Voiture</h2>
-            <form id="addVoitureForm">
+            <form method="post" action="${pageContext.request.contextPath}/VoitureServlet">
+                <input type="hidden" name="action" value="save" />
+
                 <input type="text" name="immatriculation" placeholder="Immatriculation" required />
-                <input type="text" name="marque" placeholder="Marque" required />
-                <input type="text" name="modele" placeholder="Modèle" required />
-                <input type="number" name="nombrePlaces" placeholder="Nombre de places" required />
-                <input type="text" name="typeCarburant" placeholder="Type de carburant" required />
-                <input type="text" name="categorie" placeholder="Catégorie" required />
-                <input type="number" name="prixLocationJour" placeholder="Prix / jour" required />
-                <select name="disponible">
+
+                <select name="marque" required>
+                    <option value="">-- Choisir une marque --</option>
+                    <option value="Toyota">Toyota</option>
+                    <option value="Renault">Renault</option>
+                    <option value="Peugeot">Peugeot</option>
+                    <option value="Ford">Ford</option>
+                    <option value="BMW">BMW</option>
+                </select>
+
+                <select name="modele" required>
+                    <option value="">-- Choisir un modèle --</option>
+                    <option value="Modèle A">Modèle A</option>
+                    <option value="Modèle B">Modèle B</option>
+                    <option value="Modèle C">Modèle C</option>
+                    <option value="Modèle D">Modèle D</option>
+                </select>
+
+                <select name="nombrePlaces" required>
+                    <option value="">-- Nombre de places --</option>
+                    <option value="2">2</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="7">7</option>
+                </select>
+
+                <select name="typeCarburant" required>
+                    <option value="">-- Type de carburant --</option>
+                    <option value="Essence">Essence</option>
+                    <option value="Diesel">Diesel</option>
+                    <option value="Électrique">Électrique</option>
+                    <option value="Hybride">Hybride</option>
+                </select>
+
+                <select name="categorie" required>
+                    <option value="">-- Catégorie --</option>
+                    <option value="Économique">Économique</option>
+                    <option value="Berline">Berline</option>
+                    <option value="SUV">SUV</option>
+                    <option value="Luxe">Luxe</option>
+                </select>
+
+                <input type="number" name="prixLocationJour" placeholder="Prix / jour" required min="0" step="0.01" />
+
+                <select name="disponible" required>
                     <option value="true">Disponible</option>
                     <option value="false">Indisponible</option>
                 </select>
+
+                <label>Date mise en circulation :</label>
+                <input type="date" name="dateMiseEnCirculation" />
+
+                <label>Kilométrage :</label>
+                <input type="number" name="kilometrage" min="0" step="0.1" placeholder="Kilométrage" />
+
                 <button type="submit">Ajouter</button>
             </form>
         </div>
     </div>
 
-    <!-- Modal de modification -->
-    <div class="modal" id="editVoitureModal">
+    <div class="modal" id="addVoitureModal">
         <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('editVoitureModal')">&times;</span>
-            <h2>Modifier Voiture</h2>
-            <form id="editVoitureForm">
-                <input type="hidden" name="id" id="edit-id" />
-                <input type="text" name="immatriculation" id="edit-immatriculation" required />
-                <input type="text" name="marque" id="edit-marque" required />
-                <input type="text" name="modele" id="edit-modele" required />
-                <input type="number" name="nombrePlaces" id="edit-nombrePlaces" required />
-                <input type="text" name="typeCarburant" id="edit-typeCarburant" required />
-                <input type="text" name="categorie" id="edit-categorie" required />
-                <input type="number" name="prixLocationJour" id="edit-prixLocationJour" required />
-                <select name="disponible" id="edit-disponible">
+            <span class="close-btn" onclick="closeModal('addVoitureModal')">&times;</span>
+            <h2>Ajouter une Voiture</h2>
+            <form method="post" action="${pageContext.request.contextPath}/VoitureServlet">
+                <input type="hidden" name="action" value="save" />
+
+                <input type="text" name="immatriculation" placeholder="Immatriculation" required />
+
+                <select name="marque" required>
+                    <option value="">-- Choisir une marque --</option>
+                    <option value="Toyota">Toyota</option>
+                    <option value="Renault">Renault</option>
+                    <option value="Peugeot">Peugeot</option>
+                    <option value="Ford">Ford</option>
+                    <option value="BMW">BMW</option>
+                </select>
+
+                <select name="modele" required>
+                    <option value="">-- Choisir un modèle --</option>
+                    <option value="Modèle A">Modèle A</option>
+                    <option value="Modèle B">Modèle B</option>
+                    <option value="Modèle C">Modèle C</option>
+                    <option value="Modèle D">Modèle D</option>
+                </select>
+
+                <select name="nombrePlaces" required>
+                    <option value="">-- Nombre de places --</option>
+                    <option value="2">2</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="7">7</option>
+                </select>
+
+                <select name="typeCarburant" required>
+                    <option value="">-- Type de carburant --</option>
+                    <option value="Essence">Essence</option>
+                    <option value="Diesel">Diesel</option>
+                    <option value="Électrique">Électrique</option>
+                    <option value="Hybride">Hybride</option>
+                </select>
+
+                <select name="categorie" required>
+                    <option value="">-- Catégorie --</option>
+                    <option value="Économique">Économique</option>
+                    <option value="Berline">Berline</option>
+                    <option value="SUV">SUV</option>
+                    <option value="Luxe">Luxe</option>
+                </select>
+
+                <input type="number" name="prixLocationJour" placeholder="Prix / jour" required min="0" step="0.01" />
+
+                <select name="disponible" required>
                     <option value="true">Disponible</option>
                     <option value="false">Indisponible</option>
                 </select>
-                <button type="submit">Modifier</button>
+
+                <label>Date mise en circulation :</label>
+                <input type="date" name="dateMiseEnCirculation" />
+
+                <label>Kilométrage :</label>
+                <input type="number" name="kilometrage" min="0" step="0.1" placeholder="Kilométrage" />
+
+                <button type="submit">Ajouter</button>
             </form>
         </div>
     </div>
 
-    <!-- Modal de suppression -->
     <div class="modal" id="deleteVoitureModal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('deleteVoitureModal')">&times;</span>
             <h2>Supprimer la voiture ?</h2>
             <p>Voulez-vous vraiment supprimer cette voiture ?</p>
-            <form id="deleteVoitureForm">
-                <input type="hidden" name="id" id="delete-id" />
+            <form method="post" action="${pageContext.request.contextPath}/VoitureServlet">
+                <input type="hidden" name="action" value="delete" />
+                <input type="hidden" name="immatriculation" id="delete-immatriculation" />
                 <button type="submit" class="delete-confirm-btn">Oui, supprimer</button>
                 <button type="button" onclick="closeModal('deleteVoitureModal')">Annuler</button>
             </form>
         </div>
     </div>
 
+
 </main>
 
 <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        // Ouvrir modal ajout
-        document.getElementById("addVoitureBtn").addEventListener("click", () => {
-            openModal("addVoitureModal");
-        });
-
-        // Soumission formulaire d'ajout
-        document.getElementById("addVoitureForm").addEventListener("submit", (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            fetch("VoitureServlet", {
-                method: "POST",
-                body: formData,
-            })
-                .then(() => location.reload());
-        });
-
-        // Préremplir et ouvrir modal de modification
-        document.querySelectorAll(".edit-btn").forEach(btn => {
-            btn.addEventListener("click", () => {
-                const id = btn.dataset.voitureId;
-                fetch(`VoitureServlet?action=get&id=${id}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        document.getElementById("edit-id").value = data.id;
-                        document.getElementById("edit-immatriculation").value = data.immatriculation;
-                        document.getElementById("edit-marque").value = data.marque;
-                        document.getElementById("edit-modele").value = data.modele;
-                        document.getElementById("edit-nombrePlaces").value = data.nombrePlaces;
-                        document.getElementById("edit-typeCarburant").value = data.typeCarburant;
-                        document.getElementById("edit-categorie").value = data.categorie;
-                        document.getElementById("edit-prixLocationJour").value = data.prixLocationJour;
-                        document.getElementById("edit-disponible").value = data.disponible;
-                        openModal("editVoitureModal");
-                    });
-            });
-        });
-
-        // Soumission formulaire de modification
-        document.getElementById("editVoitureForm").addEventListener("submit", (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            formData.append("action", "update");
-            fetch("VoitureServlet", {
-                method: "POST",
-                body: formData,
-            })
-                .then(() => location.reload());
-        });
-
-        // Ouvrir modal de suppression
-        document.querySelectorAll(".delete-btn").forEach(btn => {
-            btn.addEventListener("click", () => {
-                const id = btn.dataset.voitureId;
-                document.getElementById("delete-id").value = id;
-                openModal("deleteVoitureModal");
-            });
-        });
-
-        // Soumission formulaire suppression
-        document.getElementById("deleteVoitureForm").addEventListener("submit", (e) => {
-            e.preventDefault();
-            const id = document.getElementById("delete-id").value;
-            fetch(`VoitureServlet?action=delete&id=${id}`, {
-                method: "GET"
-            })
-                .then(() => location.reload());
-        });
-    });
-
-    // Fonctions utilitaires
     function openModal(id) {
         document.getElementById(id).style.display = "block";
     }
     function closeModal(id) {
         document.getElementById(id).style.display = "none";
     }
+    function openEditModal(immatriculation) {
+        document.getElementById("edit-immatriculation").value = immatriculation;
+        document.getElementById("edit-immatriculation-display").value = immatriculation;
+        openModal("editVoitureModal");
+    }
+    function openDeleteModal(immatriculation) {
+        document.getElementById("delete-immatriculation").value = immatriculation;
+        openModal("deleteVoitureModal");
+    }
+    document.getElementById("tableSearchInput").addEventListener("input", function() {
+        const filter = this.value.toLowerCase();
+        document.querySelectorAll("#voituresTable tbody tr").forEach(row => {
+            row.style.display = row.textContent.toLowerCase().includes(filter) ? "" : "none";
+        });
+    });
 </script>
-
 </body>
 </html>

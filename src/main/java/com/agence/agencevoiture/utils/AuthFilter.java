@@ -18,7 +18,7 @@ public class AuthFilter implements  Filter {
 
         // Si pas connecté ou utilisateur absent de la session
         if (session == null || session.getAttribute("utilisateur") == null) {
-            res.sendRedirect("accueil.jsp");
+            res.sendRedirect("Acceuil.jsp");
             return;
         }
         // Vérification du rôle pour chaque page
@@ -26,9 +26,9 @@ public class AuthFilter implements  Filter {
         String uri = req.getRequestURI();
 
         if (uri.contains("dashboardChef.jsp") && !"CHEF".equalsIgnoreCase(role)) {
-            res.sendRedirect("accueil.jsp");
+            res.sendRedirect("Acceuil.jsp");
         } else if (uri.contains("dashboardManager.jsp") && !"GESTIONNAIRE".equalsIgnoreCase(role)) {
-            res.sendRedirect("accueil.jsp");
+            res.sendRedirect("Acceuil.jsp");
         } else {
             chain.doFilter(request, response); // Laisser passer
         }

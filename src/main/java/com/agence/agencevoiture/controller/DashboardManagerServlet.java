@@ -1,9 +1,12 @@
 package com.agence.agencevoiture.controller;
 
+import com.agence.agencevoiture.entity.Client;
 import com.agence.agencevoiture.entity.Location;
 import com.agence.agencevoiture.entity.Utilisateur;
 import com.agence.agencevoiture.entity.Voiture;
+import com.agence.agencevoiture.service.ClientService;
 import com.agence.agencevoiture.service.LocationService;
+import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -28,6 +31,7 @@ public class DashboardManagerServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
         try {
             // Exemple d'utilisateur connecté stocké en session
             Utilisateur utilisateur = (Utilisateur) request.getSession().getAttribute("utilisateur");
@@ -72,5 +76,11 @@ public class DashboardManagerServlet extends HttpServlet {
             request.setAttribute("error", "Erreur lors du chargement du tableau de bord.");
             request.getRequestDispatcher("erreur.jsp").forward(request, response);
         }
+        ClientService clientService = new ClientService();
+        List<Client> clients = clientService.rechercherTousLesClients();
+
+        request.setAttribute("clients", clients);
+        RequestDispatcher dispatcher = request.getRequestDispatcher("GestionClient.jsp");
+        dispatcher.forward(request, response);
     }
 }

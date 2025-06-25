@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.*, java.math.BigDecimal, java.text.DecimalFormat" %>
 <%@ page import="com.agence.agencevoiture.entity.*" %>
+<%@ page import="com.agence.agencevoiture.utils.AppPaths" %>
 
 <%
     DecimalFormat df = new DecimalFormat("#,###");
@@ -48,9 +49,13 @@
         <h3><i class="fas fa-car"></i> <span>Agence Location</span></h3>
     </div>
     <ul class="sidebar-menu">
-        <li><a href="${pageContext.request.contextPath}/DashboardManager.jsp" class="active"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
-        <li><a href="${pageContext.request.contextPath}/GestionVoiture.jsp"><i class="fas fa-car"></i> <span>Gestion Voitures</span></a></li>
-        <li><a href="${pageContext.request.contextPath}/GestionClient.jsp"><i class="fas fa-users"></i> <span>Gestion Clients</span></a></li>
+        <li><a href="<%= request.getContextPath() + AppPaths.DASHBOARD %>" class="active"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+        <li><a href="<%= request.getContextPath() + AppPaths.GESTION_VOITURES %>"><i class="fas fa-car"></i> <span>Gestion Voitures</span></a></li>
+        <li>
+            <a href="${pageContext.request.contextPath}/ClientServlet">
+                <i class="fas fa-users"></i> <span>Gestion Clients</span>
+            </a>
+        </li>
         <li><a href="${pageContext.request.contextPath}/GestionLocation.jsp"><i class="fas fa-file-contract"></i> <span>Locations</span></a></li>
         <li><a href="#"><i class="fas fa-search"></i> <span>Recherche Avancée</span></a></li>
         <li><a href="#"><i class="fas fa-chart-line"></i> <span>Statistiques</span></a></li>
@@ -61,7 +66,7 @@
     <div class="top-nav">
         <div class="search-bar">
             <i class="fas fa-search"></i>
-            <input type="text" id="searchInput" placeholder="Rechercher voiture, client...">
+            <input type="text" id="searchInputTable" placeholder="Filtrer le tableau des locations(Par Client ou Voiture)">
         </div>
 
         <div class="user-profile">
@@ -132,9 +137,9 @@
 
     <h2 class="section-title"><i class="fas fa-file-contract"></i> Locations en cours</h2>
 
-    <!-- Champ recherche local au tableau -->
+
     <div style="margin-bottom: 10px;">
-        <input type="text" id="searchInputTable" placeholder="Filtrer le tableau des locations...">
+
     </div>
 
     <table class="activity-table">

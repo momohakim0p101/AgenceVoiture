@@ -1,8 +1,15 @@
+<%@ page import="com.agence.agencevoiture.entity.Utilisateur" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
+<%
+  Utilisateur utilisateur = (Utilisateur) request.getAttribute("utilisateur");
+  if (utilisateur == null) {
+    utilisateur = (Utilisateur) session.getAttribute("utilisateur");
+  }
+%>
 
 <!DOCTYPE html>
 <html lang="fr">
@@ -10,10 +17,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Gestion Clients - Agence de Location</title>
+
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-  <link rel="stylesheet"  href="./css/dashboard.css">
-  <link rel="stylesheet" href="./css/GestionClient.css">
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dashboard.css" />
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/GestionClient.css" />
 </head>
 <body>
 <aside class="sidebar">
@@ -21,10 +29,14 @@
     <h3><i class="fas fa-car"></i> <span>Agence Location</span></h3>
   </div>
   <ul class="sidebar-menu">
-    <li><a href="a href="${pageContext.request.contextPath}/DashboardManagerServlet"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
-    <li><a href="GestionVoiture.jsp"><i class="fas fa-car"></i> <span>Gestion Voitures</span></a></li>
-    <li><a href="GestionClient.jsp" class="active"><i class="fas fa-users"></i> <span>Gestion Clients</span></a></li>
-    <li><a href="GestionLocation.jsp"><i class="fas fa-file-contract"></i> <span>Locations</span></a></li>
+    <li><a href="${pageContext.request.contextPath}/DashboardManagerServlet"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+    <li><a href="${pageContext.request.contextPath}/VoitureServlet" class="active"><i class="fas fa-car"></i> <span>Gestion Voitures</span></a></li>
+    <li>
+      <a href="${pageContext.request.contextPath}/ClientServlet">
+        <i class="fas fa-users"></i> <span>Gestion Clients</span>
+      </a>
+    </li>
+    <li><a href="${pageContext.request.contextPath}/LocationServlet?action.views"><i class="fas fa-file-contract"></i> <span>Locations</span></a></li>
   </ul>
 </aside>
 
@@ -37,12 +49,19 @@
     <div class="user-profile">
       <img src="https://randomuser.me/api/portraits/men/41.jpg" alt="Profile" />
       <div class="user-info">
-        <span class="user-name">Jean Dupont</span>
-        <span class="user-role">Gestionnaire</span>
+        <% if (utilisateur != null) { %>
+        <span class="user-name"><%= utilisateur.getNom() %></span>
+        <span class="user-role"><%= utilisateur.getRole() %></span>
+        <% } else { %>
+        <span class="user-name">Utilisateur non connecté</span>
+        <span class="user-role">Rôle inconnu</span>
+        <% } %>
       </div>
-      <button class="logout-btn" title="Déconnexion">
-        <i class="fas fa-sign-out-alt"></i>
-      </button>
+      <form method="get" action="${pageContext.request.contextPath}/LogoutServlet" style="display:inline;">
+        <button class="logout-btn" title="Déconnexion" type="submit">
+          <i class="fas fa-sign-out-alt"></i>
+        </button>
+      </form>
     </div>
   </div>
 
@@ -57,11 +76,7 @@
     <div class="table-header">
       <h3>Liste des Clients</h3>
       <div class="table-actions">
-        <div class="search-clients">
-          <i class="fas fa-search"></i>
-          <input type="text" id="tableSearchInput" placeholder="Rechercher..." />
-        </div>
-        <button class="filter-btn">
+        <button class="filter-btn" type="button">
           <i class="fas fa-filter"></i> Filtrer
         </button>
       </div>
@@ -84,20 +99,36 @@
         <tr>
           <td>
             <div class="client-name">
-              <img src="${client.avatarUrl != null ? client.avatarUrl : 'https://randomuser.me/api/portraits/lego/1.jpg'}" class="client-avatar" />
+              <c:choose>
+                <c:when test="${client.sexe == 'M'}">
+                  <i class="fas fa-male client-avatar" style="font-size: 30px; color: steelblue; margin-right: 8px;"></i>
+                </c:when>
+                <c:when test="${client.sexe == 'F'}">
+                  <i class="fas fa-female client-avatar" style="font-size: 30px; color: hotpink; margin-right: 8px;"></i>
+                </c:when>
+                <c:otherwise>
+                  <i class="fas fa-user client-avatar" style="font-size: 30px; color: gray; margin-right: 8px;"></i>
+                </c:otherwise>
+              </c:choose>
               <span>${client.prenom} ${client.nom}</span>
             </div>
           </td>
           <td>${client.cin}</td>
           <td>${client.telephone}</td>
           <td>${client.email}</td>
-          <td>${client.sexe == 'M' ? 'Masculin' : 'Féminin'}</td>
+          <td>
+            <c:choose>
+              <c:when test="${client.sexe == 'M'}">Masculin</c:when>
+              <c:when test="${client.sexe == 'F'}">Féminin</c:when>
+              <c:otherwise>Inconnu</c:otherwise>
+            </c:choose>
+          </td>
           <td>${client.adresse}</td>
           <td>
-            <button class="action-btn edit-btn" data-client-id="${client.id}">
+            <button class="action-btn edit-btn" data-client-id="${client.cin}" type="button">
               <i class="fas fa-edit"></i> Modifier
             </button>
-            <button class="action-btn delete-btn" data-client-id="${client.id}">
+            <button class="action-btn delete-btn" data-client-id="${client.cin}" type="button">
               <i class="fas fa-trash"></i> Supprimer
             </button>
           </td>
@@ -111,174 +142,146 @@
   </div>
 
   <!-- Modal Ajouter/Modifier Client -->
-  <div class="modal" id="clientModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 class="modal-title" id="modalTitle">Ajouter un Nouveau Client</h3>
-        <button class="close-modal">&times;</button>
-      </div>
-      <div class="modal-body">
-        <form id="clientForm" method="post" action="ClientServlet">
-          <input type="hidden" id="clientId" name="id" />
-          <div class="form-row">
-            <div class="form-group">
-              <label for="clientCIN">CIN*</label>
-              <input type="text" id="clientCIN" name="cin" class="form-control" required />
-            </div>
-            <div class="form-group">
-              <label for="clientGender">Sexe*</label>
-              <select id="clientGender" name="sexe" class="form-select" required>
-                <option value="">Sélectionner</option>
-                <option value="M">Masculin</option>
-                <option value="F">Féminin</option>
-              </select>
-            </div>
-          </div>
+  <div class="modal" id="clientModal" aria-hidden="true" role="dialog" tabindex="-1">
+    <div class="modal-content" role="document">
+      <h3 id="modalTitle">Ajouter un Client</h3>
+      <form id="clientForm" method="post"action="${pageContext.request.contextPath}/ClientServlet" novalidate>
+        <input type="hidden" name="action" id="formAction" value="save" />
 
-          <div class="form-row">
-            <div class="form-group">
-              <label for="clientFirstName">Prénom*</label>
-              <input type="text" id="clientFirstName" name="prenom" class="form-control" required />
-            </div>
-            <div class="form-group">
-              <label for="clientLastName">Nom*</label>
-              <input type="text" id="clientLastName" name="nom" class="form-control" required />
-            </div>
-          </div>
+        CIN: <input type="text" id="clientCIN" name="cin" required /><br />
+        Prénom: <input type="text" id="clientFirstName" name="prenom" required /><br />
+        Nom: <input type="text" id="clientLastName" name="nom" required /><br />
+        Sexe:
+        <select id="clientGender" name="sexe" required>
+          <option value="">Sélectionner</option>
+          <option value="M">Masculin</option>
+          <option value="F">Féminin</option>
+        </select><br />
+        Adresse: <input type="text" id="clientAddress" name="adresse" /><br />
+        Email: <input type="email" id="clientEmail" name="email" required /><br />
+        Téléphone: <input type="tel" id="clientPhone" name="telephone" required /><br />
 
-          <div class="form-group">
-            <label for="clientAddress">Adresse</label>
-            <input type="text" id="clientAddress" name="adresse" class="form-control" />
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="clientEmail">Email*</label>
-              <input type="email" id="clientEmail" name="email" class="form-control" required />
-            </div>
-            <div class="form-group">
-              <label for="clientPhone">Téléphone*</label>
-              <input type="tel" id="clientPhone" name="telephone" class="form-control" required />
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="clientStatus">Statut</label>
-            <select id="clientStatus" name="statut" class="form-select">
-              <option value="active">Actif</option>
-              <option value="inactive">Inactif</option>
-            </select>
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary close-modal">Annuler</button>
-        <button type="submit" form="clientForm" class="btn btn-primary" id="saveClientBtn">Enregistrer</button>
-      </div>
+        <button class="action-btn edit-btn" type="submit" id="saveClientBtn">Enregistrer</button>
+        <button class="action-btn delete-btn" type="button" id="cancelBtn">Annuler</button>
+      </form>
     </div>
   </div>
-
   <!-- Modal Confirmation Suppression -->
-  <div class="modal" id="deleteModal">
-    <div class="modal-content" style="max-width: 500px;">
-      <div class="modal-header">
-        <h3 class="modal-title">Confirmer la suppression</h3>
-        <button class="close-modal">&times;</button>
-      </div>
-      <div class="modal-body">
-        <p>Êtes-vous sûr de vouloir supprimer ce client? Cette action est irréversible.</p>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary close-modal">Annuler</button>
-        <form method="post" action="ClientServlet" style="display:inline;">
-          <input type="hidden" id="deleteClientId" name="id" />
-          <input type="hidden" name="action" value="delete" />
-          <button type="submit" class="btn btn-danger" id="confirmDeleteBtn">Supprimer</button>
-        </form>
-      </div>
+  <div class="modal" id="deleteModal" aria-hidden="true" role="dialog" tabindex="-1">
+    <div class="modal-content" role="document">
+      <h3>Confirmer la suppression</h3>
+      <p>Voulez-vous vraiment supprimer ce client ?</p>
+
+      <form method="post" action="${pageContext.request.contextPath}/ClientServlet">
+        <input type="hidden" name="action" value="delete" />
+        <input type="hidden" name="cin" id="deleteCin" />
+        <button class="action-btn delete-btn" type="submit" id="submitDeleteBtn">Supprimer</button>
+        <button class="action-btn edit-btn" type="button" id="cancelDeleteBtn">Annuler</button>
+      </form>
     </div>
   </div>
-</main>
 
+</main>
 <script>
-  const addClientBtn = document.getElementById('addClientBtn');
   const clientModal = document.getElementById('clientModal');
   const deleteModal = document.getElementById('deleteModal');
-  const closeModalBtns = document.querySelectorAll('.close-modal');
   const modalTitle = document.getElementById('modalTitle');
   const clientForm = document.getElementById('clientForm');
-  const clientIdInput = document.getElementById('clientId');
-  const deleteClientIdInput = document.getElementById('deleteClientId');
-  const saveClientBtn = document.getElementById('saveClientBtn');
+  const formActionInput = document.getElementById('formAction');
 
-  let isEditMode = false;
+  const clientCINInput = document.getElementById('clientCIN');
+  const clientFirstNameInput = document.getElementById('clientFirstName');
+  const clientLastNameInput = document.getElementById('clientLastName');
+  const clientGenderInput = document.getElementById('clientGender');
+  const clientAddressInput = document.getElementById('clientAddress');
+  const clientEmailInput = document.getElementById('clientEmail');
+  const clientPhoneInput = document.getElementById('clientPhone');
 
-  // Ouvrir le modal d'ajout
-  addClientBtn.addEventListener('click', () => {
-    isEditMode = false;
+  const deleteCinInput = document.getElementById('deleteCin');
+
+  let clientToDeleteCin = null;
+
+  // Ouvrir un modal
+  function openModal(modal) {
+    modal.style.display = 'block';
+    modal.setAttribute('aria-hidden', 'false');
+  }
+
+  // Fermer un modal
+  function closeModal(modal) {
+    modal.style.display = 'none';
+    modal.setAttribute('aria-hidden', 'true');
+  }
+
+  // Bouton Ajouter Client : reset formulaire + ouvrir modal
+  document.getElementById('addClientBtn').addEventListener('click', () => {
     modalTitle.textContent = 'Ajouter un Nouveau Client';
     clientForm.reset();
-    clientIdInput.value = '';
-    clientForm.action = 'ClientServlet?action=save';
+    formActionInput.value = 'save';
+    clientCINInput.readOnly = false;
     openModal(clientModal);
   });
 
-  // Gérer les clics sur les boutons Modifier et Supprimer
-  document.addEventListener('click', (e) => {
-    const editBtn = e.target.closest('.edit-btn');
-    const deleteBtn = e.target.closest('.delete-btn');
-
+  // Gestion clics modifier / supprimer sur la table
+  document.querySelector('#clientsTable tbody').addEventListener('click', e => {
     // Modifier
-    if (editBtn) {
-      const clientId = editBtn.getAttribute('data-client-id');
-      fetch(`ClientServlet?action=find&id=${clientId}`)
-              .then(response => response.json())
-              .then(client => {
-                isEditMode = true;
-                modalTitle.textContent = 'Modifier le Client';
-                clientForm.action = 'ClientServlet?action=update';
-                clientIdInput.value = client.id;
-                document.getElementById('clientCIN').value = client.cin;
-                document.getElementById('clientFirstName').value = client.prenom;
-                document.getElementById('clientLastName').value = client.nom;
-                document.getElementById('clientEmail').value = client.email;
-                document.getElementById('clientPhone').value = client.telephone;
-                document.getElementById('clientAddress').value = client.adresse;
-                document.getElementById('clientGender').value = client.sexe;
-                document.getElementById('clientStatus').value = client.statut;
-                openModal(clientModal);
-              })
-              .catch(error => {
-                console.error('Erreur lors de la récupération du client :', error);
-                alert("Une erreur s'est produite lors du chargement du client.");
-              });
-    }
+    if (e.target.closest('.edit-btn')) {
+      const btn = e.target.closest('.edit-btn');
+      const tr = btn.closest('tr');
 
+      formActionInput.value = 'update';
+
+      // Récupérer le texte complet prénom + nom
+      const fullNameText = tr.querySelector('td:nth-child(1) span').textContent.trim();
+      // Séparer prénom et nom (premier mot = prénom, reste = nom)
+      const fullNameParts = fullNameText.split(' ');
+      const prenom = fullNameParts.length > 0 ? fullNameParts[0] : '';
+      const nom = fullNameParts.length > 1 ? fullNameParts.slice(1).join(' ') : '';
+
+      const cin = tr.querySelector('td:nth-child(2)').textContent.trim();
+      clientCINInput.value = cin;
+      clientCINInput.readOnly = true;
+
+      clientFirstNameInput.value = prenom;
+      clientLastNameInput.value = nom;
+
+      const sexeTexte = tr.querySelector('td:nth-child(5)').textContent.trim();
+      clientGenderInput.value = (sexeTexte === 'Masculin') ? 'M' : (sexeTexte === 'Féminin' ? 'F' : '');
+
+      clientAddressInput.value = tr.querySelector('td:nth-child(6)').textContent.trim();
+      clientEmailInput.value = tr.querySelector('td:nth-child(4)').textContent.trim();
+      clientPhoneInput.value = tr.querySelector('td:nth-child(3)').textContent.trim();
+
+      modalTitle.textContent = 'Modifier le Client';
+      openModal(clientModal);
+    }
     // Supprimer
-    if (deleteBtn) {
-      const clientId = deleteBtn.getAttribute('data-client-id');
-      deleteClientIdInput.value = clientId;
+    else if (e.target.closest('.delete-btn')) {
+      const btn = e.target.closest('.delete-btn');
+      clientToDeleteCin = btn.getAttribute('data-client-id');
+      deleteCinInput.value = clientToDeleteCin;
       openModal(deleteModal);
     }
   });
 
-  // Fermer toutes les modales
-  closeModalBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      closeModal(btn.closest('.modal'));
-    });
+  // Annuler ajout/modif client
+  document.getElementById('cancelBtn').addEventListener('click', () => {
+    closeModal(clientModal);
   });
 
-  function openModal(modal) {
-    modal.classList.add('show');
-    modal.style.display = 'block';
-  }
+  // Annuler suppression client
+  document.getElementById('cancelDeleteBtn').addEventListener('click', () => {
+    closeModal(deleteModal);
+  });
 
-  function closeModal(modal) {
-    modal.classList.remove('show');
-    modal.style.display = 'none';
-  }
+  // Fermer modals au clic en dehors
+  window.addEventListener('click', e => {
+    if (e.target.classList.contains('modal')) {
+      closeModal(e.target);
+    }
+  });
 </script>
+
 
 </body>
 </html>

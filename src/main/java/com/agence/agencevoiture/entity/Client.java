@@ -32,15 +32,14 @@ public class Client {
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
     private List<Location> location;
 
-    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
-    private List<Avis> reviews;
-
 
     public Client() {
-
+        // constructeur vide nécessaire pour JPA
     }
 
-    public Client(String cin, String prenom, String nom, String sexe, String adresse, String email, String telephone, List<Location> location, List<Avis> reviews) {
+
+    public Client(String cin, String nom, String prenom, String email, String telephone, String adresse, String sexe) {
+
         this.cin = cin;
         this.prenom = prenom;
         this.nom = nom;
@@ -49,7 +48,6 @@ public class Client {
         this.email = email;
         this.telephone = telephone;
         this.location = location;
-        this.reviews = reviews;
     }
 
     public String getCin() {
@@ -116,13 +114,8 @@ public class Client {
         this.location = location;
     }
 
-    public List<Avis> getReviews() {
-        return reviews;
-    }
 
-    public void setReviews(List<Avis> reviews) {
-        this.reviews = reviews;
-    }
+
 
     @Override
     public String toString() {
@@ -135,7 +128,13 @@ public class Client {
                 ", email='" + email + '\'' +
                 ", telephone='" + telephone + '\'' +
                 ", reservation=" + location +
-                ", reviews=" + reviews +
                 '}';
     }
+    public String toJson() {
+        return String.format(
+                "{\"cin\":\"%s\",\"prenom\":\"%s\",\"nom\":\"%s\",\"telephone\":\"%s\",\"email\":\"%s\",\"adresse\":\"%s\",\"sexe\":\"%s\"}",
+                cin, prenom, nom, telephone, email, adresse, sexe
+        );
+    }
+
 }

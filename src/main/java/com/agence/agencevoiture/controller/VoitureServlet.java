@@ -2,111 +2,138 @@ package com.agence.agencevoiture.controller;
 
 import com.agence.agencevoiture.entity.Voiture;
 import com.agence.agencevoiture.service.VoitureService;
-
-import jakarta.servlet.*;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
-import jakarta.servlet.annotation.*;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-@WebServlet("/voiture")
+@WebServlet("/VoitureServlet")
 public class VoitureServlet extends HttpServlet {
 
-    private final VoitureService voitureService = new VoitureService();
+    private VoitureService voitureService;
+    private static final Logger logger = Logger.getLogger(VoitureServlet.class.getName());
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void init() {
+        voitureService = new VoitureService();
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String action = req.getParameter("action");
+
+        try {
+            if (action == null || action.equals("view")) {
+                afficherListeVoitures(req, resp);
+            } else if ("delete".equals(action)) {
+                supprimerVoiture(req, resp);
+            } else {
+                redirigerAvecErreur(resp, "action_inconnue");
+            }
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Erreur dans doGet", e);
+            redirigerAvecErreur(resp, "exception");
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String action = req.getParameter("action");
+
+        try {
+            switch (action) {
+                case "save" -> ajouterVoiture(req, resp);
+                case "update" -> modifierVoiture(req, resp);
+                case "delete" -> supprimerVoiture(req, resp);
+                default -> redirigerAvecErreur(resp, "action_inconnue");
+            }
+        } catch (NumberFormatException e) {
+            logger.log(Level.WARNING, "Erreur de format numérique", e);
+            redirigerAvecErreur(resp, "format_invalide");
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Erreur dans doPost", e);
+            redirigerAvecErreur(resp, "exception");
+        }
+    }
+
+    // ----- Méthodes privées -----
+
+    private void afficherListeVoitures(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         List<Voiture> voitures = voitureService.listerToutesLesVoitures();
-        request.setAttribute("voitures", voitures);
-        request.getRequestDispatcher("voiture.jsp").forward(request, response);
+        req.setAttribute("voitures", voitures);
+        req.getRequestDispatcher("/GestionVoiture.jsp").forward(req, resp);
     }
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String action = request.getParameter("action");
-
-        switch (action) {
-            case "ajouter":
-                ajouterVoiture(request, response);
-                break;
-            case "supprimer":
-                supprimerVoiture(request, response);
-                break;
-            case "modifier":
-                modifierVoiture(request, response);
-                break;
-            default:
-                request.setAttribute("erreur", "Action non reconnue.");
-                doGet(request, response);
+    private void ajouterVoiture(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        Voiture voiture = construireVoitureDepuisRequete(req);
+        boolean success = voitureService.ajouterVoiture(voiture);
+        if (success) {
+            redirigerSansErreur(resp);
+        } else {
+            redirigerAvecErreur(resp, "ajout");
         }
     }
 
-    private void ajouterVoiture(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        try {
-            Voiture voiture = extractVoitureFromRequest(request);
-            boolean success = voitureService.ajouterVoiture(voiture);
+    private void modifierVoiture(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        Voiture voiture = construireVoitureDepuisRequete(req);
+        boolean success = voitureService.mettreAJourVoiture(voiture);
+        if (success) {
+            redirigerSansErreur(resp);
+        } else {
+            redirigerAvecErreur(resp, "modification");
+        }
+    }
 
-            request.setAttribute(success ? "message" : "erreur",
-                    success ? "Voiture ajoutée avec succès." : "Échec de l'ajout (doublon ?)");
-        } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("erreur", "Erreur lors de l'ajout.");
+    private void supprimerVoiture(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String immatriculation = req.getParameter("immatriculation");
+        if (immatriculation == null || immatriculation.isEmpty()) {
+            redirigerAvecErreur(resp, "champs_obligatoires");
+            return;
         }
 
-        doGet(request, response);
+        boolean success = voitureService.supprimerVoiture(immatriculation);
+        if (success) {
+            redirigerSansErreur(resp);
+        } else {
+            redirigerAvecErreur(resp, "suppression");
+        }
     }
 
-    private void supprimerVoiture(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String immat = request.getParameter("immatriculation");
+    private Voiture construireVoitureDepuisRequete(HttpServletRequest req) throws NumberFormatException {
+        String immatriculation = req.getParameter("immatriculation");
+        String marque = req.getParameter("marque");
+        String modele = req.getParameter("modele");
+        String typeCarburant = req.getParameter("typeCarburant");
+        String categorie = req.getParameter("categorie");
+        String prixStr = req.getParameter("prixLocationJour");
+        String placesStr = req.getParameter("nombrePlaces");
+        String disponibleStr = req.getParameter("disponible");
+        String dateStr = req.getParameter("dateMiseEnCirculation");
+        String kilometrageStr = req.getParameter("kilometrage");
 
-        boolean success = voitureService.supprimerVoiture(immat);
-        request.setAttribute(success ? "message" : "erreur",
-                success ? "Voiture supprimée." : "Voiture introuvable.");
-        doGet(request, response);
-    }
-
-    private void modifierVoiture(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        try {
-            Voiture voiture = extractVoitureFromRequest(request);
-            boolean success = voitureService.mettreAJourVoiture(voiture);
-
-            request.setAttribute(success ? "message" : "erreur",
-                    success ? "Voiture mise à jour avec succès." : "Échec de la mise à jour.");
-        } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("erreur", "Erreur lors de la mise à jour.");
+        // Validation simple : null ou vide
+        if (immatriculation == null || marque == null || modele == null ||
+                immatriculation.isEmpty() || marque.isEmpty() || modele.isEmpty()) {
+            throw new IllegalArgumentException("Champs obligatoires manquants");
         }
 
-        doGet(request, response);
+        return new Voiture(
+                immatriculation, marque, modele,
+                typeCarburant, categorie,
+                prixStr, placesStr,
+                disponibleStr, dateStr, kilometrageStr
+        );
     }
 
-    private Voiture extractVoitureFromRequest(HttpServletRequest request) throws Exception {
-        String immatriculation = request.getParameter("immatriculation");
-        int places = Integer.parseInt(request.getParameter("nombrePlaces"));
-        String marque = request.getParameter("marque");
-        String modele = request.getParameter("modele");
-        Date miseEnCirc = new SimpleDateFormat("yyyy-MM-dd").parse(request.getParameter("dateMiseEnCirculation"));
-        double km = Double.parseDouble(request.getParameter("kilometrage"));
-        String carburant = request.getParameter("typeCarburant");
-        String categorie = request.getParameter("categorie");
-        double prix = Double.parseDouble(request.getParameter("prixLocationJour"));
-        boolean dispo = "on".equals(request.getParameter("disponible"));
+    private void redirigerAvecErreur(HttpServletResponse resp, String codeErreur) throws IOException {
+        resp.sendRedirect("VoitureServlet?action=view&error=" + codeErreur);
+    }
 
-        Voiture voiture = new Voiture();
-        voiture.setImmatriculation(immatriculation);
-        voiture.setNombrePlaces(places);
-        voiture.setMarque(marque);
-        voiture.setModele(modele);
-        voiture.setDateMiseEnCirculation(miseEnCirc);
-        voiture.setKilometrage(km);
-        voiture.setTypeCarburant(carburant);
-        voiture.setCategorie(categorie);
-        voiture.setPrixLocationJour(prix);
-        voiture.setDisponible(dispo);
-
-        return voiture;
+    private void redirigerSansErreur(HttpServletResponse resp) throws IOException {
+        resp.sendRedirect("VoitureServlet?action=view");
     }
 }

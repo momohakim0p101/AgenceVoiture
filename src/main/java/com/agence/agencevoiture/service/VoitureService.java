@@ -1,6 +1,7 @@
 package com.agence.agencevoiture.service;
 
 import com.agence.agencevoiture.dao.VoitureDAO;
+import com.agence.agencevoiture.entity.Client;
 import com.agence.agencevoiture.entity.Voiture;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
@@ -92,6 +93,14 @@ public class VoitureService {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public Voiture trouverVoitureImm(String immatriculation){
+
+        if(immatriculation == null || immatriculation.trim().isEmpty()){
+            return null;
+        }
+        return voitureDAO.trouverVoiture(immatriculation);
     }
 
 

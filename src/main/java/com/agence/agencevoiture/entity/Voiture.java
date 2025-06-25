@@ -1,6 +1,9 @@
 package com.agence.agencevoiture.entity;
 
 import jakarta.persistence.*;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -42,30 +45,52 @@ public class Voiture {
     @OneToMany(mappedBy = "voiture")
     private List<Location> locations;
 
-    @OneToMany(mappedBy = "voiture")
-    private List<Avis> avis;
+
+    public Voiture(){
+
+    }
 
 
-
-
-    public Voiture(String immatriculation, int nombrePlaces, String marque, String modele, Date dateMiseEnCirculation, double kilometrage, String typeCarburant, String categorie, double prixLocationJour, boolean disponible, List<Location> locations, List<Avis> avis) {
+    // Constructeur avec conversion des String en types réels
+    public Voiture(String immatriculation, String marque, String modele, String typeCarburant, String categorie,
+                   String prixStr, String placesStr, String disponibleStr, String dateStr, String kilometrageStr) {
         this.immatriculation = immatriculation;
-        this.nombrePlaces = nombrePlaces;
         this.marque = marque;
         this.modele = modele;
-        this.dateMiseEnCirculation = dateMiseEnCirculation;
-        this.kilometrage = kilometrage;
         this.typeCarburant = typeCarburant;
         this.categorie = categorie;
-        this.prixLocationJour = prixLocationJour;
-        this.disponible = disponible;
-        this.locations = locations;
-        this.avis = avis;
+
+        try {
+            this.prixLocationJour = Double.parseDouble(prixStr);
+        } catch (NumberFormatException e) {
+            this.prixLocationJour = 0.0;
+        }
+
+        try {
+            this.nombrePlaces = Integer.parseInt(placesStr);
+        } catch (NumberFormatException e) {
+            this.nombrePlaces = 0;
+        }
+
+        // Conversion String -> boolean
+        this.disponible = "true".equalsIgnoreCase(disponibleStr) || "on".equalsIgnoreCase(disponibleStr);
+
+        SimpleDateFormat  sdf = new SimpleDateFormat("yyyy-MM-dd"); // adapter au format attendu
+        try {
+            this.dateMiseEnCirculation = sdf.parse(dateStr);
+        } catch (ParseException e) {
+            this.dateMiseEnCirculation = null;
+        }
+
+        try {
+            this.kilometrage = Double.parseDouble(kilometrageStr);
+        } catch (NumberFormatException e) {
+            this.kilometrage = 0.0;
+        }
     }
 
-    public Voiture() {
 
-    }
+
 
     public String getImmatriculation() {
         return immatriculation;
@@ -155,13 +180,7 @@ public class Voiture {
         this.locations = locations;
     }
 
-    public List<Avis> getAvis() {
-        return avis;
-    }
 
-    public void setAvis(List<Avis> avis) {
-        this.avis = avis;
-    }
 
     @Override
     public String toString() {
@@ -177,7 +196,7 @@ public class Voiture {
                 ", prixLocationJour=" + prixLocationJour +
                 ", disponible=" + disponible +
                 ", reservations=" + locations +
-                ", avis=" + avis +
+
                 '}';
     }
 }
