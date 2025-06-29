@@ -10,6 +10,7 @@ import java.util.List;
 @Entity
 @Table(name = "voiture")
 public class Voiture {
+
     @Id
     @Column(name = "immatriculation", length = 20)
     private String immatriculation;
@@ -42,46 +43,56 @@ public class Voiture {
     @Column(name = "disponible")
     private boolean disponible = true;
 
+    @Column(name = "image_path")
+    private String imagePath;  // Chemin ou nom du fichier image
+
     @OneToMany(mappedBy = "voiture")
     private List<Location> locations;
 
-
-    public Voiture(){
-
+    // Constructeur vide obligatoire pour JPA
+    public Voiture() {
     }
 
-
-    // Constructeur avec conversion des String en types réels
+    /**
+     * Constructeur avec conversion depuis des chaînes de caractères.
+     * Utile pour créer une instance à partir d'une requête HTTP.
+     */
     public Voiture(String immatriculation, String marque, String modele, String typeCarburant, String categorie,
-                   String prixStr, String placesStr, String disponibleStr, String dateStr, String kilometrageStr) {
+                   String prixStr, String placesStr, String disponibleStr, String dateStr, String kilometrageStr,
+                   String imagePath) {
         this.immatriculation = immatriculation;
         this.marque = marque;
         this.modele = modele;
         this.typeCarburant = typeCarburant;
         this.categorie = categorie;
+        this.imagePath = imagePath;
 
+        // Parsing prixLocationJour
         try {
             this.prixLocationJour = Double.parseDouble(prixStr);
         } catch (NumberFormatException e) {
             this.prixLocationJour = 0.0;
         }
 
+        // Parsing nombrePlaces
         try {
             this.nombrePlaces = Integer.parseInt(placesStr);
         } catch (NumberFormatException e) {
             this.nombrePlaces = 0;
         }
 
-        // Conversion String -> boolean
+        // Parsing boolean disponible
         this.disponible = "true".equalsIgnoreCase(disponibleStr) || "on".equalsIgnoreCase(disponibleStr);
 
-        SimpleDateFormat  sdf = new SimpleDateFormat("yyyy-MM-dd"); // adapter au format attendu
+        // Parsing date (format yyyy-MM-dd attendu)
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         try {
             this.dateMiseEnCirculation = sdf.parse(dateStr);
         } catch (ParseException e) {
             this.dateMiseEnCirculation = null;
         }
 
+        // Parsing kilometrage
         try {
             this.kilometrage = Double.parseDouble(kilometrageStr);
         } catch (NumberFormatException e) {
@@ -89,8 +100,7 @@ public class Voiture {
         }
     }
 
-
-
+    // Getters & setters
 
     public String getImmatriculation() {
         return immatriculation;
@@ -172,15 +182,21 @@ public class Voiture {
         this.disponible = disponible;
     }
 
-    public List<Location> getReservations() {
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
+
+    public List<Location> getLocations() {
         return locations;
     }
 
-    public void setReservations(List<Location> locations) {
+    public void setLocations(List<Location> locations) {
         this.locations = locations;
     }
-
-
 
     @Override
     public String toString() {
@@ -195,8 +211,8 @@ public class Voiture {
                 ", categorie='" + categorie + '\'' +
                 ", prixLocationJour=" + prixLocationJour +
                 ", disponible=" + disponible +
-                ", reservations=" + locations +
-
+                ", imagePath='" + imagePath + '\'' +
+                ", locations=" + locations +
                 '}';
     }
 }

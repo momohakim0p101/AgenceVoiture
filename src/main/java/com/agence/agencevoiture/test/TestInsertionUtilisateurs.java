@@ -8,19 +8,19 @@ public class TestInsertionUtilisateurs {
         UtilisateurDAO dao = new UtilisateurDAO();
 
         Utilisateur papi = new Utilisateur();
-        papi.setNom("Diop");
-        papi.setPrenom("Papi");
-        papi.setIdentifiant("Papi123@");
+        papi.setNom("DIOP");
+        papi.setPrenom("Papa Bothie");
+        papi.setIdentifiant("gestionnaire@agence.ma");
         papi.setEmail("papi@agence.com");
-        papi.setMotDePasse("papi123"); // à hasher
+        papi.setMotDePasse("password"); // à hasher
         papi.setRole("gestionnaire");
 
         Utilisateur modou = new Utilisateur();
-        modou.setNom("Fall");
-        modou.setIdentifiant("modou123@");
+        modou.setNom("POUYE");
+        modou.setIdentifiant("chef@agence.ma");
         modou.setPrenom("Modou");
         modou.setEmail("modou@agence.com");
-        modou.setMotDePasse("modou123");
+        modou.setMotDePasse("password");
         modou.setRole("chef");
 
         dao.creerUtilisateur(papi);

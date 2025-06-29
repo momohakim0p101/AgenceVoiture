@@ -2,14 +2,17 @@ package com.agence.agencevoiture.controller;
 
 import com.agence.agencevoiture.entity.Voiture;
 import com.agence.agencevoiture.service.VoitureService;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.*;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @WebServlet("/VoitureServlet")
 public class VoitureServlet extends HttpServlet {
@@ -23,7 +26,7 @@ public class VoitureServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String action = req.getParameter("action");
 
         try {
@@ -41,7 +44,7 @@ public class VoitureServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String action = req.getParameter("action");
 
         try {
@@ -51,21 +54,75 @@ public class VoitureServlet extends HttpServlet {
                 case "delete" -> supprimerVoiture(req, resp);
                 default -> redirigerAvecErreur(resp, "action_inconnue");
             }
-        } catch (NumberFormatException e) {
-            logger.log(Level.WARNING, "Erreur de format numérique", e);
-            redirigerAvecErreur(resp, "format_invalide");
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Erreur dans doPost", e);
             redirigerAvecErreur(resp, "exception");
         }
     }
 
-    // ----- Méthodes privées -----
-
-    private void afficherListeVoitures(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    private void afficherListeVoitures(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         List<Voiture> voitures = voitureService.listerToutesLesVoitures();
-        req.setAttribute("voitures", voitures);
-        req.getRequestDispatcher("/GestionVoiture.jsp").forward(req, resp);
+
+        String query = req.getParameter("query");
+        String carburant = req.getParameter("carburant");
+        String categorie = req.getParameter("categorie");
+        String prixMaxStr = req.getParameter("prixMax");
+        String kmMaxStr = req.getParameter("kmMax");
+        String sort = req.getParameter("sort");
+
+        // Filtrage
+        if (query != null && !query.trim().isEmpty()) {
+            voitures = voitures.stream()
+                    .filter(v -> v.getMarque().toLowerCase().contains(query.toLowerCase()) ||
+                            v.getModele().toLowerCase().contains(query.toLowerCase()) ||
+                            v.getImmatriculation().toLowerCase().contains(query.toLowerCase()))
+                    .collect(Collectors.toList());
+        }
+
+        if (carburant != null && !carburant.isEmpty()) {
+            voitures = voitures.stream()
+                    .filter(v -> carburant.equalsIgnoreCase(v.getTypeCarburant()))
+                    .collect(Collectors.toList());
+        }
+
+        if (categorie != null && !categorie.isEmpty()) {
+            voitures = voitures.stream()
+                    .filter(v -> categorie.equalsIgnoreCase(v.getCategorie()))
+                    .collect(Collectors.toList());
+        }
+
+        if (prixMaxStr != null && !prixMaxStr.isEmpty()) {
+            try {
+                double prixMax = Double.parseDouble(prixMaxStr);
+                voitures = voitures.stream()
+                        .filter(v -> v.getPrixLocationJour() <= prixMax)
+                        .collect(Collectors.toList());
+            } catch (NumberFormatException ignored) {}
+        }
+
+        if (kmMaxStr != null && !kmMaxStr.isEmpty()) {
+            try {
+                int kmMax = Integer.parseInt(kmMaxStr);
+                voitures = voitures.stream()
+                        .filter(v -> v.getKilometrage() <= kmMax)
+                        .collect(Collectors.toList());
+            } catch (NumberFormatException ignored) {}
+        }
+
+        // Tri
+        if ("prix_asc".equals(sort)) {
+            voitures.sort(Comparator.comparingDouble(Voiture::getPrixLocationJour));
+        } else if ("prix_desc".equals(sort)) {
+            voitures.sort(Comparator.comparingDouble(Voiture::getPrixLocationJour).reversed());
+        }
+
+        try {
+            req.setAttribute("voitures", voitures);
+            req.getRequestDispatcher("/GestionVoiture.jsp").forward(req, resp);
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Erreur dans afficherListeVoitures", e);
+            redirigerAvecErreur(resp, "affichage");
+        }
     }
 
     private void ajouterVoiture(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -103,29 +160,19 @@ public class VoitureServlet extends HttpServlet {
         }
     }
 
-    private Voiture construireVoitureDepuisRequete(HttpServletRequest req) throws NumberFormatException {
-        String immatriculation = req.getParameter("immatriculation");
-        String marque = req.getParameter("marque");
-        String modele = req.getParameter("modele");
-        String typeCarburant = req.getParameter("typeCarburant");
-        String categorie = req.getParameter("categorie");
-        String prixStr = req.getParameter("prixLocationJour");
-        String placesStr = req.getParameter("nombrePlaces");
-        String disponibleStr = req.getParameter("disponible");
-        String dateStr = req.getParameter("dateMiseEnCirculation");
-        String kilometrageStr = req.getParameter("kilometrage");
-
-        // Validation simple : null ou vide
-        if (immatriculation == null || marque == null || modele == null ||
-                immatriculation.isEmpty() || marque.isEmpty() || modele.isEmpty()) {
-            throw new IllegalArgumentException("Champs obligatoires manquants");
-        }
-
+    private Voiture construireVoitureDepuisRequete(HttpServletRequest req) {
         return new Voiture(
-                immatriculation, marque, modele,
-                typeCarburant, categorie,
-                prixStr, placesStr,
-                disponibleStr, dateStr, kilometrageStr
+                req.getParameter("immatriculation"),
+                req.getParameter("marque"),
+                req.getParameter("modele"),
+                req.getParameter("typeCarburant"),
+                req.getParameter("categorie"),
+                req.getParameter("prixLocationJour"),
+                req.getParameter("nombrePlaces"),
+                req.getParameter("disponible"),
+                req.getParameter("dateMiseEnCirculation"),
+                req.getParameter("kilometrage"),
+                req.getParameter("imageUrl")
         );
     }
 
