@@ -1,482 +1,497 @@
 <%@ page import="com.agence.agencevoiture.entity.Utilisateur" %>
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-
 <%
-    Utilisateur utilisateur = (Utilisateur) request.getAttribute("utilisateur");
-    if (utilisateur == null) {
-        utilisateur = (Utilisateur) session.getAttribute("utilisateur");
-    }
-    // CSRF token example (if CSRF protection is added)
-    String csrfToken = (String) session.getAttribute("csrfToken");
+    Utilisateur utilisateur = (Utilisateur) session.getAttribute("utilisateur");
 %>
-
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="scroll-smooth">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Gestion Voitures - Agence de Location</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dashboard.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/GestionClient.css">
-    <style>
-        /* Nouveaux styles pour les cartes de véhicules */
-        .vehicle-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-            padding: 20px;
-        }
-
-        .vehicle-card {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            padding: 20px;
-            transition: transform 0.3s ease;
-        }
-
-        .vehicle-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-
-        .vehicle-card h3 {
-            margin-top: 0;
-            color: #2c3e50;
-            font-size: 1.3rem;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-        }
-
-        .vehicle-card .immatriculation {
-            font-weight: bold;
-            color: #3498db;
-            margin: 5px 0;
-        }
-
-        .vehicle-card .details {
-            margin: 10px 0;
-            color: #555;
-        }
-
-        .vehicle-card .details div {
-            margin-bottom: 5px;
-        }
-
-        .vehicle-card .category {
-            font-weight: bold;
-            color: #e74c3c;
-            margin: 10px 0;
-        }
-
-        .vehicle-card .price {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #27ae60;
-            margin: 10px 0;
-        }
-
-        .vehicle-card .actions {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 15px;
-        }
-
-        .vehicle-card .actions button {
-            padding: 8px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: background-color 0.3s;
-        }
-
-        .vehicle-card .actions .edit-btn {
-            background-color: #3498db;
-            color: white;
-        }
-
-        .vehicle-card .actions .edit-btn:hover {
-            background-color: #2980b9;
-        }
-
-        .vehicle-card .actions .delete-btn {
-            background-color: #e74c3c;
-            color: white;
-        }
-
-        .vehicle-card .actions .delete-btn:hover {
-            background-color: #c0392b;
-        }
-
-        .search-container {
-            padding: 20px;
-            background: white;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .search-container input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 1rem;
-        }
-    </style>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
-<body>
-<aside class="sidebar">
-    <div class="sidebar-header">
-        <h3><i class="fas fa-car"></i> <span>Agence Location</span></h3>
+<body class="bg-gray-100 flex min-h-screen font-sans">
+
+<!-- Sidebar -->
+<aside class="fixed top-0 left-0 h-screen w-64 bg-[#3b82f6] text-white flex flex-col">
+    <div class="flex items-center justify-center gap-2 px-4 py-6 border-b border-white/10">
+        <img src="${pageContext.request.contextPath}/assets/logo.png" alt="Logo AutoDrive" class="h-8" />
+        <span class="font-bold text-xl">AutoDrive</span>
     </div>
-    <ul class="sidebar-menu">
-        <li><a href="${pageContext.request.contextPath}/DashboardManagerServlet"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-        <li><a href="${pageContext.request.contextPath}/VoitureServlet?action=view" class="active"><i class="fas fa-car"></i> Gestion Voitures</a></li>
-        <li><a href="${pageContext.request.contextPath}/ClientServlet"><i class="fas fa-users"></i> Gestion Clients</a></li>
-        <li><a href="${pageContext.request.contextPath}/GestionLocation.jsp"><i class="fas fa-file-contract"></i> Locations</a></li>
-    </ul>
+    <nav class="flex flex-col mt-4 px-2 space-y-1 text-sm font-medium">
+        <a href="${pageContext.request.contextPath}/dashboard.jsp" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-[#2563eb] transition">
+            <!-- Icon Dashboard: graphique simple -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M11 17h2m-1-8v8m-6 4h14a2 2 0 002-2v-7a2 2 0 00-2-2H5a2 2 0 00-2 2v7a2 2 0 002 2z" />
+            </svg>
+            Tableau de bord
+        </a>
+        <a href="${pageContext.request.contextPath}/voitures.jsp" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-[#2563eb] transition">
+            <!-- Icon Voiture -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 13l1.5-2h15l1.5 2M5 16h14v2a1 1 0 01-1 1h-12a1 1 0 01-1-1v-2z" />
+                <circle cx="7.5" cy="19.5" r="1.5" />
+                <circle cx="16.5" cy="19.5" r="1.5" />
+            </svg>
+            Gestion voitures
+        </a>
+        <a href="${pageContext.request.contextPath}/gestionclients.jsp" class="flex items-center gap-3 px-3 py-2 rounded bg-[#2563eb] transition">
+            <!-- Icon Clients: silhouette utilisateur -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5.121 17.804A8.962 8.962 0 0112 15c2.428 0 4.636 1.01 6.279 2.657M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            Gestion clients
+        </a>
+        <a href="${pageContext.request.contextPath}/locations.jsp" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-[#2563eb] transition">
+            <!-- Icon Locations: clé -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 11c1.104 0 2-.896 2-2s-.896-2-2-2-2 .896-2 2 .896 2 2 2z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M7 14l5 5m0 0l5-5m-5 5V9" />
+            </svg>
+            Gestion locations
+        </a>
+        <a href="${pageContext.request.contextPath}/utilisateurs.jsp" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-[#2563eb] transition">
+            <!-- Icon Utilisateurs: groupe utilisateurs -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87M12 12a5 5 0 100-10 5 5 0 000 10z" />
+            </svg>
+            Gestion utilisateurs
+        </a>
+    </nav>
 </aside>
 
-<main class="main-content">
-    <div class="top-nav">
-        <div class="table-actions">
-            <div class="search-clients">
-                <i class="fas fa-search"></i>
-                <input type="text" id="tableSearchInput" placeholder="Rechercher..." />
+<!-- Main Content -->
+<main class="flex-1 flex flex-col">
+    <!-- Top nav -->
+    <header class="flex justify-between items-center bg-white px-6 py-4 shadow-sm border-b border-gray-200">
+        <div class="flex items-center gap-4">
+            <div class="relative">
+                <input id="searchInput" type="text" placeholder="Rechercher par marque, modèle ou immatriculation..."
+                       class="pl-10 pr-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 w-72" />
+                <i class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i>
             </div>
         </div>
-        <div class="user-profile">
-            <img src="https://randomuser.me/api/portraits/men/41.jpg" alt="Profile" />
-            <div class="user-info">
-                <span class="user-name"><%= utilisateur != null ? utilisateur.getNom() : "Utilisateur non connecté" %></span>
-                <span class="user-role"><%= utilisateur != null ? utilisateur.getRole() : "Rôle inconnu" %></span>
+
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-3">
+                <img src="https://randomuser.me/api/portraits/men/41.jpg" alt="Profil" class="w-10 h-10 rounded-full object-cover" />
+                <div class="flex flex-col text-gray-700">
+                    <span class="font-semibold text-sm"><%= utilisateur != null ? utilisateur.getNom() : "Utilisateur" %></span>
+                    <span class="text-xs text-gray-500"><%= utilisateur != null ? utilisateur.getRole() : "Rôle inconnu" %></span>
+                </div>
             </div>
-            <form method="get" action="${pageContext.request.contextPath}/LogoutServlet" style="display:inline;">
-                <button class="logout-btn" title="Déconnexion" type="submit">
-                    <i class="fas fa-sign-out-alt"></i>
+            <form method="get" action="${pageContext.request.contextPath}/LogoutServlet">
+                <button type="submit" title="Déconnexion"
+                        class="text-gray-600 hover:text-red-600 transition">
+                    <i class="fas fa-sign-out-alt fa-lg"></i>
+                </button>
+            </form>
+        </div>
+    </header>
+
+    <!-- Page Header -->
+    <section class="flex justify-between items-center bg-white p-6 border-b border-gray-200">
+        <h2 class="text-2xl font-semibold text-gray-700 flex items-center gap-2">
+            <i class="fas fa-car-side text-blue-600"></i> Gestion des Voitures
+        </h2>
+        <button
+                onclick="openModal('addCarModal')"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded flex items-center gap-2 transition"
+        >
+            <i class="fas fa-plus"></i> Ajouter une voiture
+        </button>
+    </section>
+
+    <!-- Cars Grid -->
+    <section id="carsGrid" class="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 overflow-auto">
+        <c:forEach var="voiture" items="${voitures}">
+            <article
+                    class="bg-white rounded shadow p-5 flex flex-col justify-between hover:shadow-lg transition cursor-pointer vehicle-card"
+                    data-marque="${voiture.marque.toLowerCase()}"
+                    data-modele="${voiture.modele.toLowerCase()}"
+                    data-immatriculation="${voiture.immatriculation.toLowerCase()}"
+            >
+                <header>
+                    <h3 class="text-xl font-semibold text-gray-800">${voiture.marque} ${voiture.modele}</h3>
+                    <p class="text-sm text-blue-600 font-semibold">${voiture.immatriculation}</p>
+                </header>
+                <div class="mt-3 space-y-1 text-gray-600 text-sm">
+                    <p><i class="fas fa-users mr-1 text-gray-400"></i> ${voiture.nombrePlaces} places</p>
+                    <p><i class="fas fa-gas-pump mr-1 text-gray-400"></i> ${voiture.typeCarburant}</p>
+                    <p><i class="fas fa-calendar-alt mr-1 text-gray-400"></i> ${voiture.dateMiseEnCirculation}</p>
+                    <p><i class="fas fa-tachometer-alt mr-1 text-gray-400"></i> ${voiture.kilometrage} km</p>
+                </div>
+                <p class="mt-3 font-bold text-red-600">Catégorie: ${voiture.categorie}</p>
+                <p class="mt-1 font-bold text-green-600">${voiture.prixLocationJour} FCFA / jour</p>
+                <p class="mt-2">
+                    <c:choose>
+                        <c:when test="${voiture.disponible}">
+                            <span class="text-green-600 font-semibold"><i class="fas fa-check-circle"></i> Disponible</span>
+                        </c:when>
+                        <c:otherwise>
+                            <span class="text-red-600 font-semibold"><i class="fas fa-times-circle"></i> Indisponible</span>
+                        </c:otherwise>
+                    </c:choose>
+                </p>
+                <footer class="mt-4 flex gap-2">
+                    <button
+                            onclick="openEditModal('${voiture.immatriculation}')"
+                            class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded flex items-center justify-center gap-2 transition"
+                    >
+                        <i class="fas fa-edit"></i> Modifier
+                    </button>
+                    <button
+                            onclick="openDeleteModal('${voiture.immatriculation}')"
+                            class="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 rounded flex items-center justify-center gap-2 transition"
+                    >
+                        <i class="fas fa-trash"></i> Supprimer
+                    </button>
+                </footer>
+            </article>
+        </c:forEach>
+        <c:if test="${empty voitures}">
+            <p class="col-span-full text-center text-gray-500 mt-10">Aucune voiture trouvée.</p>
+        </c:if>
+    </section>
+
+    <!-- Modals -->
+
+    <!-- Modal Ajout -->
+    <div id="addCarModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50">
+        <div class="bg-white rounded-lg shadow-lg w-11/12 max-w-lg p-6 relative">
+            <button
+                    class="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
+                    onclick="closeModal('addCarModal')"
+                    aria-label="Fermer"
+            >
+                <i class="fas fa-times fa-lg"></i>
+            </button>
+            <h3 class="text-xl font-semibold mb-4">Ajouter une voiture</h3>
+            <form method="post" action="${pageContext.request.contextPath}/VoitureServlet" class="space-y-4">
+                <input type="hidden" name="action" value="save" />
+
+                <input
+                        type="text" name="immatriculation" placeholder="Immatriculation"
+                        required
+                        class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+
+                <select name="marque" required class="w-full border border-gray-300 rounded px-3 py-2">
+                    <option value="" disabled selected>-- Choisir une marque --</option>
+                    <option>Toyota</option>
+                    <option>Renault</option>
+                    <option>Peugeot</option>
+                    <option>Ford</option>
+                    <option>BMW</option>
+                </select>
+
+                <select name="modele" required class="w-full border border-gray-300 rounded px-3 py-2">
+                    <option value="" disabled selected>-- Choisir un modèle --</option>
+                    <option>Modèle A</option>
+                    <option>Modèle B</option>
+                    <option>Modèle C</option>
+                    <option>Modèle D</option>
+                </select>
+
+                <select name="nombrePlaces" required class="w-full border border-gray-300 rounded px-3 py-2">
+                    <option value="" disabled selected>-- Nombre de places --</option>
+                    <option>2</option>
+                    <option>4</option>
+                    <option>5</option>
+                    <option>7</option>
+                </select>
+
+                <select name="typeCarburant" required class="w-full border border-gray-300 rounded px-3 py-2">
+                    <option value="" disabled selected>-- Type de carburant --</option>
+                    <option>Essence</option>
+                    <option>Diesel</option>
+                    <option>Électrique</option>
+                    <option>Hybride</option>
+                </select>
+
+                <select name="categorie" required class="w-full border border-gray-300 rounded px-3 py-2">
+                    <option value="" disabled selected>-- Catégorie --</option>
+                    <option>Économique</option>
+                    <option>Berline</option>
+                    <option>SUV</option>
+                    <option>Luxe</option>
+                </select>
+
+                <input
+                        type="number" name="prixLocationJour" placeholder="Prix / jour (FCFA)"
+                        min="0" step="0.01" required
+                        class="w-full border border-gray-300 rounded px-3 py-2"
+                />
+
+                <select name="disponible" required class="w-full border border-gray-300 rounded px-3 py-2">
+                    <option value="true" selected>Disponible</option>
+                    <option value="false">Indisponible</option>
+                </select>
+
+                <label class="block font-semibold">Date mise en circulation :</label>
+                <input type="date" name="dateMiseEnCirculation" class="w-full border border-gray-300 rounded px-3 py-2" />
+
+                <label class="block font-semibold">Kilométrage :</label>
+                <input
+                        type="number" name="kilometrage" min="0" step="0.1" placeholder="Kilométrage"
+                        class="w-full border border-gray-300 rounded px-3 py-2"
+                />
+
+                <button
+                        type="submit"
+                        class="bg-blue-600 hover:bg-blue-700 text-white w-full py-2 rounded font-semibold transition"
+                >
+                    Ajouter
                 </button>
             </form>
         </div>
     </div>
 
-    <c:if test="${not empty param.error}">
-        <div class="alert-error">
-            <p>Erreur : ${param.error}</p>
-        </div>
-    </c:if>
-
-    <div class="page-header">
-        <h1 class="page-title"><i class="fas fa-car"></i> Gestion des Voitures</h1>
-        <button class="add-client-btn" onclick="openModal('addVoitureModal')">
-            <i class="fas fa-plus"></i> Ajouter une Voiture
-        </button>
-    </div>
-
-    <div class="search-container">
-        <input type="text" id="vehicleSearchInput" placeholder="Rechercher par marque, modèle ou immatriculation..." />
-    </div>
-
-    <div class="vehicle-grid">
-        <c:forEach var="voiture" items="${voitures}">
-            <div class="vehicle-card">
-                <h3>${voiture.marque} ${voiture.modele}</h3>
-                <div class="immatriculation">${voiture.immatriculation}</div>
-                <div class="details">
-                    <div><i class="fas fa-users"></i> ${voiture.nombrePlaces} places</div>
-                    <div><i class="fas fa-gas-pump"></i> ${voiture.typeCarburant}</div>
-                    <div><i class="fas fa-calendar-alt"></i> ${voiture.dateMiseEnCirculation}</div>
-                    <div><i class="fas fa-tachometer-alt"></i> ${voiture.kilometrage} km</div>
-                </div>
-                <div class="category">Catégorie: ${voiture.categorie}</div>
-                <div class="price">${voiture.prixLocationJour} FCFA/jour</div>
-                <div class="disponible">
-                    <c:choose>
-                        <c:when test="${voiture.disponible}">
-                            <span style="color: green;"><i class="fas fa-check-circle"></i> Disponible</span>
-                        </c:when>
-                        <c:otherwise>
-                            <span style="color: red;"><i class="fas fa-times-circle"></i> Indisponible</span>
-                        </c:otherwise>
-                    </c:choose>
-                </div>
-                <div class="actions">
-                    <button class="edit-btn" onclick="openEditModal('${voiture.immatriculation}')">
-                        <i class="fas fa-edit"></i> Modifier
-                    </button>
-                    <button class="delete-btn" onclick="openDeleteModal('${voiture.immatriculation}')">
-                        <i class="fas fa-trash"></i> Supprimer
-                    </button>
-                </div>
-            </div>
-        </c:forEach>
-        <c:if test="${empty voitures}">
-            <div style="grid-column: 1 / -1; text-align: center; padding: 20px;">
-                Aucune voiture trouvée.
-            </div>
-        </c:if>
-    </div>
-
-    <!-- Modales d'ajout, modification, suppression incluses ici (même structure, mais formulaire avec champ caché CSRF si activé) -->
-
-    <!-- Ajout -->
-    <div class="modal" id="addVoitureModal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('addVoitureModal')">&times;</span>
-            <h2>Ajouter une Voiture</h2>
-            <form method="post" action="${pageContext.request.contextPath}/VoitureServlet">
-                <input type="hidden" name="action" value="save" />
-
-                <input type="text" name="immatriculation" placeholder="Immatriculation" required />
-
-                <select name="marque" required>
-                    <option value="">-- Choisir une marque --</option>
-                    <option value="Toyota">Toyota</option>
-                    <option value="Renault">Renault</option>
-                    <option value="Peugeot">Peugeot</option>
-                    <option value="Ford">Ford</option>
-                    <option value="BMW">BMW</option>
-                </select>
-
-                <select name="modele" required>
-                    <option value="">-- Choisir un modèle --</option>
-                    <option value="Modèle A">Modèle A</option>
-                    <option value="Modèle B">Modèle B</option>
-                    <option value="Modèle C">Modèle C</option>
-                    <option value="Modèle D">Modèle D</option>
-                </select>
-
-                <select name="nombrePlaces" required>
-                    <option value="">-- Nombre de places --</option>
-                    <option value="2">2</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="7">7</option>
-                </select>
-
-                <select name="typeCarburant" required>
-                    <option value="">-- Type de carburant --</option>
-                    <option value="Essence">Essence</option>
-                    <option value="Diesel">Diesel</option>
-                    <option value="Électrique">Électrique</option>
-                    <option value="Hybride">Hybride</option>
-                </select>
-
-                <select name="categorie" required>
-                    <option value="">-- Catégorie --</option>
-                    <option value="Économique">Économique</option>
-                    <option value="Berline">Berline</option>
-                    <option value="SUV">SUV</option>
-                    <option value="Luxe">Luxe</option>
-                </select>
-
-                <input type="number" name="prixLocationJour" placeholder="Prix / jour" required min="0" step="0.01" />
-
-                <select name="disponible" required>
-                    <option value="true">Disponible</option>
-                    <option value="false">Indisponible</option>
-                </select>
-
-                <label>Date mise en circulation :</label>
-                <input type="date" name="dateMiseEnCirculation" />
-
-                <label>Kilométrage :</label>
-                <input type="number" name="kilometrage" min="0" step="0.1" placeholder="Kilométrage" />
-
-                <button type="submit">Ajouter</button>
-            </form>
-        </div>
-    </div>
-
-    <div class="modal" id="addVoitureModal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('addVoitureModal')">&times;</span>
-            <h2>Ajouter une Voiture</h2>
-            <form method="post" action="${pageContext.request.contextPath}/VoitureServlet">
-                <input type="hidden" name="action" value="save" />
-
-                <input type="text" name="immatriculation" placeholder="Immatriculation" required />
-
-                <select name="marque" required>
-                    <option value="">-- Choisir une marque --</option>
-                    <option value="Toyota">Toyota</option>
-                    <option value="Renault">Renault</option>
-                    <option value="Peugeot">Peugeot</option>
-                    <option value="Ford">Ford</option>
-                    <option value="BMW">BMW</option>
-                </select>
-
-                <select name="modele" required>
-                    <option value="">-- Choisir un modèle --</option>
-                    <option value="Modèle A">Modèle A</option>
-                    <option value="Modèle B">Modèle B</option>
-                    <option value="Modèle C">Modèle C</option>
-                    <option value="Modèle D">Modèle D</option>
-                </select>
-
-                <select name="nombrePlaces" required>
-                    <option value="">-- Nombre de places --</option>
-                    <option value="2">2</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="7">7</option>
-                </select>
-
-                <select name="typeCarburant" required>
-                    <option value="">-- Type de carburant --</option>
-                    <option value="Essence">Essence</option>
-                    <option value="Diesel">Diesel</option>
-                    <option value="Électrique">Électrique</option>
-                    <option value="Hybride">Hybride</option>
-                </select>
-
-                <select name="categorie" required>
-                    <option value="">-- Catégorie --</option>
-                    <option value="Économique">Économique</option>
-                    <option value="Berline">Berline</option>
-                    <option value="SUV">SUV</option>
-                    <option value="Luxe">Luxe</option>
-                </select>
-
-                <input type="number" name="prixLocationJour" placeholder="Prix / jour" required min="0" step="0.01" />
-
-                <select name="disponible" required>
-                    <option value="true">Disponible</option>
-                    <option value="false">Indisponible</option>
-                </select>
-
-                <label>Date mise en circulation :</label>
-                <input type="date" name="dateMiseEnCirculation" />
-
-                <label>Kilométrage :</label>
-                <input type="number" name="kilometrage" min="0" step="0.1" placeholder="Kilométrage" />
-
-                <button type="submit">Ajouter</button>
-            </form>
-        </div>
-    </div>
-
-    <div class="modal" id="deleteVoitureModal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('deleteVoitureModal')">&times;</span>
-            <h2>Supprimer la voiture ?</h2>
-            <p>Voulez-vous vraiment supprimer cette voiture ?</p>
-            <form method="post" action="${pageContext.request.contextPath}/VoitureServlet">
-                <input type="hidden" name="action" value="delete" />
-                <input type="hidden" name="immatriculation" id="delete-immatriculation" />
-                <button type="submit" class="delete-confirm-btn">Oui, supprimer</button>
-                <button type="button" onclick="closeModal('deleteVoitureModal')">Annuler</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal de modification -->
-    <div class="modal" id="editVoitureModal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('editVoitureModal')">&times;</span>
-            <h2>Modifier la Voiture</h2>
-            <form method="post" action="${pageContext.request.contextPath}/VoitureServlet">
+    <!-- Modal Modification -->
+    <div id="editCarModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50">
+        <div class="bg-white rounded-lg shadow-lg w-11/12 max-w-lg p-6 relative overflow-auto max-h-[90vh]">
+            <button
+                    class="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
+                    onclick="closeModal('editCarModal')"
+                    aria-label="Fermer"
+            >
+                <i class="fas fa-times fa-lg"></i>
+            </button>
+            <h3 class="text-xl font-semibold mb-4">Modifier la voiture</h3>
+            <form method="post" action="${pageContext.request.contextPath}/VoitureServlet" class="space-y-4">
                 <input type="hidden" name="action" value="update" />
                 <input type="hidden" name="immatriculation" id="edit-immatriculation" />
 
-                <label>Immatriculation :</label>
-                <input type="text" id="edit-immatriculation-display" readonly disabled />
+                <label class="block font-semibold">Immatriculation :</label>
+                <input
+                        type="text"
+                        id="edit-immatriculation-display"
+                        disabled
+                        class="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100"
+                />
 
-                <label>Marque :</label>
-                <select name="marque" id="edit-marque" required>
-                    <option value="">-- Choisir une marque --</option>
-                    <option value="Toyota">Toyota</option>
-                    <option value="Renault">Renault</option>
-                    <option value="Peugeot">Peugeot</option>
-                    <option value="Ford">Ford</option>
-                    <option value="BMW">BMW</option>
+                <label class="block font-semibold">Marque :</label>
+                <select
+                        name="marque"
+                        id="edit-marque"
+                        required
+                        class="w-full border border-gray-300 rounded px-3 py-2"
+                >
+                    <option value="" disabled>-- Choisir une marque --</option>
+                    <option>Toyota</option>
+                    <option>Renault</option>
+                    <option>Peugeot</option>
+                    <option>Ford</option>
+                    <option>BMW</option>
                 </select>
 
-                <label>Modèle :</label>
-                <select name="modele" id="edit-modele" required>
-                    <option value="">-- Choisir un modèle --</option>
-                    <option value="Modèle A">Modèle A</option>
-                    <option value="Modèle B">Modèle B</option>
-                    <option value="Modèle C">Modèle C</option>
-                    <option value="Modèle D">Modèle D</option>
+                <label class="block font-semibold">Modèle :</label>
+                <select
+                        name="modele"
+                        id="edit-modele"
+                        required
+                        class="w-full border border-gray-300 rounded px-3 py-2"
+                >
+                    <option value="" disabled>-- Choisir un modèle --</option>
+                    <option>Modèle A</option>
+                    <option>Modèle B</option>
+                    <option>Modèle C</option>
+                    <option>Modèle D</option>
                 </select>
 
-                <label>Places :</label>
-                <select name="nombrePlaces" id="edit-nombrePlaces" required>
-                    <option value="">-- Nombre de places --</option>
-                    <option value="2">2</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="7">7</option>
+                <label class="block font-semibold">Nombre de places :</label>
+                <select
+                        name="nombrePlaces"
+                        id="edit-nombrePlaces"
+                        required
+                        class="w-full border border-gray-300 rounded px-3 py-2"
+                >
+                    <option value="" disabled>-- Nombre de places --</option>
+                    <option>2</option>
+                    <option>4</option>
+                    <option>5</option>
+                    <option>7</option>
                 </select>
 
-                <label>Type Carburant :</label>
-                <select name="typeCarburant" id="edit-typeCarburant" required>
-                    <option value="">-- Type de carburant --</option>
-                    <option value="Essence">Essence</option>
-                    <option value="Diesel">Diesel</option>
-                    <option value="Électrique">Électrique</option>
-                    <option value="Hybride">Hybride</option>
+                <label class="block font-semibold">Type de carburant :</label>
+                <select
+                        name="typeCarburant"
+                        id="edit-typeCarburant"
+                        required
+                        class="w-full border border-gray-300 rounded px-3 py-2"
+                >
+                    <option value="" disabled>-- Type de carburant --</option>
+                    <option>Essence</option>
+                    <option>Diesel</option>
+                    <option>Électrique</option>
+                    <option>Hybride</option>
                 </select>
 
-                <label>Catégorie :</label>
-                <select name="categorie" id="edit-categorie" required>
-                    <option value="">-- Catégorie --</option>
-                    <option value="Économique">Économique</option>
-                    <option value="Berline">Berline</option>
-                    <option value="SUV">SUV</option>
-                    <option value="Luxe">Luxe</option>
+                <label class="block font-semibold">Catégorie :</label>
+                <select
+                        name="categorie"
+                        id="edit-categorie"
+                        required
+                        class="w-full border border-gray-300 rounded px-3 py-2"
+                >
+                    <option value="" disabled>-- Catégorie --</option>
+                    <option>Économique</option>
+                    <option>Berline</option>
+                    <option>SUV</option>
+                    <option>Luxe</option>
                 </select>
 
-                <label>Prix / jour :</label>
-                <input type="number" name="prixLocationJour" id="edit-prixLocationJour" required min="0" step="0.01" />
+                <label class="block font-semibold">Prix / jour (FCFA) :</label>
+                <input
+                        type="number"
+                        name="prixLocationJour"
+                        id="edit-prixLocationJour"
+                        min="0"
+                        step="0.01"
+                        required
+                        class="w-full border border-gray-300 rounded px-3 py-2"
+                />
 
-                <label>Disponible :</label>
-                <select name="disponible" id="edit-disponible" required>
+                <label class="block font-semibold">Disponible :</label>
+                <select
+                        name="disponible"
+                        id="edit-disponible"
+                        required
+                        class="w-full border border-gray-300 rounded px-3 py-2"
+                >
                     <option value="true">Disponible</option>
                     <option value="false">Indisponible</option>
                 </select>
 
-                <label>Date mise en circulation :</label>
-                <input type="date" name="dateMiseEnCirculation" id="edit-dateMiseEnCirculation" />
+                <label class="block font-semibold">Date mise en circulation :</label>
+                <input
+                        type="date"
+                        name="dateMiseEnCirculation"
+                        id="edit-dateMiseEnCirculation"
+                        class="w-full border border-gray-300 rounded px-3 py-2"
+                />
 
-                <label>Kilométrage :</label>
-                <input type="number" name="kilometrage" id="edit-kilometrage" min="0" step="0.1" placeholder="Kilométrage" />
+                <label class="block font-semibold">Kilométrage :</label>
+                <input
+                        type="number"
+                        name="kilometrage"
+                        id="edit-kilometrage"
+                        min="0"
+                        step="0.1"
+                        placeholder="Kilométrage"
+                        class="w-full border border-gray-300 rounded px-3 py-2"
+                />
 
-                <button type="submit">Modifier</button>
+                <button
+                        type="submit"
+                        class="bg-blue-600 hover:bg-blue-700 text-white w-full py-2 rounded font-semibold transition"
+                >
+                    Modifier
+                </button>
             </form>
         </div>
     </div>
 
+    <!-- Modal Suppression -->
+    <div id="deleteCarModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50">
+        <div class="bg-white rounded-lg shadow-lg w-96 p-6 relative">
+            <button
+                    class="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
+                    onclick="closeModal('deleteCarModal')"
+                    aria-label="Fermer"
+            >
+                <i class="fas fa-times fa-lg"></i>
+            </button>
+            <h3 class="text-xl font-semibold mb-4">Supprimer la voiture</h3>
+            <p>Voulez-vous vraiment supprimer cette voiture ?</p>
+            <form method="post" action="${pageContext.request.contextPath}/VoitureServlet" class="mt-4 flex justify-end gap-4">
+                <input type="hidden" name="action" value="delete" />
+                <input type="hidden" name="immatriculation" id="delete-immatriculation" />
+                <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded font-semibold transition">
+                    Oui, supprimer
+                </button>
+                <button
+                        type="button"
+                        onclick="closeModal('deleteCarModal')"
+                        class="bg-gray-300 hover:bg-gray-400 px-5 py-2 rounded transition"
+                >
+                    Annuler
+                </button>
+            </form>
+        </div>
+    </div>
 </main>
 
 <script>
+    // Modal open/close helpers
     function openModal(id) {
-        document.getElementById(id).style.display = "block";
+        document.getElementById(id).classList.remove('hidden');
     }
     function closeModal(id) {
-        document.getElementById(id).style.display = "none";
-    }
-    function openEditModal(immatriculation) {
-        document.getElementById("edit-immatriculation").value = immatriculation;
-        document.getElementById("edit-immatriculation-display").value = immatriculation;
-        openModal("editVoitureModal");
-    }
-    function openDeleteModal(immatriculation) {
-        document.getElementById("delete-immatriculation").value = immatriculation;
-        openModal("deleteVoitureModal");
+        document.getElementById(id).classList.add('hidden');
     }
 
-    // Nouvelle fonction de recherche pour les cartes
-    document.getElementById("vehicleSearchInput").addEventListener("input", function() {
+    // Fill edit modal with selected car data
+    function openEditModal(immatriculation) {
+        // Trouver la carte voiture correspondante
+        const card = [...document.querySelectorAll('.vehicle-card')].find(
+            c => c.dataset.immatriculation === immatriculation.toLowerCase()
+        );
+        if (!card) return;
+
+        // Récupérer les infos
+        document.getElementById('edit-immatriculation').value = immatriculation;
+        document.getElementById('edit-immatriculation-display').value = immatriculation;
+        document.getElementById('edit-marque').value = card.dataset.marque;
+        document.getElementById('edit-modele').value = card.dataset.modele;
+        document.getElementById('edit-nombrePlaces').value = card.querySelector('p:contains("places")')?.textContent.match(/\d+/) || '';
+        document.getElementById('edit-typeCarburant').value = card.dataset.typecarburant || card.querySelector('p:contains("carburant")')?.textContent || '';
+        // Pour les autres champs, on peut les stocker dans data-* si besoin. Sinon ajouter dans les cards.
+        // Mais pour l'instant on garde simple : il faut ajouter data-attributes supplémentaires si nécessaire.
+
+        // Autres champs à récupérer dans le DOM
+        // On va récupérer depuis les éléments textuels si possible
+        // Places :
+        const placesText = card.querySelector('p:contains("places")')?.textContent || '';
+        document.getElementById('edit-nombrePlaces').value = placesText.match(/\d+/) ? placesText.match(/\d+/)[0] : '';
+
+        // Carburant
+        const carburantText = !(!'' && !card.querySelector('p:contains("carburant")')?.textContent);
+        document.getElementById('edit-typeCarburant').value = carburantText.trim();
+
+        // Pour date, km, catégorie, prix, dispo, on doit ajouter data-* dans la card ou chercher dans le DOM
+        // Pour simplifier, on va stocker dans data-* les infos importantes. Je vais améliorer ça :
+
+        document.getElementById('edit-nombrePlaces').value = card.dataset.nombreplaces || '';
+        document.getElementById('edit-typeCarburant').value = card.dataset.typecarburant || '';
+        document.getElementById('edit-categorie').value = card.dataset.categorie || '';
+        document.getElementById('edit-prixLocationJour').value = card.dataset.prixlocationjour || '';
+        document.getElementById('edit-disponible').value = card.dataset.disponible || 'true';
+        document.getElementById('edit-dateMiseEnCirculation').value = card.dataset.datemiseencirculation || '';
+        document.getElementById('edit-kilometrage').value = card.dataset.kilometrage || '';
+
+        openModal('editCarModal');
+    }
+
+    function openDeleteModal(immatriculation) {
+        document.getElementById('delete-immatriculation').value = immatriculation;
+        openModal('deleteCarModal');
+    }
+
+    // Recherche filtre simple sur les cartes
+    document.getElementById('searchInput').addEventListener('input', function () {
         const filter = this.value.toLowerCase();
-        document.querySelectorAll(".vehicle-card").forEach(card => {
-            const text = card.textContent.toLowerCase();
-            card.style.display = text.includes(filter) ? "block" : "none";
+        document.querySelectorAll('.vehicle-card').forEach(card => {
+            const text = (
+                card.dataset.marque + ' ' +
+                card.dataset.modele + ' ' +
+                card.dataset.immatriculation
+            ).toLowerCase();
+            card.style.display = text.includes(filter) ? 'flex' : 'none';
         });
     });
 </script>
