@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <!-- Écriture dans un fichier -->
+        <File name="FileLogger" fileName="logs/app.log" append="true">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n"/>
+        </File>
+
+        <!-- Console (facultatif) -->
+        <Console name="ConsoleLogger" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss} %-5p %c{1}:%L - %m%n"/>
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <!-- Logger de base -->
+        <Root level="info">
+            <AppenderRef ref="FileLogger"/>
+            <AppenderRef ref="ConsoleLogger"/>
+        </Root>
+    </Loggers>
+</Configuration>
