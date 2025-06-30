@@ -1,5 +1,6 @@
 package com.agence.agencevoiture.utils;
 
+<<<<<<< HEAD
 import org.apache.logging.log4j.*;
 public class MainApp {
 
@@ -10,4 +11,7 @@ public class MainApp {
                 logger.warn("Ceci est un avertissement");
                 logger.error("Une erreur c'est produite");
             }
+=======
+public class MainApp {
+>>>>>>> origin/main
 }
