@@ -18,14 +18,14 @@
     <span class="font-bold text-xl">AutoDrive</span>
   </div>
   <nav class="flex flex-col mt-4 px-2 space-y-1 text-sm font-medium">
-    <a href="${pageContext.request.contextPath}/dashboard.jsp" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-[#2563eb] transition">
+    <a href="${pageContext.request.contextPath}/DashboardManagerServlet" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-[#2563eb] transition">
       <!-- Icon Dashboard: graphique simple -->
       <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
         <path stroke-linecap="round" stroke-linejoin="round" d="M11 17h2m-1-8v8m-6 4h14a2 2 0 002-2v-7a2 2 0 00-2-2H5a2 2 0 00-2 2v7a2 2 0 002 2z" />
       </svg>
       Tableau de bord
     </a>
-    <a href="${pageContext.request.contextPath}/voitures.jsp" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-[#2563eb] transition">
+    <a href="${pageContext.request.contextPath}/VoitureServlet" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-[#2563eb] transition">
       <!-- Icon Voiture -->
       <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
         <path stroke-linecap="round" stroke-linejoin="round" d="M3 13l1.5-2h15l1.5 2M5 16h14v2a1 1 0 01-1 1h-12a1 1 0 01-1-1v-2z" />
@@ -34,13 +34,14 @@
       </svg>
       Gestion voitures
     </a>
-    <a href="${pageContext.request.contextPath}/gestionclients.jsp" class="flex items-center gap-3 px-3 py-2 rounded bg-[#2563eb] transition">
-      <!-- Icon Clients: silhouette utilisateur -->
-      <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M5.121 17.804A8.962 8.962 0 0112 15c2.428 0 4.636 1.01 6.279 2.657M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-      </svg>
-      Gestion clients
-    </a>
+    <a href="${pageContext.request.contextPath}/ClientServlet" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-[#2563eb] transition">
+    <!-- Icon Locations: clé -->
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 11c1.104 0 2-.896 2-2s-.896-2-2-2-2 .896-2 2 .896 2 2 2z" />
+      <path stroke-linecap="round" stroke-linejoin="round" d="M7 14l5 5m0 0l5-5m-5 5V9" />
+    </svg>
+    Gestion clients
+  </a>
     <a href="${pageContext.request.contextPath}/locations.jsp" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-[#2563eb] transition">
       <!-- Icon Locations: clé -->
       <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
