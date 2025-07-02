@@ -31,14 +31,26 @@ public class VoitureDAO {
             return voiture;
         }
 
-        public List<Voiture> trouverTous(){
-            EntityManager em = emf.createEntityManager();
-            List<Voiture> voitures = em.createQuery("select v from Voiture v", Voiture.class).getResultList();
+    public List<Voiture> trouverVoituresDisponibles() {
+        EntityManager em = emf.createEntityManager();
+        try {
+            return em.createQuery("SELECT v FROM Voiture v WHERE v.disponible = true", Voiture.class)
+                    .getResultList();
+        } finally {
             em.close();
-            return voitures;
         }
+    }
 
-        public void supprimerVoiture(Voiture voiture){
+
+    public List<Voiture> trouverTous(){
+        EntityManager em = emf.createEntityManager();
+        List<Voiture> voitures = em.createQuery("select v from Voiture v", Voiture.class).getResultList();
+        em.close();
+        return voitures;
+    }
+
+
+    public void supprimerVoiture(Voiture voiture){
             EntityManager em = emf.createEntityManager();
             em.getTransaction().begin();
             voiture = em.merge(voiture);

@@ -1,10 +1,7 @@
 package com.agence.agencevoiture.service;
 
 import com.agence.agencevoiture.dao.VoitureDAO;
-import com.agence.agencevoiture.entity.Client;
 import com.agence.agencevoiture.entity.Voiture;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.TypedQuery;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -79,9 +76,28 @@ public class VoitureService {
 
     public List<Voiture> listerVoituresDisponibles() {
         return voitureDAO.trouverTous().stream()
-                .filter(Voiture::isDisponible)
+                .filter(v -> {
+                    System.out.println("VOITURE: " + v.getImmatriculation() + " dispo=" + v.isDisponible());
+                    return v.isDisponible();
+                })
                 .collect(Collectors.toList());
     }
+
+    public List<Voiture> rechercherVoituresDisponibles(String marque, String carburant, String categorie, Integer kmMax, Integer anneeMin) {
+        return voitureDAO.trouverTous().stream()
+                .filter(Voiture::isDisponible)
+                .filter(v -> marque == null || marque.isEmpty() || v.getMarque().equalsIgnoreCase(marque))
+                .filter(v -> carburant == null || carburant.isEmpty() || v.getTypeCarburant().equalsIgnoreCase(carburant))
+                .filter(v -> categorie == null || categorie.isEmpty() || v.getCategorie().equalsIgnoreCase(categorie))
+                .filter(v -> kmMax == null || v.getKilometrage() <= kmMax)
+                .filter(v -> anneeMin == null ||
+                        (v.getDateMiseEnCirculation() != null &&
+                                v.getDateMiseEnCirculation().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate().getYear() >= anneeMin))
+                .collect(Collectors.toList());
+    }
+
+
+
     public boolean changerDisponibilite(String immat, boolean disponible) {
         Voiture voiture = voitureDAO.trouverVoiture(immat);
         if (voiture == null) return false;

@@ -54,6 +54,8 @@ public class ClientService {
         return clientDAO.trouverClient(cin.trim());
     }
 
+
+
     /**
      * Récupère tous les clients enregistrés.
      *

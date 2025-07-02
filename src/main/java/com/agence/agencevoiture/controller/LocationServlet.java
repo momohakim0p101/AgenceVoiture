@@ -1,113 +1,74 @@
 package com.agence.agencevoiture.controller;
 
-import com.agence.agencevoiture.dao.ClientDAO;
-import com.agence.agencevoiture.dao.VoitureDAO;
 import com.agence.agencevoiture.entity.Client;
 import com.agence.agencevoiture.entity.Location;
 import com.agence.agencevoiture.entity.Voiture;
+import com.agence.agencevoiture.service.ClientService;
 import com.agence.agencevoiture.service.LocationService;
+import com.agence.agencevoiture.service.VoitureService;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
-
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
-@WebServlet("/location")
+@WebServlet("/LocationServlet")
 public class LocationServlet extends HttpServlet {
 
-    private final LocationService locationService = new LocationService();
-    private final ClientDAO clientDAO = new ClientDAO();
-    private final VoitureDAO voitureDAO = new VoitureDAO();
+    private VoitureService voitureService;
+    private ClientService clientService;
+    private LocationService locationService;
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        List<Location> locations = locationService.listerToutesLesLocations();
-        request.setAttribute("locations", locations);
-        request.getRequestDispatcher("location.jsp").forward(request, response);
+    public void init() {
+        voitureService = new VoitureService();
+        clientService = new ClientService();
+        locationService = new LocationService();
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String action = request.getParameter("action");
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
-        switch (action) {
-            case "ajouter":
-                ajouterLocation(request, response);
-                break;
-            case "supprimer":
-                supprimerLocation(request, response);
-                break;
-            case "modifier":
-                modifierLocation(request, response);
-                break;
-            default:
-                request.setAttribute("erreur", "Action non reconnue.");
-                doGet(request, response);
-        }
+        List<Voiture> voituresDisponibles = locationService.voituresDisponibles();
+        List<Client> clients = clientService.rechercherTousLesClients();
+        List<Location> locationsActives = locationService.listerToutesLesLocations()
+                .stream()
+                .filter(loc -> loc.getStatut() == Location.StatutLocation.CONFIRMEE)
+                .collect(Collectors.toList());
+
+
+        Set<String> marques = voituresDisponibles.stream()
+                .map(Voiture::getMarque)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toCollection(TreeSet::new));
+
+        Set<String> categories = voituresDisponibles.stream()
+                .map(Voiture::getCategorie)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toCollection(TreeSet::new));
+
+        Set<String> carburants = voituresDisponibles.stream()
+                .map(Voiture::getTypeCarburant)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toCollection(TreeSet::new));
+
+        request.setAttribute("voituresDisponibles", voituresDisponibles);
+        request.setAttribute("clients", clients);
+        request.setAttribute("locationsActives", locationsActives);
+        request.setAttribute("marques", marques);
+        request.setAttribute("categories", categories);
+        request.setAttribute("carburants", carburants);
+
+        request.getRequestDispatcher("Location.jsp").forward(request, response);
     }
 
-    private void ajouterLocation(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        try {
-            Location location = extraireLocationDepuisRequete(request);
-            locationService.ajouterLocation(location);
-            request.setAttribute("message", "Location ajoutée avec succès.");
-        } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("erreur", "Erreur lors de l'ajout de la location.");
-        }
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        // Rediriger simplement vers doGet (aucune logique côté POST nécessaire)
         doGet(request, response);
-    }
-
-    private void supprimerLocation(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        try {
-            Long id = Long.parseLong(request.getParameter("id"));
-            boolean success = locationService.supprimerLocation(id);
-            request.setAttribute(success ? "message" : "erreur", success ? "Location supprimée." : "Location introuvable.");
-        } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("erreur", "Erreur lors de la suppression.");
-        }
-        doGet(request, response);
-    }
-
-    private void modifierLocation(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        try {
-            Location location = extraireLocationDepuisRequete(request);
-            locationService.mettreAJourLocation(location);
-            request.setAttribute("message", "Location mise à jour avec succès.");
-        } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("erreur", "Erreur lors de la mise à jour.");
-        }
-        doGet(request, response);
-    }
-
-    private Location extraireLocationDepuisRequete(HttpServletRequest request) throws Exception {
-        Long id = request.getParameter("id") != null ? Long.parseLong(request.getParameter("id")) : null;
-        String immatriculation = request.getParameter("immatriculation");
-        String cinClient = request.getParameter("cin_client");
-        Date debut = new SimpleDateFormat("yyyy-MM-dd").parse(request.getParameter("dateDebut"));
-        Date fin = new SimpleDateFormat("yyyy-MM-dd").parse(request.getParameter("dateFin"));
-        double montant = Double.parseDouble(request.getParameter("montant"));
-        String statut = request.getParameter("statut");
-
-        // Récupération de la voiture et du client
-        Voiture voiture = voitureDAO.trouverVoiture(immatriculation);
-        Client client = clientDAO.trouverClient(cinClient);
-
-        Location location = new Location();
-        location.setIdReservation(id);
-        location.setVoiture(voiture);
-        location.setClient(client);
-        location.setDateDebut(debut);
-        location.setDateFin(fin);
-        location.setMontantTotal(montant);
-        location.setStatut(statut);
-
-        return location;
     }
 }

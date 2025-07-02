@@ -1,66 +1,76 @@
 package com.agence.agencevoiture.entity;
 
 import jakarta.persistence.*;
-
 import java.util.Date;
 
 @Entity
-@Table(name="reservation")
+@Table(name = "reservation")
 public class Location {
+
+    public enum StatutLocation {
+        CONFIRMEE,
+        TERMINEE,
+        ANNULEE,
+        EN_COURS,
+        LOUE
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_reservation")
     private Long idReservation;
 
-    @Column(name = "date_debut", nullable = false)
+    // Correction ici : correspondance réelle avec la colonne "cin_client" dans la base
+    @ManyToOne
+    @JoinColumn(name = "cin_client", referencedColumnName = "cin", nullable = false)
+    private Client client;
+
+    // Adaptation selon ta base si tu as "immatriculation" comme clé de voiture
+    @ManyToOne
+    @JoinColumn(name = "immatriculation_voiture", referencedColumnName = "immatriculation", nullable = false)
+    private Voiture voiture;
+
     @Temporal(TemporalType.DATE)
+    @Column(name = "date_debut")
     private Date dateDebut;
 
-    @Column(name = "date_fin", nullable = false)
     @Temporal(TemporalType.DATE)
+    @Column(name = "date_fin")
     private Date dateFin;
 
     @Column(name = "montant_total")
     private double montantTotal;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "statut")
-    private String statut; // Confirmée, Annulée, Terminée
-
-    @ManyToOne
-    @JoinColumn(name = "cin_client", referencedColumnName = "cin")
-    private Client client;
-
-    @ManyToOne
-    @JoinColumn(name = "immatriculation_voiture", referencedColumnName = "immatriculation")
-    private Voiture voiture;
+    private StatutLocation statut;
 
     @OneToOne(mappedBy = "location", cascade = CascadeType.ALL)
     private Facture facture;
 
-    public Location() {
-
-    }
-
-    public Location(Long idReservation, Date dateDebut, Date dateFin, double montantTotal, String statut, Client client, Voiture voiture, Facture facture) {
-        this.idReservation = idReservation;
-        this.dateDebut = dateDebut;
-        this.dateFin = dateFin;
-        this.montantTotal = montantTotal;
-        this.statut = statut;
-        this.client = client;
-        this.voiture = voiture;
-        this.facture = facture;
-    }
-
     // Getters & Setters
-
-
     public Long getIdReservation() {
         return idReservation;
     }
 
     public void setIdReservation(Long idReservation) {
         this.idReservation = idReservation;
+    }
+
+    public Client getClient() {
+        return client;
+    }
+
+    public void setClient(Client client) {
+        this.client = client;
+    }
+
+    public Voiture getVoiture() {
+        return voiture;
+    }
+
+    public void setVoiture(Voiture voiture) {
+        this.voiture = voiture;
     }
 
     public Date getDateDebut() {
@@ -87,28 +97,12 @@ public class Location {
         this.montantTotal = montantTotal;
     }
 
-    public String getStatut() {
+    public StatutLocation getStatut() {
         return statut;
     }
 
-    public void setStatut(String statut) {
+    public void setStatut(StatutLocation statut) {
         this.statut = statut;
-    }
-
-    public Client getClient() {
-        return client;
-    }
-
-    public void setClient(Client client) {
-        this.client = client;
-    }
-
-    public Voiture getVoiture() {
-        return voiture;
-    }
-
-    public void setVoiture(Voiture voiture) {
-        this.voiture = voiture;
     }
 
     public Facture getFacture() {
@@ -117,19 +111,5 @@ public class Location {
 
     public void setFacture(Facture facture) {
         this.facture = facture;
-    }
-
-    @Override
-    public String toString() {
-        return "Location{" +
-                "idReservation=" + idReservation +
-                ", dateDebut=" + dateDebut +
-                ", dateFin=" + dateFin +
-                ", montantTotal=" + montantTotal +
-                ", statut='" + statut + '\'' +
-                ", client=" + client +
-                ", voiture=" + voiture +
-                ", facture=" + facture +
-                '}';
     }
 }

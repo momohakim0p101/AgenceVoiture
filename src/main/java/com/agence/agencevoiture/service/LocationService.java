@@ -3,57 +3,52 @@ package com.agence.agencevoiture.service;
 import com.agence.agencevoiture.dao.LocationDAO;
 import com.agence.agencevoiture.entity.Client;
 import com.agence.agencevoiture.entity.Location;
+import com.agence.agencevoiture.entity.Location.StatutLocation;
 import com.agence.agencevoiture.entity.Voiture;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.TypedQuery;
+import jakarta.persistence.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class LocationService {
 
     @PersistenceContext
     private EntityManager em;
 
-    // 1. Situation du parking
+    private final LocationDAO locationDAO = new LocationDAO();
 
-    /**
-     * Nombre total de voitures dans l’agence
-     */
-    public long compterVoitures() {
-        return em.createQuery("SELECT COUNT(v) FROM Voiture v", Long.class).getSingleResult();
+    public LocationService() {
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("pu");
+        this.em = emf.createEntityManager();
     }
 
-    /**
-     * Liste des voitures actuellement en location avec infos locataires
-     */
+    // 1. Situation du parking
+
+    public long compterVoitures() {
+        return em.createQuery("SELECT COUNT(v) FROM Voiture v", Long.class)
+                .getSingleResult();
+    }
+
     public List<Location> voituresEnLocation() {
         return em.createQuery(
                         "SELECT l FROM Location l WHERE l.statut = :statut", Location.class)
-                .setParameter("statut", "Confirmée")
+                .setParameter("statut", StatutLocation.CONFIRMEE)
                 .getResultList();
     }
 
-    /**
-     * Liste des voitures disponibles
-     */
     public List<Voiture> voituresDisponibles() {
         return em.createQuery(
                         "SELECT v FROM Voiture v WHERE v.disponible = true", Voiture.class)
                 .getResultList();
     }
 
-    // 2. Voitures les plus recherchées (les plus louées)
+    // 2. Voitures les plus louées
 
-    /**
-     * Top N voitures les plus louées
-     */
     public List<Object[]> voituresLesPlusLoueés(int topN) {
         return em.createQuery(
                         "SELECT l.voiture, COUNT(l) as nb " +
@@ -66,22 +61,18 @@ public class LocationService {
 
     // 3. Bilan financier mensuel
 
-    /**
-     * Chiffre d’affaires (total des locations terminées) pour un mois donné
-     */
     public BigDecimal bilanFinancierMensuel(int annee, int mois) {
         TypedQuery<Double> query = em.createQuery(
                 "SELECT COALESCE(SUM(l.montantTotal), 0) FROM Location l " +
                         "WHERE l.statut = :statut " +
                         "AND FUNCTION('YEAR', l.dateFin) = :annee " +
                         "AND FUNCTION('MONTH', l.dateFin) = :mois", Double.class);
-        query.setParameter("statut", "Terminée");
+        query.setParameter("statut", StatutLocation.TERMINEE);
         query.setParameter("annee", annee);
         query.setParameter("mois", mois);
         Double result = query.getSingleResult();
         return BigDecimal.valueOf(result != null ? result : 0.0);
     }
-
 
     public Location reserverVoiture(Client client, Voiture voiture, Date dateDebut, Date dateFin, double prixJour) {
         if (client == null || voiture == null || !voiture.isDisponible() || dateDebut == null || dateFin == null || !dateFin.after(dateDebut)) {
@@ -94,37 +85,46 @@ public class LocationService {
         location.setDateFin(dateFin);
         long diffJours = (dateFin.getTime() - dateDebut.getTime()) / (1000 * 60 * 60 * 24);
         location.setMontantTotal(diffJours * prixJour);
-        location.setStatut("Confirmée");
+        location.setStatut(StatutLocation.CONFIRMEE);
 
+        em.getTransaction().begin();
         em.persist(location);
         voiture.setDisponible(false);
         em.merge(voiture);
+        em.getTransaction().commit();
 
         return location;
     }
 
     public Location terminerLocation(Long idReservation) {
+        em.getTransaction().begin();
         Location location = em.find(Location.class, idReservation);
-        if (location == null || !"Confirmée".equals(location.getStatut())) {
+        if (location == null || location.getStatut() != StatutLocation.CONFIRMEE) {
+            em.getTransaction().rollback();
             throw new IllegalStateException("Location non trouvée ou déjà terminée");
         }
-        location.setStatut("Terminée");
+        location.setStatut(StatutLocation.TERMINEE);
         location.getVoiture().setDisponible(true);
         em.merge(location.getVoiture());
-        return em.merge(location);
+        em.merge(location);
+        em.getTransaction().commit();
+        return location;
     }
 
     public Location annulerLocation(Long idReservation) {
+        em.getTransaction().begin();
         Location location = em.find(Location.class, idReservation);
-        if (location == null || !"Confirmée".equals(location.getStatut())) {
+        if (location == null || location.getStatut() != StatutLocation.CONFIRMEE) {
+            em.getTransaction().rollback();
             throw new IllegalStateException("Location non trouvée ou déjà terminée");
         }
-        location.setStatut("Annulée");
+        location.setStatut(StatutLocation.ANNULEE);
         location.getVoiture().setDisponible(true);
         em.merge(location.getVoiture());
-        return em.merge(location);
+        em.merge(location);
+        em.getTransaction().commit();
+        return location;
     }
-
 
     public Location chercherParId(Long id) {
         return em.find(Location.class, id);
@@ -143,8 +143,6 @@ public class LocationService {
     public List<Location> listerToutesLesLocations() {
         return locationDAO.trouverTous();
     }
-
-    private final LocationDAO locationDAO = new LocationDAO();
 
     public boolean supprimerLocation(Long id) {
         try {
@@ -165,11 +163,15 @@ public class LocationService {
     }
 
     public long compterClientsAyantLoué() {
-        String jpql = "SELECT COUNT(DISTINCT l.client) FROM Location l WHERE l.statut IN (:statuts)";
-        return em.createQuery(jpql, Long.class)
-                .setParameter("statuts", Arrays.asList("Confirmée", "Terminée"))
-                .getSingleResult();
+        List<StatutLocation> statuts = Arrays.asList(StatutLocation.LOUE, StatutLocation.EN_COURS);
+        TypedQuery<Long> query = em.createQuery(
+                "SELECT COUNT(DISTINCT l.client) FROM Location l WHERE l.statut IN :statuts", Long.class);
+        query.setParameter("statuts", statuts);
+        Long result = query.getSingleResult();
+        return result != null ? result : 0L;
     }
+
+
 
     public long compterTotalClients() {
         return em.createQuery("SELECT COUNT(c) FROM Client c", Long.class)
@@ -177,17 +179,19 @@ public class LocationService {
     }
 
     public long compterClientsActifsMois(int annee, int mois) {
+        List<StatutLocation> statuts = Arrays.asList(StatutLocation.CONFIRMEE, StatutLocation.TERMINEE);
         String jpql = "SELECT COUNT(DISTINCT l.client) FROM Location l " +
-                "WHERE l.statut IN (:statuts) " +
+                "WHERE l.statut IN :statuts " +
                 "AND FUNCTION('YEAR', l.dateDebut) = :annee " +
                 "AND FUNCTION('MONTH', l.dateDebut) = :mois";
 
         return em.createQuery(jpql, Long.class)
-                .setParameter("statuts", Arrays.asList("Confirmée", "Terminée"))
+                .setParameter("statuts", statuts)
                 .setParameter("annee", annee)
                 .setParameter("mois", mois)
                 .getSingleResult();
     }
+
 
     public List<Voiture> rechercherVoituresParMarqueOuModele(String motCle) {
         String jpql = "SELECT v FROM Voiture v WHERE LOWER(v.marque) LIKE :motCle OR LOWER(v.modele) LIKE :motCle";
@@ -203,10 +207,14 @@ public class LocationService {
                 .getResultList();
     }
 
-
-
     public void setEntityManager(EntityManager em) {
         this.em = em;
+    }
 
+    public List<Location> listerLocationsHistoriques() {
+        List<Location> toutesLocations = locationDAO.trouverTous();
+        return toutesLocations.stream()
+                .filter(loc -> loc.getStatut() != null && loc.getStatut() != StatutLocation.CONFIRMEE)
+                .collect(Collectors.toList());
     }
 }

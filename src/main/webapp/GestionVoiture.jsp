@@ -1,4 +1,5 @@
 <%@ page import="com.agence.agencevoiture.entity.Utilisateur" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%
     Utilisateur utilisateur = (Utilisateur) session.getAttribute("utilisateur");
@@ -20,8 +21,8 @@
 <!-- Menu Latéral -->
 <aside class="fixed top-0 left-0 h-screen w-64 bg-[#3b82f6] text-white flex flex-col">
     <div class="flex items-center justify-center gap-2 px-4 py-6 border-b border-white/10">
-        <img src="${pageContext.request.contextPath}/assets/logo.png" alt="Logo AutoDrive" class="h-8" />
-        <span class="font-bold text-xl">AutoDrive</span>
+        <img src="https://cdn.brandfetch.io/idD08_sdcu/w/250/h/250/theme/dark/icon.png?c=1dxbfHSJFAPEGdCLU4o5B" alt="Logo AutoDrive" class="h-8" />
+        <span class="font-bold text-xl">AutoManager</span>
     </div>
     <nav class="flex flex-col mt-4 px-2 space-y-1 text-sm font-medium">
         <a href="${pageContext.request.contextPath}/DashboardManagerServlet" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-[#2563eb] transition">
@@ -156,7 +157,7 @@
             </article>
         </c:forEach>
         <c:if test="${empty voitures}">
-            <p class="col-span-full text-center text-gray-500 mt-10">Aucune voiture trouvée.</p>
+            <p class="col-span-full text-center text-gray-500 mt-10">Aucune voiture trouve.</p>
         </c:if>
     </section>
 
@@ -192,11 +193,11 @@
                 </select>
 
                 <select name="modele" required class="w-full border border-gray-300 rounded px-3 py-2">
-                    <option value="" disabled selected>-- Choisir un modèle --</option>
-                    <option>Modèle A</option>
-                    <option>Modèle B</option>
-                    <option>Modèle C</option>
-                    <option>Modèle D</option>
+                    <option value="" disabled selected>-- Choisir un modele --</option>
+                    <option>Modele A</option>
+                    <option>Modele B</option>
+                    <option>Modele C</option>
+                    <option>Modele D</option>
                 </select>
 
                 <select name="nombrePlaces" required class="w-full border border-gray-300 rounded px-3 py-2">
@@ -211,13 +212,13 @@
                     <option value="" disabled selected>-- Type de carburant --</option>
                     <option>Essence</option>
                     <option>Diesel</option>
-                    <option>Électrique</option>
+                    <option>Electrique</option>
                     <option>Hybride</option>
                 </select>
 
                 <select name="categorie" required class="w-full border border-gray-300 rounded px-3 py-2">
-                    <option value="" disabled selected>-- Catégorie --</option>
-                    <option>Économique</option>
+                    <option value="" disabled selected>-- Categorie --</option>
+                    <option>Economique</option>
                     <option>Berline</option>
                     <option>SUV</option>
                     <option>Luxe</option>
@@ -237,9 +238,15 @@
                 <label class="block font-semibold">Date mise en circulation :</label>
                 <input type="date" name="dateMiseEnCirculation" class="w-full border border-gray-300 rounded px-3 py-2" />
 
-                <label class="block font-semibold">Kilométrage :</label>
+                <label class="block font-semibold">Kilometrage :</label>
                 <input
                         type="number" name="kilometrage" min="0" step="0.1" placeholder="Kilométrage"
+                        class="w-full border border-gray-300 rounded px-3 py-2"
+                />
+                <input
+                        type="text"
+                        name="imageUrl"
+                        placeholder="URL de l'image"
                         class="w-full border border-gray-300 rounded px-3 py-2"
                 />
 
@@ -291,14 +298,14 @@
                     <option>BMW</option>
                 </select>
 
-                <label class="block font-semibold">Modèle :</label>
+                <label class="block font-semibold">Modele :</label>
                 <select
                         name="modele"
                         id="edit-modele"
                         required
                         class="w-full border border-gray-300 rounded px-3 py-2"
                 >
-                    <option value="" disabled>-- Choisir un modèle --</option>
+                    <option value="" disabled>-- Choisir un modele --</option>
                     <option>Modèle A</option>
                     <option>Modèle B</option>
                     <option>Modèle C</option>
@@ -329,19 +336,19 @@
                     <option value="" disabled>-- Type de carburant --</option>
                     <option>Essence</option>
                     <option>Diesel</option>
-                    <option>Électrique</option>
+                    <option>Electrique</option>
                     <option>Hybride</option>
                 </select>
 
-                <label class="block font-semibold">Catégorie :</label>
+                <label class="block font-semibold">Categorie :</label>
                 <select
                         name="categorie"
                         id="edit-categorie"
                         required
                         class="w-full border border-gray-300 rounded px-3 py-2"
                 >
-                    <option value="" disabled>-- Catégorie --</option>
-                    <option>Économique</option>
+                    <option value="" disabled>-- Categorie --</option>
+                    <option>Economique</option>
                     <option>Berline</option>
                     <option>SUV</option>
                     <option>Luxe</option>
@@ -377,7 +384,7 @@
                         class="w-full border border-gray-300 rounded px-3 py-2"
                 />
 
-                <label class="block font-semibold">Kilométrage :</label>
+                <label class="block font-semibold">Kilometrage :</label>
                 <input
                         type="number"
                         name="kilometrage"

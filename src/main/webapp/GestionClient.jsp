@@ -1,5 +1,7 @@
 <%@ page import="com.agence.agencevoiture.entity.Client" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+
 
 <!DOCTYPE html>
 <html lang="fr">
@@ -14,8 +16,8 @@
 <!-- Menu Latéral -->
 <aside class="fixed top-0 left-0 h-screen w-64 bg-[#3b82f6] text-white flex flex-col">
   <div class="flex items-center justify-center gap-2 px-4 py-6 border-b border-white/10">
-    <img src="${pageContext.request.contextPath}/assets/logo.png" alt="Logo AutoDrive" class="h-8" />
-    <span class="font-bold text-xl">AutoDrive</span>
+    <img src="https://cdn.brandfetch.io/idD08_sdcu/w/250/h/250/theme/dark/icon.png?c=1dxbfHSJFAPEGdCLU4o5B" alt="Logo AutoDrive" class="h-8" />
+    <span class="font-bold text-xl">AutoManager</span>
   </div>
   <nav class="flex flex-col mt-4 px-2 space-y-1 text-sm font-medium">
     <a href="${pageContext.request.contextPath}/DashboardManagerServlet" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-[#2563eb] transition">
@@ -42,7 +44,7 @@
     </svg>
     Gestion clients
   </a>
-    <a href="${pageContext.request.contextPath}/locations.jsp" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-[#2563eb] transition">
+    <a href="${pageContext.request.contextPath}/LocationServlet" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-[#2563eb] transition">
       <!-- Icon Locations: clé -->
       <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
         <path stroke-linecap="round" stroke-linejoin="round" d="M12 11c1.104 0 2-.896 2-2s-.896-2-2-2-2 .896-2 2 .896 2 2 2z" />

@@ -16,8 +16,14 @@ import java.util.*;
 @WebServlet("/DashboardChefServlet")
 public class DashboardChefServlet extends HttpServlet {
 
-    private final LocationService locationService = new LocationService();
+    private LocationService locationService = new LocationService();
     private final VoitureService voitureService = new VoitureService();
+
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        locationService = new LocationService(); // ici, l'EntityManager sera créé dans le constructeur
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)

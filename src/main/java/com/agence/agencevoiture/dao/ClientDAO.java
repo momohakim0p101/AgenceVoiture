@@ -2,7 +2,6 @@ package com.agence.agencevoiture.dao;
 
 
 import com.agence.agencevoiture.entity.Client;
-import com.agence.agencevoiture.utils.MainApp;
 import jakarta.persistence.Persistence;
 import jakarta.persistence.EntityManager;
 import org.apache.logging.log4j.LogManager;
@@ -13,7 +12,7 @@ import java.util.List;
 
 
 public class ClientDAO {
-    private static final Logger logger = LogManager.getLogger(MainApp.class);
+
     private static  final JpaEntityManagerFactory emf = (JpaEntityManagerFactory) Persistence.createEntityManagerFactory("pu");
 
 
