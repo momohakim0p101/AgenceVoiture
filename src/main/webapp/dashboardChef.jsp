@@ -1,131 +1,147 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.util.*, com.agence.agencevoiture.entity.*" %>
+<%@ page import="java.util.*, java.math.BigDecimal, java.text.DecimalFormat" %>
+<%@ page import="com.agence.agencevoiture.entity.*" %>
+
+<%
+    DecimalFormat df = new DecimalFormat("#,###");
+
+    Utilisateur utilisateur = (Utilisateur) session.getAttribute("utilisateur");
+
+    Long totalVoitures = (Long) request.getAttribute("totalVoitures");
+    List<Voiture> voituresDisponibles = (List<Voiture>) request.getAttribute("voituresDisponibles");
+    List<Location> locationsEnCours = (List<Location>) request.getAttribute("locationsEnCours");
+    Object revenuMoisObj = request.getAttribute("revenuMois");
+    BigDecimal revenuMois = revenuMoisObj instanceof BigDecimal ? (BigDecimal) revenuMoisObj : BigDecimal.ZERO;
+    Long clientsActifs = (Long) request.getAttribute("clientsActifs");
+    Long pourcentageClientsMois = (Long) request.getAttribute("pourcentageClientsMois");
+    List<Object[]> voituresPopulaires = (List<Object[]>) request.getAttribute("voituresPopulaires");
+
+    String moisLabelsJson = (String) request.getAttribute("labelsJson");
+    String revenusMensuelsJson = (String) request.getAttribute("dataJson");
+
+    int nbVoituresDispo = voituresDisponibles != null ? voituresDisponibles.size() : 0;
+    int nbVoituresLouees = locationsEnCours != null ? locationsEnCours.size() : 0;
+%>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8" />
-    <title>Dashboard Chef d'Agence</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-    <style>
-        /* Ajoute ici ton CSS personnalisé */
-        body { font-family: 'Roboto', sans-serif; margin:0; background:#f5f5f5; }
-        .sidebar { width: 220px; background:#222; height: 100vh; position: fixed; color: white; }
-        .sidebar-header { padding: 20px; font-size: 1.5em; text-align:center; background:#111; }
-        .sidebar-menu { list-style:none; padding:0; margin:0; }
-        .sidebar-menu li a { color:#bbb; display:flex; align-items:center; padding:15px 20px; text-decoration:none; }
-        .sidebar-menu li a.active, .sidebar-menu li a:hover { background:#444; color:#fff; }
-        .sidebar-menu i { margin-right:10px; }
-        .main-content { margin-left: 220px; padding: 20px; }
-        .top-nav { background:#fff; padding: 10px 20px; display:flex; justify-content:flex-end; align-items:center; box-shadow: 0 1px 5px rgba(0,0,0,0.1); }
-        .top-nav .user-profile { display:flex; align-items:center; gap:10px; }
-        .top-nav img { border-radius:50%; width:35px; height:35px; }
-        .dashboard-cards { display:flex; gap:20px; margin:20px 0; flex-wrap: wrap; }
-        .card { background:#fff; flex: 1 1 200px; padding:20px; border-radius:8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: relative; }
-        .card .card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; }
-        .card .card-title { font-weight: 500; font-size: 1.1em; }
-        .card .card-icon { font-size: 1.5em; padding: 8px; border-radius: 50%; color:#fff; }
-        .card-icon.info { background:#17a2b8; }
-        .card-icon.success { background:#28a745; }
-        .card-icon.warning { background:#ffc107; color:#212529; }
-        .card-icon.danger { background:#dc3545; }
-        .card .card-value { font-size: 2.2em; font-weight: 700; }
-        .section-title { font-size: 1.3em; margin: 30px 0 10px; color: #333; }
-        table { width: 100%; border-collapse: collapse; background:#fff; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        th, td { padding: 12px 15px; border-bottom: 1px solid #ddd; text-align: left; }
-        th { background: #f8f9fa; }
-    </style>
+    <meta charset="UTF-8">
+    <title>Dashboard Chef - AutoManager</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body>
-
-<!-- Sidebar -->
-<aside class="sidebar">
-    <div class="sidebar-header"><i class="fas fa-car"></i> Chef d'Agence</div>
-    <ul class="sidebar-menu">
-        <li><a href="#" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-        <li><a href="#"><i class="fas fa-car"></i> Gestion Voitures</a></li>
-        <li><a href="#"><i class="fas fa-users"></i> Gestion Clients</a></li>
-        <li><a href="#"><i class="fas fa-file-contract"></i> Locations</a></li>
-        <li><a href="#"><i class="fas fa-chart-line"></i> Statistiques</a></li>
-    </ul>
-</aside>
-
-<!-- Main Content -->
-<main class="main-content">
-    <div class="top-nav">
-        <div class="user-profile">
-            <img src="https://randomuser.me/api/portraits/men/45.jpg" alt="Profile" />
-            <div>
-                <div><strong>Chef d'Agence</strong></div>
-                <div>Jean Dupont</div>
-            </div>
+<body class="bg-gray-50 font-sans">
+<div class="flex min-h-screen">
+    <aside class="w-80 bg-gray-50 p-4 flex flex-col justify-between">
+        <div>
+            <h1 class="text-base font-medium text-[#101518] mb-6">AutoGo</h1>
+            <nav class="flex flex-col gap-2">
+                <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-xl bg-[#eaedf1] text-[#101518] font-medium text-sm">
+                    <i class="fas fa-home"></i> Situation du parking
+                </a>
+                <a href="#" class="flex items-center gap-3 px-3 py-2 text-[#101518] text-sm">
+                    <i class="fas fa-star"></i> Voitures les plus recherchées
+                </a>
+                <a href="#bilan" class="flex items-center gap-3 px-3 py-2 text-[#101518] text-sm">
+                    <i class="fas fa-chart-line"></i> Bilan mensuel
+                </a>
+            </nav>
         </div>
-    </div>
+        <div>
+            <a href="<%= request.getContextPath() %>/LogoutServlet" class="flex items-center gap-3 px-3 py-2 text-[#101518] text-sm">
+                <i class="fas fa-sign-out-alt"></i> Retour au site
+            </a>
+        </div>
+    </aside>
+    <main class="flex-1 p-6">
+        <header class="flex justify-between items-center mb-6">
+            <h2 class="text-3xl font-bold text-[#101518]">Tableau de bord</h2>
+            <div class="flex items-center gap-3">
+                <img src="https://randomuser.me/api/portraits/men/41.jpg" alt="Profil" class="w-10 h-10 rounded-full">
+                <div>
+                    <p class="text-sm font-medium text-[#101518]"><%= utilisateur != null ? utilisateur.getPrenom() + " " + utilisateur.getNom() : "Utilisateur" %></p>
+                    <p class="text-xs text-gray-500">Chef</p>
+                </div>
+            </div>
+        </header>
 
-    <div class="dashboard-cards">
-        <div class="card">
-            <div class="card-header">
-                <span class="card-title">Total Voitures</span>
-                <div class="card-icon info"><i class="fas fa-car"></i></div>
+        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+            <div class="border rounded-xl p-6 bg-white">
+                <p class="text-sm font-medium text-[#101518]">Voitures disponibles</p>
+                <p class="text-2xl font-bold text-[#101518] mt-2"><%= nbVoituresDispo %></p>
             </div>
-            <div class="card-value"><%= request.getAttribute("totalVoitures") %></div>
-        </div>
-        <div class="card">
-            <div class="card-header">
-                <span class="card-title">Voitures Disponibles</span>
-                <div class="card-icon success"><i class="fas fa-check-circle"></i></div>
+            <div class="border rounded-xl p-6 bg-white">
+                <p class="text-sm font-medium text-[#101518]">Voitures louées</p>
+                <p class="text-2xl font-bold text-[#101518] mt-2"><%= nbVoituresLouees %></p>
             </div>
-            <div class="card-value"><%= request.getAttribute("voituresDispo") %></div>
-        </div>
-        <div class="card">
-            <div class="card-header">
-                <span class="card-title">Voitures en Location</span>
-                <div class="card-icon warning"><i class="fas fa-car-side"></i></div>
+            <div class="border rounded-xl p-6 bg-white">
+                <p class="text-sm font-medium text-[#101518]">Clients actifs</p>
+                <p class="text-2xl font-bold text-[#101518] mt-2"><%= clientsActifs %></p>
             </div>
-            <div class="card-value"><%= request.getAttribute("voituresEnLocation") %></div>
-        </div>
-        <div class="card">
-            <div class="card-header">
-                <span class="card-title">Bilan (FCFA)</span>
-                <div class="card-icon danger"><i class="fas fa-money-bill-wave"></i></div>
+            <div class="border rounded-xl p-6 bg-white">
+                <p class="text-sm font-medium text-[#101518]">Revenu du mois</p>
+                <p class="text-2xl font-bold text-[#101518] mt-2"><%= df.format(revenuMois) %> F CFA</p>
             </div>
-            <div class="card-value"><%= request.getAttribute("bilan") %></div>
-        </div>
-    </div>
+        </section>
 
-    <h3 class="section-title"><i class="fas fa-clock"></i> Locations en cours</h3>
-    <table>
-        <thead>
-        <tr>
-            <th>Client</th>
-            <th>Voiture</th>
-            <th>Montant (FCFA)</th>
-            <th>Jours</th>
-        </tr>
-        </thead>
-        <tbody>
-        <%
-            List<Location> locations = (List<Location>) request.getAttribute("locations");
-            if (locations != null && !locations.isEmpty()) {
-                for (Location l : locations) {
-        %>
-        <tr>
-            <td><%= l.getClient().getNom() %></td>
-            <td><%= l.getVoiture().getImmatriculation() %></td>
-            <td><%= l.getMontantTotal() %></td>
-            <td><%= l.getJours() %></td>
-        </tr>
-        <%
-            }
-        } else {
-        %>
-        <tr><td colspan="4" style="text-align:center;">Aucune location en cours</td></tr>
-        <%
-            }
-        %>
-        </tbody>
-    </table>
-</main>
+        <section class="mb-10">
+            <h3 class="text-xl font-bold text-[#101518] mb-4">Voitures les plus louées</h3>
+            <div class="overflow-x-auto">
+                <table class="min-w-full border bg-white">
+                    <thead>
+                    <tr class="bg-gray-100">
+                        <th class="text-left px-4 py-2 text-sm font-medium text-[#101518]">Modèle</th>
+                        <th class="text-left px-4 py-2 text-sm font-medium text-[#101518]">Nombre de locations</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <% if (voituresPopulaires != null && !voituresPopulaires.isEmpty()) {
+                        for (Object[] obj : voituresPopulaires) {
+                            Voiture v = (Voiture) obj[0];
+                            Long nb = (Long) obj[1]; %>
+                    <tr class="border-t">
+                        <td class="px-4 py-2 text-sm text-[#101518]"><%= v.getMarque() + " " + v.getModele() %></td>
+                        <td class="px-4 py-2 text-sm text-[#101518]"><%= nb %></td>
+                    </tr>
+                    <% } } else { %>
+                    <tr><td colspan="2" class="px-4 py-2 text-center text-sm text-gray-500">Aucune donnée disponible</td></tr>
+                    <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </section>
 
+        <section id="bilan" class="mt-10">
+            <h3 class="text-xl font-bold text-[#101518] mb-4">Bilan Financier Mensuel</h3>
+            <div class="bg-white rounded-xl p-6">
+                <canvas id="bilanChart" height="100"></canvas>
+            </div>
+            <script>
+                const ctx = document.getElementById('bilanChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: <%= moisLabelsJson %>,
+                        datasets: [{
+                            label: 'Revenus mensuels (F CFA)',
+                            data: <%= revenusMensuelsJson %>,
+                            backgroundColor: '#4F46E5',
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            </script>
+        </section>
+
+    </main>
+</div>
 </body>
 </html>

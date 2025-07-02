@@ -60,6 +60,7 @@
       Gestion utilisateurs
     </a>
   </nav>
+  <div class="mt-auto text-xs text-gray-300 text-center pt-6">© 2025 AutoManager</div>
 </aside>
 
 
