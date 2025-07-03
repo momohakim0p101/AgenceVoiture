@@ -104,7 +104,7 @@
                         <th class="py-2 px-4 border">Carburant</th>
                         <th class="py-2 px-4 border">Km</th>
                         <th class="py-2 px-4 border">Année</th>
-                        <th class="py-2 px-4 border">Action</th>
+
                     </tr>
                     </thead>
                     <tbody id="voitureTableBody">
@@ -121,40 +121,11 @@
                             <td class="py-2 px-4 border">${voiture.typeCarburant}</td>
                             <td class="py-2 px-4 border">${voiture.kilometrage}</td>
                             <td class="py-2 px-4 border"><fmt:formatDate value="${voiture.dateMiseEnCirculation}" pattern="yyyy" /></td>
-                            <td class="py-2 px-4 border text-center">
-                                <form action="LouerVoitureServlet" method="post">
-                                    <input type="hidden" name="voitureId" value="${voiture.immatriculation}" />
-                                    <button type="submit" class="text-blue-600 hover:underline">Louer</button>
-                                </form>
-                            </td>
                         </tr>
                     </c:forEach>
                     </tbody>
                 </table>
             </div>
-        </section>
-
-        <section>
-            <h2 class="text-2xl font-bold mb-4">Louer une voiture</h2>
-            <form action="LouerVoitureServlet" method="post" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <select name="voitureId" class="p-2 border rounded">
-                    <option value="">-- Voiture --</option>
-                    <c:forEach var="v" items="${voituresDisponibles}">
-                        <option value="${v.immatriculation}">${v.marque} ${v.modele}</option>
-                    </c:forEach>
-                </select>
-                <select name="clientId" class="p-2 border rounded">
-                    <option value="">-- Client --</option>
-                    <c:forEach var="c" items="${clients}">
-                        <option value="${c.cin}">${c.nom} ${c.prenom}</option>
-                    </c:forEach>
-                </select>
-                <input type="date" name="dateLocation" class="p-2 border rounded" />
-                <input type="date" name="dateRetourPrevue" class="p-2 border rounded" />
-                <div class="md:col-span-2">
-                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Louer</button>
-                </div>
-            </form>
         </section>
 
         <section>

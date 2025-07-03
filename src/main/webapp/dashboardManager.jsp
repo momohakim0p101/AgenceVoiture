@@ -165,6 +165,12 @@
                     class="bg-blue-600 hover:bg-blue-700 transition text-white px-4 py-2 rounded shadow-sm select-none">
                 Historique
             </button>
+            <form action="NouvelleLocationServlet" method="get">
+                <button
+                        class="bg-blue-600 hover:bg-blue-700 transition text-white px-4 py-2 rounded shadow-sm select-none">
+                    Nouvelle Location
+                </button>
+            </form>
         </div>
 
         <!-- Notification box -->
