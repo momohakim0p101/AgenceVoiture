@@ -4,6 +4,7 @@ package com.agence.agencevoiture.dao;
 import com.agence.agencevoiture.entity.Location;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Persistence;
+import jakarta.persistence.TypedQuery;
 import org.eclipse.persistence.jpa.JpaEntityManagerFactory;
 
 
@@ -20,6 +21,21 @@ public class LocationDAO {
         em.getTransaction().commit();
         em.close();
     }
+
+    public List<Location> findByStatut(Location.StatutLocation statut) {
+        TypedQuery<Location> query = emf.createEntityManager().createQuery(
+                "SELECT l FROM Location l WHERE l.statut = :statut", Location.class);
+        query.setParameter("statut", statut);
+        return query.getResultList();
+    }
+
+    public List<Location> findByStatuts(List<Location.StatutLocation> statuts) {
+        TypedQuery<Location> query = emf.createEntityManager().createQuery(
+                "SELECT l FROM Location l WHERE l.statut IN :statuts", Location.class);
+        query.setParameter("statuts", statuts);
+        return query.getResultList();
+    }
+
 
     public Location trouverLocation(Long id_reservation){
         EntityManager em = emf.createEntityManager();

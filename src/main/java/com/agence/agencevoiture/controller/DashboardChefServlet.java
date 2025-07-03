@@ -27,7 +27,9 @@ public class DashboardChefServlet extends HttpServlet {
 
         long totalVoitures = voitureService.listerToutesLesVoitures().size();
         List<Voiture> voituresDisponibles = voitureService.listerVoituresDisponibles();
-        List<Location> locationsEnCours = locationService.voituresEnLocation();
+        List<Location> locationsEnCours = locationService.getLocationsEnCours();
+        List<Location> locationsHistoriques = locationService.getLocationsHistoriques();
+        request.setAttribute("locationsHistoriques", locationsHistoriques);
         BigDecimal revenuMois = locationService.bilanFinancierMensuel(now.getYear(), now.getMonthValue());
 
         long clientsActifs = locationService.compterClientsActifsMois(now.getYear(), now.getMonthValue());

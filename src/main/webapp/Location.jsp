@@ -66,6 +66,20 @@
 
     <!-- Main content -->
     <div class="flex-1 p-8 space-y-12 bg-gray-50">
+        <c:if test="${not empty erreur}">
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6" role="alert">
+                <strong class="font-bold">Erreur : </strong>
+                <span class="block sm:inline">${erreur}</span>
+            </div>
+        </c:if>
+
+        <c:if test="${not empty message}">
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-6" role="alert">
+                <strong class="font-bold">Succès : </strong>
+                <span class="block sm:inline">${message}</span>
+            </div>
+        </c:if>
+
         <section>
             <h2 class="text-2xl font-bold mb-4">Recherche de voitures (temps réel)</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -134,8 +148,8 @@
                 <select name="locationId" class="p-2 border rounded">
                     <option value="">-- Location --</option>
                     <c:forEach var="location" items="${locationsActives}">
-                        <option value="${location.id}">
-                                ${location.voiture.marque} ${location.voiture.modele} - ${location.client.nom}
+                        <option value="${location.idReservation}">
+                               ${location.voiture.immatriculation} - ${location.voiture.marque} ${location.voiture.modele} - ${location.client.nom}
                         </option>
                     </c:forEach>
                 </select>

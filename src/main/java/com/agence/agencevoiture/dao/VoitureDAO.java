@@ -1,5 +1,6 @@
 package com.agence.agencevoiture.dao;
 
+import com.agence.agencevoiture.entity.Location;
 import com.agence.agencevoiture.entity.Voiture;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Persistence;
@@ -31,16 +32,16 @@ public class VoitureDAO {
             return voiture;
         }
 
-    public List<Voiture> trouverVoituresDisponibles() {
-        EntityManager em = emf.createEntityManager();
-        try {
-            return em.createQuery("SELECT v FROM Voiture v WHERE v.disponible = true", Voiture.class)
-                    .getResultList();
-        } finally {
-            em.close();
-        }
-    }
 
+    public List<Voiture> findVoituresDisponibles() {
+        String jpql = "SELECT v FROM Voiture v WHERE v NOT IN (" +
+                "SELECT l.voiture FROM Location l WHERE l.statut = :enCours OR l.statut = :loue" +
+                ")";
+        TypedQuery<Voiture> query = emf.createEntityManager().createQuery(jpql, Voiture.class);
+        query.setParameter("enCours", Location.StatutLocation.EN_COURS);
+        query.setParameter("loue", Location.StatutLocation.LOUE);
+        return query.getResultList();
+    }
 
     public List<Voiture> trouverTous(){
         EntityManager em = emf.createEntityManager();

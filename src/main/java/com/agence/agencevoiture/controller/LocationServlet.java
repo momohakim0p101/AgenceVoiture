@@ -32,11 +32,10 @@ public class LocationServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        List<Voiture> voituresDisponibles = locationService.voituresDisponibles();
-        List<Client> clients = clientService.rechercherTousLesClients();
+        List<Voiture> voituresDisponibles = voitureService.listerVoituresDisponibles();
         List<Location> locationsActives = locationService.listerToutesLesLocations()
                 .stream()
-                .filter(loc -> loc.getStatut() == Location.StatutLocation.CONFIRMEE)
+                .filter(loc -> loc.getStatut() == Location.StatutLocation.EN_COURS)
                 .collect(Collectors.toList());
 
 
@@ -56,11 +55,11 @@ public class LocationServlet extends HttpServlet {
                 .collect(Collectors.toCollection(TreeSet::new));
 
         request.setAttribute("voituresDisponibles", voituresDisponibles);
-        request.setAttribute("clients", clients);
         request.setAttribute("locationsActives", locationsActives);
         request.setAttribute("marques", marques);
         request.setAttribute("categories", categories);
         request.setAttribute("carburants", carburants);
+
 
         request.getRequestDispatcher("Location.jsp").forward(request, response);
     }

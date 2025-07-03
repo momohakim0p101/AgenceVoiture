@@ -34,7 +34,7 @@ public class DashboardManagerServlet extends HttpServlet {
             Utilisateur utilisateur = (Utilisateur) request.getSession().getAttribute("utilisateur");
 
             long totalVoitures = locationService.compterVoitures();
-            List<Location> locationsEnCours = locationService.voituresEnLocation();
+            List<Location> locationsEnCours = locationService.getLocationsEnCours();
             List<Voiture> voituresDisponibles = locationService.voituresDisponibles();
 
             List<Location> locationsHistoriques = locationService.listerLocationsHistoriques();

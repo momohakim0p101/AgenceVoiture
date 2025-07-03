@@ -154,9 +154,11 @@
     <h2 id="modalClientTitle" class="text-xl font-semibold mb-4">Ajouter un client</h2>
     <form id="formClient" method="post" action="${pageContext.request.contextPath}/ClientServlet" class="space-y-4">
       <input type="hidden" name="action" id="formAction" value="save" />
-      <input type="hidden" name="cin" id="clientCinInput" />
+
 
       <div>
+        <label for="clientCinInput" class="block text-sm font-medium text-gray-700">CIN</label>
+        <input type="text" name="cin" id="clientCinInput"  required class="mt-1 block w-full rounded border border-gray-300 p-2" />
         <label for="clientPrenom" class="block text-sm font-medium text-gray-700">Prénom</label>
         <input type="text" id="clientPrenom" name="prenom" required class="mt-1 block w-full rounded border border-gray-300 p-2" />
       </div>

@@ -18,6 +18,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @WebServlet("/NouvelleLocationServlet")
 public class NouvelleLocationServlet extends HttpServlet {
@@ -35,16 +36,13 @@ public class NouvelleLocationServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-        // Charger clients et voitures pour affichage dans la JSP
-        List<Client> clients = clientService.rechercherTousLesClients(); // méthode à créer si nécessaire
-        List<Voiture> voitures = voitureService.listerToutesLesVoitures(); // méthode à créer si nécessaire
+        List<Client> clients = clientService.rechercherTousLesClients();
+        List<Voiture> voituresDisponibles = voitureService.listerVoituresDisponibles();
 
         request.setAttribute("clients", clients);
-        request.setAttribute("voitures", voitures);
+        request.setAttribute("voitures", voituresDisponibles);
         request.getRequestDispatcher("nouvelle_location.jsp").forward(request, response);
     }
-
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -53,60 +51,73 @@ public class NouvelleLocationServlet extends HttpServlet {
         String dateDebutStr = request.getParameter("dateDebut");
         String dateFinStr = request.getParameter("dateFin");
 
+        // Validation basique
         if (cin == null || cin.isEmpty() ||
                 immatriculation == null || immatriculation.isEmpty() ||
                 dateDebutStr == null || dateDebutStr.isEmpty() ||
                 dateFinStr == null || dateFinStr.isEmpty()) {
-
             request.setAttribute("erreur", "Tous les champs sont requis.");
-            request.getRequestDispatcher("nouvelle_location.jsp").forward(request, response);
+            doGet(request, response);
             return;
         }
 
         Client client = clientService.trouverParCin(cin);
         Voiture voiture = voitureService.trouverVoitureImm(immatriculation);
 
-        if (client == null || voiture == null) {
-            request.setAttribute("erreur", "Client ou voiture introuvable.");
-            request.getRequestDispatcher("nouvelle_location.jsp").forward(request, response);
+        if (client == null) {
+            request.setAttribute("erreur", "Client introuvable.");
+            doGet(request, response);
+            return;
+        }
+
+        if (voiture == null) {
+            request.setAttribute("erreur", "Voiture introuvable.");
+            doGet(request, response);
+            return;
+        }
+
+        if (!voiture.isDisponible()) {
+            request.setAttribute("erreur", "Cette voiture n'est pas disponible.");
+            doGet(request, response);
             return;
         }
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        Date dateDebut = null;
-        Date dateFin = null;
-
+        Date dateDebut;
+        Date dateFin;
         try {
             dateDebut = sdf.parse(dateDebutStr);
             dateFin = sdf.parse(dateFinStr);
         } catch (ParseException e) {
-            request.setAttribute("erreur", "Format de date invalide.");
-            request.getRequestDispatcher("nouvelle_location.jsp").forward(request, response);
+            request.setAttribute("erreur", "Format de date invalide. Utilisez AAAA-MM-JJ.");
+            doGet(request, response);
             return;
         }
 
-        if (dateDebut.after(dateFin)) {
-            request.setAttribute("erreur", "La date de début doit être avant la date de fin.");
-            request.getRequestDispatcher("nouvelle_location.jsp").forward(request, response);
+        if (!dateDebut.before(dateFin) && !dateDebut.equals(dateFin)) {
+            request.setAttribute("erreur", "La date de début doit être antérieure ou égale à la date de fin.");
+            doGet(request, response);
             return;
         }
 
-        Location location = new Location();
-        location.setClient(client);
-        location.setVoiture(voiture);
-        location.setDateDebut(dateDebut);
-        location.setDateFin(dateFin);
-        location.setStatut(Location.StatutLocation.EN_COURS);
+        // Calcul des jours inclusifs (1 jour minimum)
+        long diffMillis = dateFin.getTime() - dateDebut.getTime();
+        long joursLocation = TimeUnit.DAYS.convert(diffMillis, TimeUnit.MILLISECONDS) + 1;
+
+        double prixParJour = voiture.getPrixLocationJour();
+        double montantTotal = joursLocation * prixParJour;
 
         try {
-            locationService.ajouterLocation(location);
-            // Après ajout réussi
+            // Utiliser la méthode reserverVoiture pour gérer la transaction et mise à jour
+            Location location = locationService.reserverVoiture(client, voiture, dateDebut, dateFin, prixParJour);
+
             request.setAttribute("location", location);
             request.getRequestDispatcher("detail_location.jsp").forward(request, response);
+
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("erreur", "Une erreur est survenue lors de la création de la location.");
-            request.getRequestDispatcher("nouvelle_location.jsp").forward(request, response);
+            request.setAttribute("erreur", "Erreur lors de la création de la location : " + e.getMessage());
+            doGet(request, response);
         }
     }
 }

@@ -195,7 +195,7 @@
     </tr>
     <tr>
       <th>Montant</th>
-      <td>${location.montantTotal}</td>
+      <td><fmt:formatNumber value="${location.montantTotal}" pattern="#,##0.00 'FCFA'" /></td>
     </tr>
   </table>
 

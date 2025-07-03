@@ -74,14 +74,8 @@ public class VoitureService {
 
 
 
-    public List<Voiture> listerVoituresDisponibles() {
-        return voitureDAO.trouverTous().stream()
-                .filter(v -> {
-                    System.out.println("VOITURE: " + v.getImmatriculation() + " dispo=" + v.isDisponible());
-                    return v.isDisponible();
-                })
-                .collect(Collectors.toList());
-    }
+
+
 
     public List<Voiture> rechercherVoituresDisponibles(String marque, String carburant, String categorie, Integer kmMax, Integer anneeMin) {
         return voitureDAO.trouverTous().stream()
@@ -118,6 +112,11 @@ public class VoitureService {
         }
         return voitureDAO.trouverVoiture(immatriculation);
     }
+
+    public List<Voiture> listerVoituresDisponibles() {
+        return voitureDAO.findVoituresDisponibles();
+    }
+
 
 
 }

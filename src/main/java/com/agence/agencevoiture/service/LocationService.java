@@ -34,12 +34,17 @@ public class LocationService {
                 .getSingleResult();
     }
 
-    public List<Location> voituresEnLocation() {
-        return em.createQuery(
-                        "SELECT l FROM Location l WHERE l.statut = :statut", Location.class)
-                .setParameter("statut", StatutLocation.CONFIRMEE)
-                .getResultList();
+    public List<Location> getLocationsEnCours() {
+        return locationDAO.findByStatut(Location.StatutLocation.EN_COURS);
     }
+
+    public List<Location> getLocationsHistoriques() {
+        return locationDAO.findByStatuts(List.of(
+                Location.StatutLocation.TERMINEE,
+                Location.StatutLocation.ANNULEE
+        ));
+    }
+
 
     public List<Voiture> voituresDisponibles() {
         return em.createQuery(
