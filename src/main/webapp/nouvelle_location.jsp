@@ -93,7 +93,12 @@
                 </div>
                 <div class="flex justify-between mt-6">
                     <button type="button" class="btn-prev px-4 py-2 bg-gray-300 rounded" data-prev="2">Précédent</button>
-                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Valider</button>
+                    <div class="flex gap-2">
+                        <a href="${pageContext.request.contextPath}/DashboardManagerServlet"
+                           class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
+                           title="Annuler la création">Annuler</a>
+                        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Valider</button>
+                    </div>
                 </div>
             </div>
         </form>

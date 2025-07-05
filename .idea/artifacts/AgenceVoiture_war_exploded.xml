@@ -63,6 +63,14 @@
           <element id="library" level="project" name="Maven: com.openhtmltopdf:openhtmltopdf-core:1.0.10" />
           <element id="library" level="project" name="Maven: de.rototor.pdfbox:graphics2d:0.32" />
           <element id="library" level="project" name="Maven: com.openhtmltopdf:openhtmltopdf-slf4j:1.0.10" />
+          <element id="library" level="project" name="Maven: com.sendgrid:sendgrid-java:4.9.2" />
+          <element id="library" level="project" name="Maven: com.sendgrid:java-http-client:4.5.0" />
+          <element id="library" level="project" name="Maven: org.apache.httpcomponents:httpcore:4.4.15" />
+          <element id="library" level="project" name="Maven: org.apache.httpcomponents:httpclient:4.5.13" />
+          <element id="library" level="project" name="Maven: commons-codec:commons-codec:1.11" />
+          <element id="library" level="project" name="Maven: org.bouncycastle:bcprov-jdk15on:1.70" />
+          <element id="library" level="project" name="Maven: com.sun.mail:javax.mail:1.6.2" />
+          <element id="library" level="project" name="Maven: javax.activation:activation:1.1" />
         </element>
       </element>
       <element id="directory" name="META-INF">

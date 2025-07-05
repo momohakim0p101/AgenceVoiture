@@ -56,34 +56,54 @@
 
 <!-- Sidebar responsive -->
 <div class="md:flex hidden flex-col w-64 bg-blue-600 text-white min-h-screen p-4" id="sidebar">
-    <div class="flex items-center justify-between mb-6">
-        <div class="flex items-center gap-2">
-            <img src="https://cdn.brandfetch.io/idD08_sdcu/w/250/h/250/theme/dark/icon.png" alt="Logo" class="h-8" />
+    <aside class="fixed top-0 left-0 h-screen w-64 bg-[#3b82f6] text-white flex flex-col">
+        <div class="flex items-center justify-center gap-2 px-4 py-6 border-b border-white/10">
+            <img src="https://cdn.brandfetch.io/idD08_sdcu/w/250/h/250/theme/dark/icon.png?c=1dxbfHSJFAPEGdCLU4o5B" alt="Logo AutoDrive" class="h-8" />
             <span class="font-bold text-xl">AutoManager</span>
         </div>
-    </div>
-    <nav class="flex flex-col gap-2 text-sm font-medium">
-        <a href="${pageContext.request.contextPath}/DashboardManagerServlet" class="flex items-center gap-2 px-3 py-2 rounded hover:bg-blue-500">
-            <i class="fas fa-tachometer-alt"></i> Tableau de bord
-        </a>
-        <a href="${pageContext.request.contextPath}/VoitureServlet" class="flex items-center gap-2 px-3 py-2 rounded hover:bg-blue-500">
-            <i class="fas fa-car"></i> Gestion voitures
-        </a>
-        <a href="${pageContext.request.contextPath}/ClientServlet" class="flex items-center gap-2 px-3 py-2 rounded hover:bg-blue-500">
-            <i class="fas fa-users"></i> Gestion clients
-        </a>
-        <a href="${pageContext.request.contextPath}/LocationServlet" class="flex items-center gap-2 px-3 py-2 rounded hover:bg-blue-500">
-            <i class="fas fa-calendar-check"></i> Gestion locations
-        </a>
-        <a href="${pageContext.request.contextPath}/utilisateurs.jsp" class="flex items-center gap-2 px-3 py-2 rounded hover:bg-blue-500">
-            <i class="fas fa-user-cog"></i> Utilisateurs
-        </a>
-    </nav>
-    <form method="get" action="${pageContext.request.contextPath}/LogoutServlet" class="mt-auto">
-        <button type="submit" class="w-full text-left flex items-center gap-2 px-3 py-2 hover:bg-red-600">
-            <i class="fas fa-sign-out-alt"></i> Déconnexion
-        </button>
-    </form>
+        <nav class="flex flex-col mt-4 px-2 space-y-1 text-sm font-medium">
+            <a href="${pageContext.request.contextPath}/DashboardManagerServlet" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-[#2563eb] transition">
+                <!-- Icon Dashboard: graphique simple -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 17h2m-1-8v8m-6 4h14a2 2 0 002-2v-7a2 2 0 00-2-2H5a2 2 0 00-2 2v7a2 2 0 002 2z" />
+                </svg>
+                Tableau de bord
+            </a>
+            <a href="${pageContext.request.contextPath}/VoitureServlet" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-[#2563eb] transition">
+                <!-- Icon Voiture -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 13l1.5-2h15l1.5 2M5 16h14v2a1 1 0 01-1 1h-12a1 1 0 01-1-1v-2z" />
+                    <circle cx="7.5" cy="19.5" r="1.5" />
+                    <circle cx="16.5" cy="19.5" r="1.5" />
+                </svg>
+                Gestion voitures
+            </a>
+            <a href="${pageContext.request.contextPath}/ClientServlet" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-[#2563eb] transition">
+                <!-- Icon Locations: clé -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 11c1.104 0 2-.896 2-2s-.896-2-2-2-2 .896-2 2 .896 2 2 2z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 14l5 5m0 0l5-5m-5 5V9" />
+                </svg>
+                Gestion clients
+            </a>
+            <a href="${pageContext.request.contextPath}/LocationServlet" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-[#2563eb] transition">
+                <!-- Icon Locations: clé -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 11c1.104 0 2-.896 2-2s-.896-2-2-2-2 .896-2 2 .896 2 2 2z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 14l5 5m0 0l5-5m-5 5V9" />
+                </svg>
+                Gestion locations
+            </a>
+            <a href="${pageContext.request.contextPath}/utilisateurs.jsp" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-[#2563eb] transition">
+                <!-- Icon Utilisateurs: groupe utilisateurs -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87M12 12a5 5 0 100-10 5 5 0 000 10z" />
+                </svg>
+                Gestion utilisateurs
+            </a>
+        </nav>
+        <div class="mt-auto text-xs text-gray-300 text-center pt-6">© 2025 AutoManager</div>
+    </aside>
 </div>
 
 <!-- Content -->
@@ -241,16 +261,30 @@
                     <td class="px-4 py-2"><%= l.getDateFin() %></td>
                     <td class="px-4 py-2"><%= df.format(l.getMontantTotal()) %> F CFA</td>
                     <td class="px-4 py-2 font-semibold text-blue-600"><%= l.getStatut() %></td>
-                    <td class="px-4 py-2 text-center">
-                        <form action="RetournerVoitureServlet" method="post" onsubmit="return confirm('Confirmer le retour de cette voiture ?');">
-                            <input type="hidden" name="locationId" value="<%= l.getIdReservation() %>">
-                            <input type="hidden" name="dateRetourEffectif" value=" <%= new java.text.SimpleDateFormat("yyyy-MM-dd").format(l.getDateFin()) %>
-%>">
+                    <td class="px-4 py-2 text-center space-x-2">
+                        <!-- Bouton Retourner -->
+                        <form action="RetournerVoitureServlet" method="post"
+                              onsubmit="return confirm('Confirmer le retour de cette voiture ?');"
+                              style="display: inline-block;">
+                            <input type="hidden" name="locationId" value="<%= l.getIdReservation() %>" />
+                            <input type="hidden" name="dateRetourEffectif"
+                                   value="<%= new java.text.SimpleDateFormat("yyyy-MM-dd").format(l.getDateFin()) %>" />
                             <button type="submit"
                                     class="inline-flex items-center gap-1 bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm shadow transition">
                                 <i class="fas fa-undo"></i> Retourner
                             </button>
                         </form>
+
+                        <!-- Bouton Relance e‑mail -->
+                        <form action="RelanceServlet" method="post" style="display: inline-block;">
+                            <input type="hidden" name="locationId" value="<%= l.getIdReservation() %>" />
+                            <button type="submit"
+                                    class="inline-flex items-center gap-1 bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm shadow transition"
+                                    title="Envoyer un e‑mail de relance">
+                                <i class="fas fa-envelope"></i> Relancer
+                            </button>
+                        </form>
+                    </td>
 
 
                 </tr>
