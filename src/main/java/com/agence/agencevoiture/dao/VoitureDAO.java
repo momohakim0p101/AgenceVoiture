@@ -34,14 +34,20 @@ public class VoitureDAO {
 
 
     public List<Voiture> findVoituresDisponibles() {
-        String jpql = "SELECT v FROM Voiture v WHERE v NOT IN (" +
-                "SELECT l.voiture FROM Location l WHERE l.statut = :enCours OR l.statut = :Confirmee" +
-                ")";
-        TypedQuery<Voiture> query = emf.createEntityManager().createQuery(jpql, Voiture.class);
+        String jpql = "SELECT v FROM Voiture v " +
+                "WHERE v NOT IN (" +
+                "  SELECT l.voiture FROM Location l WHERE l.statut = :enCours OR l.statut = :confirmee" +
+                ") AND v.enMaintenance = false";
+
+        EntityManager em = emf.createEntityManager();
+        TypedQuery<Voiture> query = em.createQuery(jpql, Voiture.class);
         query.setParameter("enCours", Location.StatutLocation.EN_COURS);
-        query.setParameter("Confirmee", Location.StatutLocation.CONFIRMEE);
-        return query.getResultList();
+        query.setParameter("confirmee", Location.StatutLocation.CONFIRMEE);
+        List<Voiture> result = query.getResultList();
+        em.close();
+        return result;
     }
+
 
     public List<Voiture> trouverTous(){
         EntityManager em = emf.createEntityManager();

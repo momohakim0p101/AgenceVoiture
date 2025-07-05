@@ -26,6 +26,33 @@
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
 <body class="bg-gray-100 min-h-screen flex">
+<%
+    String message = (String) session.getAttribute("message");
+    String erreur = (String) session.getAttribute("erreur");
+    if (message != null) session.removeAttribute("message");
+    if (erreur != null) session.removeAttribute("erreur");
+%>
+
+<div id="flashMessage" class="fixed top-5 right-5 max-w-sm w-full z-50
+    <%= (message != null || erreur != null) ? "opacity-100" : "opacity-0 pointer-events-none" %>
+    transition-opacity duration-700 ease-in-out">
+    <% if (message != null) { %>
+    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded shadow flex items-center gap-3">
+        <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+        </svg>
+        <span><%= message %></span>
+    </div>
+    <% } else if (erreur != null) { %>
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded shadow flex items-center gap-3">
+        <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+        <span><%= erreur %></span>
+    </div>
+    <% } %>
+</div>
+
 
 <!-- Sidebar responsive -->
 <div class="md:flex hidden flex-col w-64 bg-blue-600 text-white min-h-screen p-4" id="sidebar">
@@ -159,19 +186,24 @@
         </div>
 
         <!-- Section locations -->
-        <div class="flex justify-between items-center mb-4">
-            <h2 class="text-2xl font-bold text-gray-700">Locations en cours</h2>
-            <button onclick="toggleHistorique()"
-                    class="bg-blue-600 hover:bg-blue-700 transition text-white px-4 py-2 rounded shadow-sm select-none">
-                Historique
-            </button>
-            <form action="NouvelleLocationServlet" method="get">
-                <button
-                        class="bg-blue-600 hover:bg-blue-700 transition text-white px-4 py-2 rounded shadow-sm select-none">
-                    Nouvelle Location
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
+            <div class="flex items-center gap-2">
+                <form action="NouvelleLocationServlet" method="get">
+                    <button type="submit"
+                            class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-md shadow transition">
+                        <i class="fas fa-plus-circle"></i>
+                        Nouvelle Location
+                    </button>
+                </form>
+
+                <button onclick="toggleHistorique()"
+                        class="inline-flex items-center gap-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-4 py-2 rounded-md shadow transition">
+                    <i class="fas fa-history"></i>
+                    Historique
                 </button>
-            </form>
+            </div>
         </div>
+
 
         <!-- Notification box -->
         <div id="notifBox" class="hidden bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6 rounded shadow-sm select-none" role="alert" aria-live="assertive">
@@ -179,6 +211,10 @@
         </div>
 
         <!-- Table des locations en cours -->
+        <h2 class="text-xl md:text-2xl font-semibold text-gray-700 mb-4 flex items-center gap-2">
+            <i class="fas fa-calendar-check text-blue-600 text-xl"></i>
+            Locations en cours
+        </h2>
         <div id="encoursTable" class="overflow-x-auto rounded shadow bg-white">
             <table class="min-w-full text-left border-collapse border border-gray-200">
                 <thead class="bg-gray-100">
@@ -189,6 +225,7 @@
                     <th class="px-4 py-3">Date fin</th>
                     <th class="px-4 py-3">Montant</th>
                     <th class="px-4 py-3">Statut</th>
+                    <th class="px-4 py-3 text-center">Actions</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -204,6 +241,18 @@
                     <td class="px-4 py-2"><%= l.getDateFin() %></td>
                     <td class="px-4 py-2"><%= df.format(l.getMontantTotal()) %> F CFA</td>
                     <td class="px-4 py-2 font-semibold text-blue-600"><%= l.getStatut() %></td>
+                    <td class="px-4 py-2 text-center">
+                        <form action="RetournerVoitureServlet" method="post" onsubmit="return confirm('Confirmer le retour de cette voiture ?');">
+                            <input type="hidden" name="locationId" value="<%= l.getIdReservation() %>">
+                            <input type="hidden" name="dateRetourEffectif" value=" <%= new java.text.SimpleDateFormat("yyyy-MM-dd").format(l.getDateFin()) %>
+%>">
+                            <button type="submit"
+                                    class="inline-flex items-center gap-1 bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm shadow transition">
+                                <i class="fas fa-undo"></i> Retourner
+                            </button>
+                        </form>
+
+
                 </tr>
                 <%
                         }

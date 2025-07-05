@@ -6,6 +6,7 @@ import com.agence.agencevoiture.entity.Utilisateur;
 import com.agence.agencevoiture.entity.Voiture;
 import com.agence.agencevoiture.service.LocationService;
 
+import com.agence.agencevoiture.service.VoitureService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
@@ -22,9 +23,11 @@ public class DashboardManagerServlet extends HttpServlet {
 
     private LocationService locationService;
 
+    private VoitureService voitureService;
     @Override
     public void init() throws ServletException {
         locationService = new LocationService();
+        voitureService  = new VoitureService();  // ← initialise le champ, pas une variable locale
     }
 
     @Override
@@ -35,13 +38,14 @@ public class DashboardManagerServlet extends HttpServlet {
 
             long totalVoitures = locationService.compterVoitures();
             List<Location> locationsEnCours = locationService.getLocationsEnCours();
-            List<Voiture> voituresDisponibles = locationService.voituresDisponibles();
+            List<Voiture> voituresDisponibles = voitureService.listerVoituresDisponibles();
 
             List<Location> locationsHistoriques = locationService.listerLocationsHistoriques();
             if (locationsHistoriques == null) {
                 locationsHistoriques = new ArrayList<>();
             }
             request.setAttribute("locationsHistoriques", locationsHistoriques);
+            request.setAttribute("voituresDisponibles", voituresDisponibles);
 
             Calendar cal = Calendar.getInstance();
             int mois = cal.get(Calendar.MONTH) + 1;

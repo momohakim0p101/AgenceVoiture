@@ -5,7 +5,7 @@
         <class>com.agence.agencevoiture.entity.Location</class>
         <class>com.agence.agencevoiture.entity.Facture</class>
         <class>com.agence.agencevoiture.entity.Voiture</class>
-
+        <class>com.agence.agencevoiture.entity.Maintenance</class>
         <properties>
             <property name="eclipselink.logging.level" value="FINE"/>
             <property name="eclipselink.logging.level.sql" value="FINE"/>

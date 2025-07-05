@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -48,6 +49,39 @@ public class Voiture {
 
     @OneToMany(mappedBy = "voiture")
     private List<Location> locations;
+    @OneToMany(mappedBy = "voiture", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Maintenance> maintenances = new ArrayList<>();
+
+    @Column(name = "en_maintenance")
+    private boolean enMaintenance = false;
+
+    public boolean isEnMaintenance() {
+        return enMaintenance;
+    }
+
+    public void setEnMaintenance(boolean enMaintenance) {
+        this.enMaintenance = enMaintenance;
+    }
+
+
+    public List<Maintenance> getMaintenances() {
+        return maintenances;
+    }
+
+    public void setMaintenances(List<Maintenance> maintenances) {
+        this.maintenances = maintenances;
+    }
+
+    public void ajouterMaintenance(Maintenance m) {
+        maintenances.add(m);
+        m.setVoiture(this);
+    }
+
+    public void retirerMaintenance(Maintenance m) {
+        maintenances.remove(m);
+        m.setVoiture(null);
+    }
+
 
     // Constructeur vide obligatoire pour JPA
     public Voiture() {

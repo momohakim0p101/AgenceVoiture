@@ -118,7 +118,7 @@
                         <th class="py-2 px-4 border">Carburant</th>
                         <th class="py-2 px-4 border">Km</th>
                         <th class="py-2 px-4 border">Année</th>
-
+                        <th class="py-2 px-4 border">Actions</th>
                     </tr>
                     </thead>
                     <tbody id="voitureTableBody">
@@ -135,31 +135,59 @@
                             <td class="py-2 px-4 border">${voiture.typeCarburant}</td>
                             <td class="py-2 px-4 border">${voiture.kilometrage}</td>
                             <td class="py-2 px-4 border"><fmt:formatDate value="${voiture.dateMiseEnCirculation}" pattern="yyyy" /></td>
+                            <td class="py-2 px-4 border text-center">
+                                <button type="button"
+                                        class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded"
+                                        onclick="ouvrirModal('${voiture.immatriculation}', '${voiture.marque}', '${voiture.modele}')">
+                                    Planifier maintenance
+                                </button>
+                            </td>
+
                         </tr>
                     </c:forEach>
+
                     </tbody>
                 </table>
             </div>
         </section>
 
-        <section>
-            <h2 class="text-2xl font-bold mb-4">Retourner une voiture</h2>
-            <form action="RetournerVoitureServlet" method="post" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <select name="locationId" class="p-2 border rounded">
-                    <option value="">-- Location --</option>
-                    <c:forEach var="location" items="${locationsActives}">
-                        <option value="${location.idReservation}">
-                               ${location.voiture.immatriculation} - ${location.voiture.marque} ${location.voiture.modele} - ${location.client.nom}
-                        </option>
-                    </c:forEach>
-                </select>
-                <input type="date" name="dateRetourEffectif" class="p-2 border rounded" />
-                <div class="md:col-span-2">
-                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Retourner</button>
+    </div>
+    <!-- Modal de planification maintenance -->
+    <div id="modalMaintenance" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50">
+        <div class="bg-white p-6 rounded shadow-md w-full max-w-lg relative">
+            <h3 class="text-xl font-bold mb-4">Planifier maintenance pour <span id="nomVoiture"></span></h3>
+            <form action="${pageContext.request.contextPath}/MaintenanceServlet" method="post" class="space-y-4">
+                <input type="hidden" name="immatriculation" id="inputIdVoiture" />
+
+                <div>
+                    <label for="type" class="block text-sm font-medium">Type de maintenance</label>
+                    <select name="type" id="type" class="w-full p-2 border rounded" required>
+                        <option value="">-- Sélectionner --</option>
+                        <option value="VIDANGE">Vidange</option>
+                        <option value="PNEU">Pneu</option>
+                        <option value="FREIN">Frein</option>
+                        <option value="MOTEUR">Moteur</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="date" class="block text-sm font-medium">Date prévue</label>
+                    <input type="date" name="date" id="date" class="w-full p-2 border rounded" required />
+                </div>
+
+                <div>
+                    <label for="description" class="block text-sm font-medium">Description</label>
+                    <textarea name="description" id="description" class="w-full p-2 border rounded" rows="3" required></textarea>
+                </div>
+
+                <div class="flex justify-end gap-2">
+                    <button type="button" onclick="fermerModal()" class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400">Annuler</button>
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Valider</button>
                 </div>
             </form>
-        </section>
+        </div>
     </div>
+
 </div>
 
 <script>
@@ -196,6 +224,15 @@
             el.addEventListener("change", filtrer);
         });
     });
+    function ouvrirModal(idVoiture, nom) {
+        document.getElementById("modalMaintenance").classList.remove("hidden");
+        document.getElementById("inputIdVoiture").value = idVoiture;
+        document.getElementById("nomVoiture").innerText = nom;
+    }
+
+    function fermerModal() {
+        document.getElementById("modalMaintenance").classList.add("hidden");
+    }
 </script>
 
 </body>

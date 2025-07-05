@@ -14,6 +14,12 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        .vehicle-card[data-enmaintenance="true"] {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    </style>
 </head>
 <body class="bg-gray-100 flex min-h-screen font-sans">
 
@@ -118,7 +124,8 @@
                     data-marque="${voiture.marque.toLowerCase()}"
                     data-modele="${voiture.modele.toLowerCase()}"
                     data-immatriculation="${voiture.immatriculation.toLowerCase()}"
-            >
+                    data-enmaintenance="${voiture.enMaintenance}">
+
                 <header>
                     <h3 class="text-xl font-semibold text-gray-800">${voiture.marque} ${voiture.modele}</h3>
                     <p class="text-sm text-blue-600 font-semibold">${voiture.immatriculation}</p>
@@ -133,6 +140,9 @@
                 <p class="mt-1 font-bold text-green-600">${voiture.prixLocationJour} FCFA / jour</p>
                 <p class="mt-2">
                     <c:choose>
+                        <c:when test="${voiture.enMaintenance}">
+                            <span class="text-yellow-600 font-semibold"><i class="fas fa-wrench"></i> En maintenance</span>
+                        </c:when>
                         <c:when test="${voiture.disponible}">
                             <span class="text-green-600 font-semibold"><i class="fas fa-check-circle"></i> Disponible</span>
                         </c:when>
