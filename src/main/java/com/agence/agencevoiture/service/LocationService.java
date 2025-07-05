@@ -35,7 +35,7 @@ public class LocationService {
     }
 
     public List<Location> getLocationsEnCours() {
-        return locationDAO.findByStatut(Location.StatutLocation.EN_COURS);
+        return locationDAO.findByStatut(StatutLocation.CONFIRMEE);
     }
 
     public List<Location> getLocationsHistoriques() {

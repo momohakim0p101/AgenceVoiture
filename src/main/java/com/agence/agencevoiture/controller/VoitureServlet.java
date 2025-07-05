@@ -61,7 +61,7 @@ public class VoitureServlet extends HttpServlet {
     }
 
     private void afficherListeVoitures(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        List<Voiture> voitures = voitureService.listerVoituresDisponibles();
+        List<Voiture> voitures = voitureService.listerToutesLesVoitures();
 
         String query = req.getParameter("query");
         String carburant = req.getParameter("carburant");

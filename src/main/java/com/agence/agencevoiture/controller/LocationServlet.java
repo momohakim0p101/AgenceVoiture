@@ -33,9 +33,9 @@ public class LocationServlet extends HttpServlet {
             throws ServletException, IOException {
 
         List<Voiture> voituresDisponibles = voitureService.listerVoituresDisponibles();
-        List<Location> locationsActives = locationService.listerToutesLesLocations()
+        List<Location> locationsActives = locationService.getLocationsEnCours()
                 .stream()
-                .filter(loc -> loc.getStatut() == Location.StatutLocation.EN_COURS)
+                .filter(loc -> loc.getStatut() == Location.StatutLocation.CONFIRMEE)
                 .collect(Collectors.toList());
 
 

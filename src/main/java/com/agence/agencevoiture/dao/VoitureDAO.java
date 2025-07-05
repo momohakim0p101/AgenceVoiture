@@ -35,11 +35,11 @@ public class VoitureDAO {
 
     public List<Voiture> findVoituresDisponibles() {
         String jpql = "SELECT v FROM Voiture v WHERE v NOT IN (" +
-                "SELECT l.voiture FROM Location l WHERE l.statut = :enCours OR l.statut = :loue" +
+                "SELECT l.voiture FROM Location l WHERE l.statut = :enCours OR l.statut = :Confirmee" +
                 ")";
         TypedQuery<Voiture> query = emf.createEntityManager().createQuery(jpql, Voiture.class);
         query.setParameter("enCours", Location.StatutLocation.EN_COURS);
-        query.setParameter("loue", Location.StatutLocation.LOUE);
+        query.setParameter("Confirmee", Location.StatutLocation.CONFIRMEE);
         return query.getResultList();
     }
 
