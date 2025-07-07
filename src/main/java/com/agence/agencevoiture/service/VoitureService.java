@@ -117,6 +117,23 @@ public class VoitureService {
         return voitureDAO.findVoituresDisponibles();
     }
 
+    public boolean supprimerVoitureSiNonRéservée(String immatriculation) {
+        Voiture voiture = trouverVoitureImm(immatriculation);
+        if (voiture == null) return false;
+
+        // Vérifie si la voiture a des réservations
+        if (voiture.getLocations() != null && !voiture.getLocations().isEmpty()) {
+            return false;
+        }
+
+        try {
+            voitureDAO.supprimerVoiture(voiture);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
 
 }

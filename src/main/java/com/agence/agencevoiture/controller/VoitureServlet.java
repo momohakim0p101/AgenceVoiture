@@ -152,11 +152,11 @@ public class VoitureServlet extends HttpServlet {
             return;
         }
 
-        boolean success = voitureService.supprimerVoiture(immatriculation);
+        boolean success = voitureService.supprimerVoitureSiNonRéservée(immatriculation);
         if (success) {
             redirigerSansErreur(resp);
         } else {
-            redirigerAvecErreur(resp, "suppression");
+            redirigerAvecErreur(resp, "suppression_interdite");
         }
     }
 
