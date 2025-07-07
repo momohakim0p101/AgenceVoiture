@@ -2,6 +2,7 @@ package com.agence.agencevoiture.service;
 
 import com.agence.agencevoiture.dao.ClientDAO;
 import com.agence.agencevoiture.entity.Client;
+import jakarta.persistence.EntityManager;
 
 import java.util.List;
 
@@ -121,5 +122,13 @@ public class ClientService {
             return List.of();
         }
         return clientDAO.rechercherParNom(nom.trim());
+    }
+    // Total de clients ayant déjà loué
+    public int totalClients() {
+        EntityManager em = null;
+        Long count = em.createQuery(
+                        "SELECT COUNT(DISTINCT l.client.id) FROM Location l", Long.class)
+                .getSingleResult();
+        return count != null ? count.intValue() : 0;
     }
 }

@@ -1,3 +1,28 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.util.*, java.math.BigDecimal, java.text.DecimalFormat" %>
+<%@ page import="com.agence.agencevoiture.entity.*" %>
+
+<%
+    DecimalFormat df = new DecimalFormat("#,###");
+    Utilisateur utilisateur = (Utilisateur) session.getAttribute("utilisateur");
+    Long totalVoitures = (Long) request.getAttribute("totalVoitures");
+    totalVoitures = totalVoitures != null ? totalVoitures : 0L;
+    List<Location> locationsEnCours = (List<Location>) request.getAttribute("locationsEnCours");
+    List<Location> locationsHistoriques = (List<Location>) request.getAttribute("locationsHistoriques");
+    List<Voiture> voituresDisponibles = (List<Voiture>) request.getAttribute("voituresDisponibles");
+    BigDecimal revenuMois = (BigDecimal) request.getAttribute("revenuMois");
+    revenuMois = revenuMois != null ? revenuMois : BigDecimal.ZERO;
+    int nbVoituresDispo = voituresDisponibles != null ? voituresDisponibles.size() : 0;
+    int nbVoituresLouees = locationsEnCours != null ? locationsEnCours.size() : 0;
+    int clientsActifs = request.getAttribute("clientsActifs") != null ? (Integer) request.getAttribute("clientsActifs") : 0;
+    int pourcentageClientsMois = request.getAttribute("pourcentageClientsMois") != null ? (Integer) request.getAttribute("pourcentageClientsMois") : 0;
+    List<Object[]> voituresPopulaires = (List<Object[]>) request.getAttribute("voituresPopulaires");
+    BigDecimal objectifMensuel = (BigDecimal) request.getAttribute("objectifMensuel");
+    objectifMensuel = objectifMensuel != null ? objectifMensuel : BigDecimal.ZERO;
+    BigDecimal evolutionRevenu = (BigDecimal) request.getAttribute("evolutionRevenu");
+    evolutionRevenu = evolutionRevenu != null ? evolutionRevenu : BigDecimal.ZERO;
+%>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -163,94 +188,87 @@
 
         <!-- Stats Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <!-- Voitures disponibles -->
             <div class="stat-card p-6">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-[var(--text-light)] text-sm mb-1">Voitures disponibles</p>
-                        <p class="text-2xl font-bold text-[var(--text-dark)]">-</p>
+                        <p class="text-2xl font-bold text-[var(--text-dark)]"><%= nbVoituresDispo %></p>
                     </div>
                     <div class="card-icon bg-blue-100 text-blue-600">
                         <i class="fas fa-car text-xl"></i>
                     </div>
                 </div>
                 <div class="mt-4 pt-3 border-t border-gray-100">
-                    <span class="text-sm text-[var(--text-light)] flex items-center">
-                        <i class="fas fa-arrow-up text-green-500 mr-1"></i>
-                        -
-                    </span>
+            <span class="text-sm text-[var(--text-light)] flex items-center">
+                <i class="fas fa-chart-line text-green-500 mr-1"></i>
+                <%= totalVoitures > 0 ? (nbVoituresDispo * 100 / totalVoitures) : 0 %>% du parc
+            </span>
                 </div>
             </div>
 
-            <!-- Voitures louées -->
             <div class="stat-card p-6">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-[var(--text-light)] text-sm mb-1">Voitures louées</p>
-                        <p class="text-2xl font-bold text-[var(--text-dark)]">-</p>
+                        <p class="text-2xl font-bold text-[var(--text-dark)]"><%= nbVoituresLouees %></p>
                     </div>
                     <div class="card-icon bg-purple-100 text-purple-600">
                         <i class="fas fa-key text-xl"></i>
                     </div>
                 </div>
                 <div class="mt-4 pt-3 border-t border-gray-100">
-                    <span class="text-sm text-[var(--text-light)] flex items-center">
-                        <i class="fas fa-arrow-up text-green-500 mr-1"></i>
-                        -
-                    </span>
+            <span class="text-sm text-[var(--text-light)] flex items-center">
+                <i class="fas fa-chart-line text-red-500 mr-1"></i>
+                <%= totalVoitures > 0 ? (nbVoituresLouees * 100 / totalVoitures) : 0 %>% du parc
+            </span>
                 </div>
             </div>
 
-            <!-- Clients actifs -->
             <div class="stat-card p-6">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-[var(--text-light)] text-sm mb-1">Clients actifs</p>
-                        <p class="text-2xl font-bold text-[var(--text-dark)]">-</p>
+                        <p class="text-2xl font-bold text-[var(--text-dark)]"><%= clientsActifs %></p>
                     </div>
                     <div class="card-icon bg-green-100 text-green-600">
                         <i class="fas fa-users text-xl"></i>
                     </div>
                 </div>
                 <div class="mt-4 pt-3 border-t border-gray-100">
-                    <span class="text-sm text-[var(--text-light)] flex items-center">
-                        <i class="fas fa-arrow-up text-green-500 mr-1"></i>
-                        -
-                    </span>
+            <span class="text-sm text-[var(--text-light)] flex items-center">
+                <i class="fas fa-arrow-up text-green-500 mr-1"></i>
+                <%= pourcentageClientsMois %>% ce mois
+            </span>
                 </div>
             </div>
 
-            <!-- Revenu du mois -->
             <div class="stat-card p-6">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-[var(--text-light)] text-sm mb-1">Revenu du mois</p>
-                        <p class="text-2xl font-bold text-[var(--text-dark)]">-</p>
+                        <p class="text-2xl font-bold text-[var(--text-dark)]"><%= df.format(revenuMois) %> F CFA</p>
                     </div>
                     <div class="card-icon bg-amber-100 text-amber-600">
                         <i class="fas fa-money-bill-wave text-xl"></i>
                     </div>
                 </div>
                 <div class="mt-4 pt-3 border-t border-gray-100">
-                    <span class="text-sm text-[var(--text-light)] flex items-center">
-                        <i class="fas fa-arrow-up text-green-500 mr-1"></i>
-                        -
-                    </span>
+            <span class="text-sm text-[var(--text-light)] flex items-center">
+                <i class="fas fa-arrow-up text-yellow-500 mr-1"></i>
+                Ce mois
+            </span>
                 </div>
             </div>
         </div>
 
+
         <!-- Main Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Voitures populaires -->
+            <!-- Section voitures populaires -->
             <div class="bg-white rounded-2xl shadow p-6">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-xl font-bold text-[var(--text-dark)]">Voitures les plus louées</h2>
-                    <button class="text-[var(--primary)] text-sm font-medium flex items-center">
-                        Voir tout <i class="fas fa-arrow-right ml-1 text-xs"></i>
-                    </button>
                 </div>
-
                 <div class="overflow-x-auto">
                     <table class="min-w-full">
                         <thead>
@@ -261,12 +279,25 @@
                         </tr>
                         </thead>
                         <tbody>
+                        <% if (voituresPopulaires != null && !voituresPopulaires.isEmpty()) {
+                            for (Object[] ligne : voituresPopulaires) {
+                                Voiture v = (Voiture) ligne[0];
+                                Long nbLoc = (Long) ligne[1];
+                                double taux = ((double) nbLoc / totalVoitures) * 100;
+                        %>
+                        <tr>
+                            <td class="px-4 py-2 text-sm"><%= v.getModele() %></td>
+                            <td class="px-4 py-2 text-sm"><%= nbLoc %></td>
+                            <td class="px-4 py-2 text-sm"><%= String.format("%.1f", taux) %>%</td>
+                        </tr>
+                        <% }} else { %>
                         <tr>
                             <td colspan="3" class="empty-state">
                                 <i class="fas fa-car text-gray-300 text-4xl"></i>
                                 <p>Aucune donnée disponible</p>
                             </td>
                         </tr>
+                        <% } %>
                         </tbody>
                     </table>
                 </div>
@@ -289,50 +320,48 @@
                     </div>
                 </div>
 
-                <!-- Conteneur du graphique -->
+                <!-- Section graphique bilan financier -->
                 <div class="chart-container" style="position: relative; height: 40vh; width: 100%">
                     <canvas id="bilanChart"></canvas>
                 </div>
-
                 <div class="mt-6 pt-4 border-t border-gray-100">
                     <div class="flex justify-between">
                         <div>
                             <p class="text-sm text-[var(--text-light)]">Revenu total</p>
-                            <p class="text-xl font-bold">-</p>
+                            <p class="text-xl font-bold"><%= df.format(revenuMois) %> F CFA</p>
                         </div>
                         <div>
                             <p class="text-sm text-[var(--text-light)]">Évolution</p>
-                            <p class="text-xl font-bold">-</p>
+                            <p class="text-xl font-bold"><%= df.format(evolutionRevenu) %> F CFA</p>
                         </div>
                         <div>
                             <p class="text-sm text-[var(--text-light)]">Objectif</p>
-                            <p class="text-xl font-bold">-</p>
+                            <p class="text-xl font-bold"><%= df.format(objectifMensuel) %> F CFA</p>
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
 
-        <!-- Autres sections -->
+        <!-- Section résumé d'activité et objectifs -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-            <!-- Résumé activité -->
             <div class="bg-white rounded-2xl shadow p-6 col-span-2">
                 <h2 class="text-xl font-bold text-[var(--text-dark)] mb-4">Résumé d'activité</h2>
                 <div class="empty-state">
                     <i class="fas fa-list-alt text-gray-300"></i>
-                    <p>Aucune activité récente</p>
+                    <p><%= locationsHistoriques != null ? locationsHistoriques.size() : 0 %> location(s) passée(s)</p>
                 </div>
             </div>
-
-            <!-- Objectifs -->
             <div class="bg-white rounded-2xl shadow p-6">
                 <h2 class="text-xl font-bold text-[var(--text-dark)] mb-4">Objectifs du mois</h2>
                 <div class="empty-state">
                     <i class="fas fa-bullseye text-gray-300"></i>
-                    <p>Aucun objectif défini</p>
+                    <p>Atteindre <%= df.format(objectifMensuel) %> F CFA ce mois</p>
                 </div>
             </div>
         </div>
+
     </main>
 </div>
 <script>

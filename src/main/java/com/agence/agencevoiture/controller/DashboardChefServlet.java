@@ -2,8 +2,8 @@ package com.agence.agencevoiture.controller;
 
 import com.agence.agencevoiture.service.LocationService;
 import com.agence.agencevoiture.service.VoitureService;
-import com.agence.agencevoiture.entity.Location;
-import com.agence.agencevoiture.entity.Voiture;
+import com.agence.agencevoiture.service.ClientService;
+import com.agence.agencevoiture.entity.*;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -18,6 +18,8 @@ import java.util.*;
 public class DashboardChefServlet extends HttpServlet {
 
     private final LocationService locationService = new LocationService();
+    private final VoitureService voitureService = new VoitureService();
+    private final ClientService clientService = new ClientService(); // Si nécessaire
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM");
 
     @Override
@@ -26,18 +28,19 @@ public class DashboardChefServlet extends HttpServlet {
 
         LocalDate now = LocalDate.now();
 
-        // Bilan mensuel sur 6 derniers mois
+        // --- 1. Données pour graphiques financiers ---
         List<BigDecimal> revenusMensuels = new ArrayList<>();
         List<String> moisLabels = new ArrayList<>();
+        int annee = 0;
+        int mois = 0;
         for (int i = 5; i >= 0; i--) {
             LocalDate date = now.minusMonths(i);
-            int annee = date.getYear();
-            int mois = date.getMonthValue();
+            annee = date.getYear();
+            mois = date.getMonthValue();
             revenusMensuels.add(locationService.bilanFinancierMensuel(annee, mois));
             moisLabels.add(date.getMonth().name().substring(0, 3));
         }
 
-        // Bilan journalier (7 derniers jours)
         List<String> joursLabels = new ArrayList<>();
         List<BigDecimal> revenusJournaliers = new ArrayList<>();
         for (int i = 6; i >= 0; i--) {
@@ -46,7 +49,6 @@ public class DashboardChefServlet extends HttpServlet {
             revenusJournaliers.add(locationService.bilanFinancierJournalier(date));
         }
 
-        // Bilan hebdomadaire (6 dernières semaines)
         List<String> semainesLabels = new ArrayList<>();
         List<BigDecimal> revenusHebdomadaires = new ArrayList<>();
         for (int i = 5; i >= 0; i--) {
@@ -56,13 +58,51 @@ public class DashboardChefServlet extends HttpServlet {
             revenusHebdomadaires.add(locationService.bilanFinancierHebdomadaire(debutSemaine, finSemaine));
         }
 
-        // Envoyer les données au JSP
+        // --- 2. Statistiques principales ---
+        List<Voiture> voituresDisponibles = voitureService.listerVoituresDisponibles();
+        List<Location> locationsEnCours = locationService.listerLocationsEnCours();
+        List<Location> locationsHistoriques = locationService.listerLocationsTerminees();
+        Long totalVoitures = voitureService.totalVoitures();
+        BigDecimal revenuMois = locationService.bilanFinancierMensuel(now.getYear(), now.getMonthValue());
+
+        // --- 3. Clients actifs ---
+        int clientsActifs = locationService.nombreClientsActifsDuMois(now.getYear(), now.getMonthValue());
+        int totalClients = clientService.totalClients(); // méthode que tu dois définir si non encore faite
+        int pourcentageClientsMois = totalClients > 0 ? (clientsActifs * 100 / totalClients) : 0;
+
+        // --- 4. Objectif et évolution ---
+        BigDecimal objectifMensuel = locationService.objectifDuMois(); // méthode que tu dois définir ou hardcoder
+        BigDecimal revenuMoisDernier = locationService.bilanFinancierMensuel(now.minusMonths(1).getYear(), now.minusMonths(1).getMonthValue());
+        BigDecimal evolutionRevenu = revenuMois.subtract(revenuMoisDernier);
+
+        // --- 5. Voitures populaires ---
+        List<Object[]> voituresPopulaires = voitureService.voituresLesPlusLouees(5); // Top 5
+
+        // --- 6. Transfert vers JSP ---
         request.setAttribute("labelsJson", toJsonArray(moisLabels));
         request.setAttribute("dataJson", toJsonArray(revenusMensuels));
         request.setAttribute("joursLabelsJson", toJsonArray(joursLabels));
         request.setAttribute("revenusJournaliersJson", toJsonArray(revenusJournaliers));
         request.setAttribute("semainesLabelsJson", toJsonArray(semainesLabels));
         request.setAttribute("revenusHebdomadairesJson", toJsonArray(revenusHebdomadaires));
+
+        request.setAttribute("voituresDisponibles", voituresDisponibles);
+        request.setAttribute("locationsEnCours", locationsEnCours);
+        request.setAttribute("locationsHistoriques", locationsHistoriques);
+        request.setAttribute("totalVoitures", totalVoitures);
+        request.setAttribute("revenuMois", revenuMois);
+        request.setAttribute("clientsActifs", clientsActifs);
+        request.setAttribute("pourcentageClientsMois", pourcentageClientsMois);
+        request.setAttribute("objectifMensuel", objectifMensuel);
+        request.setAttribute("evolutionRevenu", evolutionRevenu);
+        request.setAttribute("voituresPopulaires", voituresPopulaires);
+
+        request.setAttribute("locationsEnCours", locationService.listerLocationsEnCours());
+        request.setAttribute("locationsHistoriques", locationService.listerLocationsTerminees());
+        request.setAttribute("clientsActifs", locationService.nombreClientsActifsDuMois(annee, mois));
+        request.setAttribute("voituresPopulaires", voitureService.voituresLesPlusLouees(5));
+        request.setAttribute("totalClients", locationService.totalClients());
+
 
         request.getRequestDispatcher("/dashboardChef.jsp").forward(request, response);
     }

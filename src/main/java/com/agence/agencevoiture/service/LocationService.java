@@ -223,11 +223,69 @@ public class LocationService {
                 .collect(Collectors.toList());
     }
 
-    public BigDecimal bilanFinancierHebdomadaire(LocalDate now, LocalDate finSemaine) {
-        return null;
+    public BigDecimal bilanFinancierHebdomadaire(LocalDate debut, LocalDate fin) {
+        TypedQuery<Double> query = em.createQuery(
+                "SELECT COALESCE(SUM(l.montantTotal), 0) FROM Location l " +
+                        "WHERE l.statut = :statut " +
+                        "AND l.dateFin BETWEEN :debut AND :fin", Double.class);
+        query.setParameter("statut", StatutLocation.TERMINEE);
+        query.setParameter("debut", java.sql.Date.valueOf(debut));
+        query.setParameter("fin", java.sql.Date.valueOf(fin));
+        Double result = query.getSingleResult();
+        return BigDecimal.valueOf(result != null ? result : 0.0);
     }
 
-    public BigDecimal bilanFinancierJournalier(LocalDate now) {
-        return null;
+    public BigDecimal bilanFinancierJournalier(LocalDate date) {
+        TypedQuery<Double> query = em.createQuery(
+                "SELECT COALESCE(SUM(l.montantTotal), 0) FROM Location l " +
+                        "WHERE l.statut = :statut " +
+                        "AND FUNCTION('YEAR', l.dateFin) = :annee " +
+                        "AND FUNCTION('MONTH', l.dateFin) = :mois " +
+                        "AND FUNCTION('DAY', l.dateFin) = :jour", Double.class);
+        query.setParameter("statut", StatutLocation.TERMINEE);
+        query.setParameter("annee", date.getYear());
+        query.setParameter("mois", date.getMonthValue());
+        query.setParameter("jour", date.getDayOfMonth());
+        Double result = query.getSingleResult();
+        return BigDecimal.valueOf(result != null ? result : 0.0);
     }
+
+    public BigDecimal objectifDuMois() {
+        // À améliorer plus tard via paramètre dynamique ou en BDD
+        return BigDecimal.valueOf(1_000_000); // Ex: 1 million F CFA
+    }
+    // Lister les locations encore actives
+    public List<Location> listerLocationsEnCours() {
+        return em.createQuery("SELECT l FROM Location l WHERE l.statut = :statut", Location.class)
+                .setParameter("statut", StatutLocation.EN_COURS)
+                .getResultList();
+    }
+
+    // Lister les locations terminées
+    public List<Location> listerLocationsTerminees() {
+        return em.createQuery("SELECT l FROM Location l WHERE l.statut = :statut", Location.class)
+                .setParameter("statut", StatutLocation.TERMINEE)
+                .getResultList();
+    }
+
+    // Nombre de clients actifs ce mois
+    public int nombreClientsActifsDuMois(int annee, int mois) {
+        Long count = em.createQuery(
+                        "SELECT COUNT(DISTINCT l.client.id) FROM Location l " +
+                                "WHERE FUNCTION('YEAR', l.dateDebut) = :annee AND FUNCTION('MONTH', l.dateDebut) = :mois", Long.class)
+                .setParameter("annee", annee)
+                .setParameter("mois", mois)
+                .getSingleResult();
+        return count != null ? count.intValue() : 0;
+    }
+
+    // Total de clients ayant déjà loué
+    public int totalClients() {
+        EntityManager em = null;
+        Long count = em.createQuery(
+                        "SELECT COUNT(DISTINCT l.client.id) FROM Location l", Long.class)
+                .getSingleResult();
+        return count != null ? count.intValue() : 0;
+    }
+
 }

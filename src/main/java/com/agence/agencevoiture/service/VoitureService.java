@@ -2,7 +2,9 @@ package com.agence.agencevoiture.service;
 
 import com.agence.agencevoiture.dao.VoitureDAO;
 import com.agence.agencevoiture.entity.Voiture;
+import jakarta.persistence.EntityManager;
 
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -87,7 +89,7 @@ public class VoitureService {
                 .filter(v -> kmMax == null || v.getKilometrage() <= kmMax)
                 .filter(v -> anneeMin == null ||
                         (v.getDateMiseEnCirculation() != null &&
-                                v.getDateMiseEnCirculation().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate().getYear() >= anneeMin))
+                                v.getDateMiseEnCirculation().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().getYear() >= anneeMin))
                 .collect(Collectors.toList());
     }
 
@@ -119,6 +121,18 @@ public class VoitureService {
         return voitureDAO.findVoituresDisponibles();
 
 
+    }
+    public long totalVoitures() {
+        return voitureDAO.trouverTous().size(); // ou requête JPA si besoin de perf
+    }
+    // Voitures les plus louées (ex: top 5)
+    public static List<Object[]> voituresLesPlusLouees(int limite) {
+        EntityManager em = null;
+        return em.createQuery(
+                        "SELECT l.voiture, COUNT(l) as nb " +
+                                "FROM Location l GROUP BY l.voiture ORDER BY nb DESC", Object[].class)
+                .setMaxResults(limite)
+                .getResultList();
     }
 
 
