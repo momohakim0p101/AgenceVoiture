@@ -1,26 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <persistence xmlns="https://jakarta.ee/xml/ns/persistence" version="3.0">
     <persistence-unit name="pu" transaction-type="RESOURCE_LOCAL">
+        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+
+        <!-- Entités -->
         <class>com.agence.agencevoiture.entity.Utilisateur</class>
         <class>com.agence.agencevoiture.entity.Client</class>
         <class>com.agence.agencevoiture.entity.Location</class>
         <class>com.agence.agencevoiture.entity.Facture</class>
         <class>com.agence.agencevoiture.entity.Voiture</class>
 
+        <!-- Connexion JDBC -->
         <properties>
+            <property name="jakarta.persistence.jdbc.driver" value="org.mariadb.jdbc.Driver"/>
+            <property name="jakarta.persistence.jdbc.url" value="jdbc:mariadb://localhost:3306/gestion_agence_voiture"/>
+            <property name="jakarta.persistence.jdbc.user" value="root"/>
+            <property name="jakarta.persistence.jdbc.password" value=""/>
+
+            <!-- Génération automatique des tables -->
+            <property name="jakarta.persistence.schema-generation.database.action" value="none"/>
+
+            <!-- Logging -->
             <property name="eclipselink.logging.level" value="FINE"/>
             <property name="eclipselink.logging.level.sql" value="FINE"/>
             <property name="eclipselink.logging.parameters" value="true"/>
-            <property name="eclipselink.target-database" value="org.eclipse.persistence.platform.database.MySQLPlatform"/>
-            <property name="jakarta.persistence.schema-generation.database.action" value="create" />
-            <property name="jakarta.persistence.jdbc.driver" value="org.mariadb.jdbc.Driver"/>
-            <property name="jakarta.persistence.jdbc.url" value="jdbc:mariadb://localhost:3306/Gestion_agence_voiture"/>
-            <property name="jakarta.persistence.jdbc.user" value="root"/>
-            <property name="jakarta.persistence.jdbc.password" value="Fatoufaye0101@"/>
 
-            <property name="hibernate.hbm2ddl.auto" value="update"/>
+            <!-- Plateforme cible -->
+            <property name="eclipselink.target-database" value="org.eclipse.persistence.platform.database.MySQLPlatform"/>
+
+            <!-- Désactivation du cache partagé (optionnel en dev) -->
+            <property name="eclipselink.cache.shared.default" value="false"/>
         </properties>
     </persistence-unit>
 </persistence>
-
-
-

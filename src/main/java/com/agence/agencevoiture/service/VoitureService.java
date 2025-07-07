@@ -3,6 +3,7 @@ package com.agence.agencevoiture.service;
 import com.agence.agencevoiture.dao.VoitureDAO;
 import com.agence.agencevoiture.entity.Voiture;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -113,8 +114,11 @@ public class VoitureService {
         return voitureDAO.trouverVoiture(immatriculation);
     }
 
+    // Dans VoitureService.java
     public List<Voiture> listerVoituresDisponibles() {
         return voitureDAO.findVoituresDisponibles();
+
+
     }
 
 

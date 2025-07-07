@@ -49,11 +49,7 @@
         </dependency>
 
         <!-- Hibernate Core (attention si tu mélanges avec EclipseLink) -->
-        <dependency>
-            <groupId>org.hibernate.orm</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <version>6.0.0.Final</version>
-        </dependency>
+
 
         <!-- Hibernate Validator -->
         <dependency>

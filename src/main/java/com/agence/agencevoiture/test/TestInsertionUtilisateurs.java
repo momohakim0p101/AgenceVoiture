@@ -11,16 +11,16 @@ public class TestInsertionUtilisateurs {
         papi.setNom("DIOP");
         papi.setPrenom("Papa Bothie");
         papi.setIdentifiant("gestionnaire@agence.ma");
-        papi.setEmail("papi@agence.com");
-        papi.setMotDePasse("password"); // à hasher
+        papi.setEmail(" mamadou.sy@example.com");
+        papi.setMotDePasse("sy123"); // à hasher
         papi.setRole("gestionnaire");
 
         Utilisateur modou = new Utilisateur();
         modou.setNom("POUYE");
         modou.setIdentifiant("chef@agence.ma");
         modou.setPrenom("Modou");
-        modou.setEmail("modou@agence.com");
-        modou.setMotDePasse("password");
+        modou.setEmail(" awa.ba@example.com");
+        modou.setMotDePasse("awa123");
         modou.setRole("chef");
 
         dao.creerUtilisateur(papi);

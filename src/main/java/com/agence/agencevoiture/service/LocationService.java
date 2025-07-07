@@ -9,7 +9,7 @@ import com.agence.agencevoiture.entity.Voiture;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
-import java.time.YearMonth;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -221,5 +221,13 @@ public class LocationService {
         return toutesLocations.stream()
                 .filter(loc -> loc.getStatut() != null && loc.getStatut() != StatutLocation.CONFIRMEE)
                 .collect(Collectors.toList());
+    }
+
+    public BigDecimal bilanFinancierHebdomadaire(LocalDate now, LocalDate finSemaine) {
+        return null;
+    }
+
+    public BigDecimal bilanFinancierJournalier(LocalDate now) {
+        return null;
     }
 }

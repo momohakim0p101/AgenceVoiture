@@ -10,3 +10,5 @@
 2025-06-19 16:35:24 INFO  com.agence.agencevoiture.utils.MainApp - Démarrage de l'apllication
 2025-06-19 16:35:24 WARN  com.agence.agencevoiture.utils.MainApp - Ceci est un avertissement
 2025-06-19 16:35:24 ERROR com.agence.agencevoiture.utils.MainApp - Une erreur c'est produit 
+2025-07-03 22:21:32 INFO  org.hibernate.validator.internal.util.Version - HV000001: Hibernate Validator 7.0.4.Final
+2025-07-03 22:29:27 INFO  org.hibernate.validator.internal.util.Version - HV000001: Hibernate Validator 7.0.4.Final

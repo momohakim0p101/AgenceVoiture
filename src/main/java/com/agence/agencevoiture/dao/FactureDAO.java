@@ -5,7 +5,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Persistence;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
 import org.eclipse.persistence.jpa.JpaEntityManagerFactory;
 
 import java.util.List;
