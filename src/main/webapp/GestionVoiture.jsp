@@ -118,55 +118,85 @@
 
     <!-- Cars Grid -->
     <section id="carsGrid" class="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 overflow-auto">
-        <c:forEach var="voiture" items="${voitures}">
-            <article
-                    class="bg-white rounded shadow p-5 flex flex-col justify-between hover:shadow-lg transition cursor-pointer vehicle-card"
-                    data-marque="${voiture.marque.toLowerCase()}"
-                    data-modele="${voiture.modele.toLowerCase()}"
-                    data-immatriculation="${voiture.immatriculation.toLowerCase()}"
-                    data-enmaintenance="${voiture.enMaintenance}">
+        <c:forEach var="voiture" items="${voitures}"><article
+                class="vehicle-card relative bg-white rounded-lg shadow-md overflow-hidden flex flex-col"
+                data-marque="${voiture.marque.toLowerCase()}"
+                data-modele="${voiture.modele.toLowerCase()}"
+                data-immatriculation="${voiture.immatriculation.toLowerCase()}"
+                data-enmaintenance="${voiture.enMaintenance}"
+                data-nombreplaces="${voiture.nombrePlaces}"
+                data-typecarburant="${voiture.typeCarburant.toLowerCase()}"
+                data-categorie="${voiture.categorie.toLowerCase()}"
+                data-prixlocationjour="${voiture.prixLocationJour}"
+                data-disponible="${voiture.disponible}"
+                data-datemiseencirculation="${voiture.dateMiseEnCirculation}"
+                data-kilometrage="${voiture.kilometrage}"
+        >
+            <!-- Image -->
+            <!-- Image -->
+            <img src="${voiture.imagePath}" alt="${voiture.marque} ${voiture.modele}" class="h-40 w-full object-cover rounded-t-lg" />
 
+            <!-- Badge de statut -->
+            <div class="p-2 text-sm">
+                <c:choose>
+                    <c:when test="${voiture.enMaintenance}">
+            <span class="text-yellow-600 font-semibold flex items-center gap-1">
+                <i class="fas fa-wrench"></i> En maintenance
+            </span>
+                    </c:when>
+                    <c:when test="${voiture.disponible}">
+            <span class="text-green-600 font-semibold flex items-center gap-1">
+                <i class="fas fa-check-circle"></i> Disponible
+            </span>
+                    </c:when>
+                    <c:otherwise>
+            <span class="text-red-600 font-semibold flex items-center gap-1">
+                <i class="fas fa-times-circle"></i> Loué
+            </span>
+                    </c:otherwise>
+                </c:choose>
+            </div>
+
+
+
+            <!-- Infos -->
+            <div class="p-4 flex-1 flex flex-col justify-between">
                 <header>
-                    <h3 class="text-xl font-semibold text-gray-800">${voiture.marque} ${voiture.modele}</h3>
+                    <h3 class="text-lg font-semibold text-gray-800">${voiture.marque} ${voiture.modele}</h3>
                     <p class="text-sm text-blue-600 font-semibold">${voiture.immatriculation}</p>
                 </header>
-                <div class="mt-3 space-y-1 text-gray-600 text-sm">
-                    <p><i class="fas fa-users mr-1 text-gray-400"></i> ${voiture.nombrePlaces} places</p>
-                    <p><i class="fas fa-gas-pump mr-1 text-gray-400"></i> ${voiture.typeCarburant}</p>
-                    <p><i class="fas fa-calendar-alt mr-1 text-gray-400"></i> ${voiture.dateMiseEnCirculation}</p>
-                    <p><i class="fas fa-tachometer-alt mr-1 text-gray-400"></i> ${voiture.kilometrage} km</p>
+
+                <ul class="mt-3 text-gray-600 text-sm space-y-1">
+                    <li><i class="fas fa-users mr-1 text-gray-400"></i> ${voiture.nombrePlaces} places</li>
+                    <li><i class="fas fa-gas-pump mr-1 text-gray-400"></i> ${voiture.typeCarburant}</li>
+                    <li><i class="fas fa-calendar-alt mr-1 text-gray-400"></i> ${voiture.dateMiseEnCirculation}</li>
+                    <li><i class="fas fa-tachometer-alt mr-1 text-gray-400"></i> ${voiture.kilometrage} km</li>
+                </ul>
+
+                <div class="mt-3">
+                    <p class="text-sm text-gray-500">Catégorie:</p>
+                    <p class="font-semibold text-gray-700">${voiture.categorie}</p>
                 </div>
-                <p class="mt-3 font-bold text-red-600">Categorie: ${voiture.categorie}</p>
-                <p class="mt-1 font-bold text-green-600">${voiture.prixLocationJour} FCFA / jour</p>
-                <p class="mt-2">
-                    <c:choose>
-                        <c:when test="${voiture.enMaintenance}">
-                            <span class="text-yellow-600 font-semibold"><i class="fas fa-wrench"></i> En maintenance</span>
-                        </c:when>
-                        <c:when test="${voiture.disponible}">
-                            <span class="text-green-600 font-semibold"><i class="fas fa-check-circle"></i> Disponible</span>
-                        </c:when>
-                        <c:otherwise>
-                            <span class="text-red-600 font-semibold"><i class="fas fa-times-circle"></i> Indisponible</span>
-                        </c:otherwise>
-                    </c:choose>
-                </p>
-                <footer class="mt-4 flex gap-2">
-                    <button
-                            onclick="openEditModal('${voiture.immatriculation}')"
-                            class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded flex items-center justify-center gap-2 transition"
-                    >
+
+                <div class="mt-2">
+                    <p class="text-sm text-gray-500">Prix/jour:</p>
+                    <p class="font-bold text-blue-600">${voiture.prixLocationJour} FCFA</p>
+                </div>
+
+                <!-- Actions -->
+                <div class="mt-4 flex gap-2">
+                    <button onclick="openEditModal('${voiture.immatriculation}')" class="flex-1 bg-gray-100 hover:bg-blue-100 text-blue-600 border border-blue-600 py-2 rounded flex items-center justify-center gap-2 text-sm">
                         <i class="fas fa-edit"></i> Modifier
                     </button>
-                    <button
-                            onclick="openDeleteModal('${voiture.immatriculation}')"
-                            class="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 rounded flex items-center justify-center gap-2 transition"
-                    >
+                    <button onclick="openDeleteModal('${voiture.immatriculation}')" class="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 rounded flex items-center justify-center gap-2 text-sm">
                         <i class="fas fa-trash"></i> Supprimer
                     </button>
-                </footer>
-            </article>
+                </div>
+            </div>
+        </article>
+
         </c:forEach>
+
         <c:if test="${empty voitures}">
             <p class="col-span-full text-center text-gray-500 mt-10">Aucune voiture trouve.</p>
         </c:if>
@@ -197,6 +227,9 @@
                 <select name="marque" required class="w-full border border-gray-300 rounded px-3 py-2">
                     <option value="" disabled selected>-- Choisir une marque --</option>
                     <option>Toyota</option>
+                    <option>Ranger Rover</option>
+                    <option>Chevrolet</option>
+                    <option>Mercedes</option>
                     <option>Renault</option>
                     <option>Peugeot</option>
                     <option>Ford</option>
@@ -455,47 +488,33 @@
         document.getElementById(id).classList.add('hidden');
     }
 
-    // Fill edit modal with selected car data
     function openEditModal(immatriculation) {
-        // Trouver la carte voiture correspondante
         const card = [...document.querySelectorAll('.vehicle-card')].find(
             c => c.dataset.immatriculation === immatriculation.toLowerCase()
         );
         if (!card) return;
 
-        // Récupérer les infos
         document.getElementById('edit-immatriculation').value = immatriculation;
         document.getElementById('edit-immatriculation-display').value = immatriculation;
-        document.getElementById('edit-marque').value = card.dataset.marque;
-        document.getElementById('edit-modele').value = card.dataset.modele;
-        document.getElementById('edit-nombrePlaces').value = card.querySelector('p:contains("places")')?.textContent.match(/\d+/) || '';
-        document.getElementById('edit-typeCarburant').value = card.dataset.typecarburant || card.querySelector('p:contains("carburant")')?.textContent || '';
-        // Pour les autres champs, on peut les stocker dans data-* si besoin. Sinon ajouter dans les cards.
-        // Mais pour l'instant on garde simple : il faut ajouter data-attributes supplémentaires si nécessaire.
-
-        // Autres champs à récupérer dans le DOM
-        // On va récupérer depuis les éléments textuels si possible
-        // Places :
-        const placesText = card.querySelector('p:contains("places")')?.textContent || '';
-        document.getElementById('edit-nombrePlaces').value = placesText.match(/\d+/) ? placesText.match(/\d+/)[0] : '';
-
-        // Carburant
-        const carburantText = !(!'' && !card.querySelector('p:contains("carburant")')?.textContent);
-        document.getElementById('edit-typeCarburant').value = carburantText.trim();
-
-        // Pour date, km, catégorie, prix, dispo, on doit ajouter data-* dans la card ou chercher dans le DOM
-        // Pour simplifier, on va stocker dans data-* les infos importantes. Je vais améliorer ça :
-
+        document.getElementById('edit-marque').value = card.dataset.marque || '';
+        document.getElementById('edit-modele').value = card.dataset.modele || '';
         document.getElementById('edit-nombrePlaces').value = card.dataset.nombreplaces || '';
         document.getElementById('edit-typeCarburant').value = card.dataset.typecarburant || '';
         document.getElementById('edit-categorie').value = card.dataset.categorie || '';
         document.getElementById('edit-prixLocationJour').value = card.dataset.prixlocationjour || '';
         document.getElementById('edit-disponible').value = card.dataset.disponible || 'true';
-        document.getElementById('edit-dateMiseEnCirculation').value = card.dataset.datemiseencirculation || '';
+        // Pour la date, formate en yyyy-MM-dd si besoin
+        if (card.dataset.datemiseencirculation) {
+            // Assure-toi que la date est au bon format, sinon adapte ici
+            document.getElementById('edit-dateMiseEnCirculation').value = card.dataset.datemiseencirculation.split(' ')[0]; // enlever heure si existe
+        } else {
+            document.getElementById('edit-dateMiseEnCirculation').value = '';
+        }
         document.getElementById('edit-kilometrage').value = card.dataset.kilometrage || '';
 
         openModal('editCarModal');
     }
+
 
     function openDeleteModal(immatriculation) {
         document.getElementById('delete-immatriculation').value = immatriculation;

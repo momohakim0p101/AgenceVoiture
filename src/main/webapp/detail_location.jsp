@@ -167,8 +167,8 @@
 
 <main>
 
-  <a href="${pageContext.request.contextPath}/GenererPDFLocation" style="text-decoration: none" class="btn-print" target="_blank">
-    <svg>...</svg> Télécharger en PDF
+  <a href="${pageContext.request.contextPath}/DashboardManagerServlet" style="text-decoration: none" class="btn-print" target="_blank">
+    <svg>...</svg> Enregistrer la location
   </a>
   <h2>Informations sur la location</h2>
 

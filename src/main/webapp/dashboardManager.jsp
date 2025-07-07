@@ -225,10 +225,13 @@
         </div>
 
 
-        <!-- Notification box -->
-        <div id="notifBox" class="hidden bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6 rounded shadow-sm select-none" role="alert" aria-live="assertive">
-            <strong>Attention : </strong> Certaines locations ont dépassé leur date de fin. Veuillez les vérifier.
+        <!-- Champ de recherche en temps réel -->
+        <div class="mb-4 flex items-center gap-2">
+            <label for="searchLocation" class="font-medium text-gray-700">Rechercher une location :</label>
+            <input type="text" id="searchLocation" placeholder="Nom client, voiture, date, etc."
+                   class="w-full max-w-md p-2 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
         </div>
+
 
         <!-- Table des locations en cours -->
         <h2 class="text-xl md:text-2xl font-semibold text-gray-700 mb-4 flex items-center gap-2">
@@ -249,6 +252,7 @@
                 </tr>
                 </thead>
                 <tbody>
+
                 <%
                     if (locationsEnCours != null && !locationsEnCours.isEmpty()) {
                         for (Location l : locationsEnCours) {
@@ -284,6 +288,14 @@
                                 <i class="fas fa-envelope"></i> Relancer
                             </button>
                         </form>
+
+                        <!-- Bouton Imprimer Facture -->
+                        <a href="FactureServlet?id=<%= l.getIdReservation() %>" target="_blank"
+                           class="inline-flex items-center gap-1 bg-gray-700 hover:bg-gray-800 text-white px-3 py-1 rounded text-sm shadow transition"
+                           title="Imprimer la facture">
+                            <i class="fas fa-file-invoice"></i>Facture
+                        </a>
+
                     </td>
 
 
@@ -374,6 +386,31 @@
     }
 
     document.addEventListener("DOMContentLoaded", verifierRetards);
+
+    const searchInput = document.getElementById("searchLocation");
+
+    searchInput.addEventListener("input", function () {
+        const term = this.value.toLowerCase();
+
+        filterTable("encoursTable", term);
+        filterTable("historiqueTable", term);
+    });
+
+    function filterTable(tableId, term) {
+        const table = document.getElementById(tableId);
+        if (!table) return;
+
+        const rows = table.querySelectorAll("tbody tr");
+
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            if (text.includes(term)) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+        });
+    }
 </script>
 </body>
 </html>

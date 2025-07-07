@@ -71,6 +71,7 @@
           <element id="library" level="project" name="Maven: org.bouncycastle:bcprov-jdk15on:1.70" />
           <element id="library" level="project" name="Maven: com.sun.mail:javax.mail:1.6.2" />
           <element id="library" level="project" name="Maven: javax.activation:activation:1.1" />
+          <element id="library" level="project" name="Maven: com.itextpdf:itextpdf:5.5.13.3" />
         </element>
       </element>
       <element id="directory" name="META-INF">

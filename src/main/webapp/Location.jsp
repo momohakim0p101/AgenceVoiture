@@ -176,6 +176,12 @@
                 </div>
 
                 <div>
+                    <label for="prix" class="block text-sm font-medium">Prix de la maintenance (en FCFA)</label>
+                    <input type="number" name="prix" id="prix" step="100" class="w-full p-2 border rounded" required />
+                </div>
+
+
+                <div>
                     <label for="description" class="block text-sm font-medium">Description</label>
                     <textarea name="description" id="description" class="w-full p-2 border rounded" rows="3" required></textarea>
                 </div>

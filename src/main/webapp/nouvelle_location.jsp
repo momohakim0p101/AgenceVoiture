@@ -11,6 +11,19 @@
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
 <body class="bg-gray-100 min-h-screen">
+<%
+    String successMessage = (String) session.getAttribute("successMessage");
+    if (successMessage != null) {
+%>
+<div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative m-4" role="alert">
+    <strong class="font-bold">Succès ! </strong>
+    <span class="block sm:inline"><%= successMessage %></span>
+</div>
+<%
+        session.removeAttribute("successMessage"); // Ne pas afficher à nouveau
+    }
+%>
+
 
 <!-- Conteneur principal avec positionnement relatif -->
 <div class="relative flex items-center justify-center min-h-screen">
@@ -55,6 +68,9 @@
                 </div>
                 <input type="hidden" name="cin" id="formCin">
                 <div class="flex justify-end mt-6">
+                    <a href="${pageContext.request.contextPath}/DashboardManagerServlet"
+                       class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
+                       title="Annuler la création">Annuler</a>
                     <button type="button" class="btn-next bg-blue-600 text-white px-4 py-2 rounded" data-next="2">Suivant</button>
                 </div>
             </div>
@@ -73,6 +89,9 @@
                 </div>
                 <input type="hidden" name="immatriculation" id="formImmat">
                 <div class="flex justify-between mt-6">
+                    <a href="${pageContext.request.contextPath}/DashboardManagerServlet"
+                       class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
+                       title="Annuler la création">Annuler</a>
                     <button type="button" class="btn-prev px-4 py-2 bg-gray-300 rounded" data-prev="1">Précédent</button>
                     <button type="button" class="btn-next bg-blue-600 text-white px-4 py-2 rounded" data-next="3">Suivant</button>
                 </div>

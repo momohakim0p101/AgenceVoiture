@@ -110,6 +110,10 @@ public class NouvelleLocationServlet extends HttpServlet {
         try {
             // Utiliser la méthode reserverVoiture pour gérer la transaction et mise à jour
             Location location = locationService.reserverVoiture(client, voiture, dateDebut, dateFin, prixParJour);
+            // Après enregistrement réussi
+            request.getSession().setAttribute("successMessage", "La location a été enregistrée avec succès !");
+
+
 
             request.setAttribute("location", location);
             request.getRequestDispatcher("detail_location.jsp").forward(request, response);

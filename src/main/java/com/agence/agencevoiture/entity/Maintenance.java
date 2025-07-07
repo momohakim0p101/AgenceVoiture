@@ -18,6 +18,10 @@ public class Maintenance {
     @Column(name = "date_maintenance", nullable = false)
     private Date dateMaintenance;
 
+    @Column(name = "prix_maintenance")
+    private double prix;
+
+
     @Column(name = "description", length = 500)
     private String description;
 
@@ -37,6 +41,14 @@ public class Maintenance {
     }
 
     // Getters et setters
+    public double getPrix() {
+        return prix;
+    }
+
+    public void setPrix(double prix) {
+        this.prix = prix;
+    }
+
 
     public Long getId() {
         return id;

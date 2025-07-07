@@ -26,6 +26,9 @@ public class MaintenanceServlet extends HttpServlet {
         String type = request.getParameter("type");
         String description = request.getParameter("description");
         String dateStr = request.getParameter("date");
+        String prixStr = request.getParameter("prix");
+        double prix = Double.parseDouble(prixStr);
+
 
         try {
             // Validation rapide
@@ -49,6 +52,8 @@ public class MaintenanceServlet extends HttpServlet {
             maintenance.setType(type);
             maintenance.setDescription(description);
             maintenance.setDateMaintenance(date);
+            maintenance.setPrix(prix);
+
 
             boolean success = maintenanceService.ajouterMaintenance(maintenance);
 
