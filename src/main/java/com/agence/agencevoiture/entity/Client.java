@@ -32,6 +32,12 @@ public class Client {
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
     private List<Location> location;
 
+    @Transient
+    public int getNombreLocations() {
+        return location != null ? location.size() : 0;
+    }
+
+
 
     public Client() {
         // constructeur vide nécessaire pour JPA

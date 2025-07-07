@@ -4,6 +4,7 @@ package com.agence.agencevoiture.dao;
 import com.agence.agencevoiture.entity.Client;
 import jakarta.persistence.Persistence;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.persistence.jpa.JpaEntityManagerFactory;
@@ -63,7 +64,31 @@ public class ClientDAO {
         return clients;
     }
 
-}
+    public List<Client> findTopClientsByLocationCount(int limit) {
+        EntityManager em = emf.createEntityManager();
+        TypedQuery<Client> query = emf.createEntityManager().createQuery(
+                "SELECT c FROM Client c ORDER BY SIZE(c.locations) DESC", Client.class);
+        query.setMaxResults(limit);
+        return query.getResultList();
+    }
+
+    public List<Client> trouverClientsFideles() {
+        EntityManager em = emf.createEntityManager();
+        try {
+            return em.createQuery(
+                    "SELECT c FROM Client c LEFT JOIN c.location l GROUP BY c ORDER BY COUNT(l) DESC",
+                    Client.class
+            ).getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
+    }
+
+
+
+
 
 
 

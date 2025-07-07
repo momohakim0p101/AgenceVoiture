@@ -2,97 +2,91 @@ package com.agence.agencevoiture.dao;
 
 import com.agence.agencevoiture.entity.Maintenance;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
-import jakarta.persistence.TypedQuery;
 
 import java.util.List;
 
-/**
- * DAO pour la gestion des opérations CRUD sur les maintenances.
- */
 public class MaintenanceDAO {
 
-    private final EntityManager em;
+    private static final EntityManagerFactory emf = Persistence.createEntityManagerFactory("pu");
 
-    public MaintenanceDAO() {
-        this.em = Persistence
-                .createEntityManagerFactory("pu")
-                .createEntityManager();
-    }
-
-    /**
-     * Crée une nouvelle maintenance.
-     */
     public void creerMaintenance(Maintenance maintenance) {
-        EntityTransaction tx = em.getTransaction();
+        EntityManager em = emf.createEntityManager();
         try {
-            tx.begin();
+            em.getTransaction().begin();
             em.persist(maintenance);
-            tx.commit();
-        } catch (Exception e) {
-            if (tx.isActive()) tx.rollback();
-            throw e;
+            em.getTransaction().commit();
+        } finally {
+            em.close();
         }
     }
 
-    /**
-     * Met à jour une maintenance existante.
-     */
     public void miseAJour(Maintenance maintenance) {
-        EntityTransaction tx = em.getTransaction();
+        EntityManager em = emf.createEntityManager();
         try {
-            tx.begin();
+            em.getTransaction().begin();
             em.merge(maintenance);
-            tx.commit();
-        } catch (Exception e) {
-            if (tx.isActive()) tx.rollback();
-            throw e;
+            em.getTransaction().commit();
+        } finally {
+            em.close();
         }
     }
 
-    /**
-     * Supprime une maintenance.
-     */
+    public void update(Maintenance maintenance) {
+        miseAJour(maintenance);
+    }
+
     public void supprimerMaintenance(Maintenance maintenance) {
-        EntityTransaction tx = em.getTransaction();
+        EntityManager em = emf.createEntityManager();
         try {
-            tx.begin();
-            Maintenance m = em.find(Maintenance.class, maintenance.getId());
-            if (m != null) {
-                em.remove(m);
-            }
-            tx.commit();
-        } catch (Exception e) {
-            if (tx.isActive()) tx.rollback();
-            throw e;
+            em.getTransaction().begin();
+            Maintenance toRemove = em.merge(maintenance);
+            em.remove(toRemove);
+            em.getTransaction().commit();
+        } finally {
+            em.close();
         }
     }
 
-    /**
-     * Trouve une maintenance par son ID.
-     */
     public Maintenance trouverParId(Long id) {
-        return em.find(Maintenance.class, id);
+        EntityManager em = emf.createEntityManager();
+        try {
+            return em.find(Maintenance.class, id);
+        } finally {
+            em.close();
+        }
     }
 
-    /**
-     * Récupère toutes les maintenances.
-     */
     public List<Maintenance> trouverToutes() {
-        TypedQuery<Maintenance> query = em.createQuery("SELECT m FROM Maintenance m", Maintenance.class);
-        return query.getResultList();
+        EntityManager em = emf.createEntityManager();
+        try {
+            return em.createQuery("SELECT m FROM Maintenance m", Maintenance.class).getResultList();
+        } finally {
+            em.close();
+        }
     }
 
-    /**
-     * Récupère les maintenances associées à une voiture.
-     */
     public List<Maintenance> trouverParVoiture(String immatriculation) {
-        TypedQuery<Maintenance> query = em.createQuery(
-                "SELECT m FROM Maintenance m WHERE m.voiture.immatriculation = :immatriculation",
-                Maintenance.class
-        );
-        query.setParameter("immatriculation", immatriculation);
-        return query.getResultList();
+        EntityManager em = emf.createEntityManager();
+        try {
+            return em.createQuery(
+                            "SELECT m FROM Maintenance m WHERE m.voiture.immatriculation = :immatriculation", Maintenance.class)
+                    .setParameter("immatriculation", immatriculation)
+                    .getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
+    public List<Maintenance> findMaintenancesEnCours() {
+        EntityManager em = emf.createEntityManager();
+        try {
+            return em.createQuery(
+                            "SELECT m FROM Maintenance m WHERE m.voiture.enMaintenance = true", Maintenance.class)
+                    .getResultList();
+        } finally {
+            em.close();
+        }
     }
 }

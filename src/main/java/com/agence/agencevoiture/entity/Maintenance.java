@@ -25,6 +25,18 @@ public class Maintenance {
     @Column(name = "description", length = 500)
     private String description;
 
+    @Column(name = "terminee", nullable = false)
+    private boolean terminee = false;
+
+    public boolean isTerminee() {
+        return terminee;
+    }
+
+    public void setTerminee(boolean terminee) {
+        this.terminee = terminee;
+    }
+
+
     @ManyToOne
     @JoinColumn(name = "voiture_immatriculation", nullable = false)
     private Voiture voiture;

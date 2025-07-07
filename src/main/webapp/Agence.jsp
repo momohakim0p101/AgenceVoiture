@@ -51,12 +51,12 @@
                     </svg>
                     Gestion locations
                 </a>
-                <a href="${pageContext.request.contextPath}/utilisateurs.jsp" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-[#2563eb] transition">
+                <a href="${pageContext.request.contextPath}/AgenceServlet" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-[#2563eb] transition">
                     <!-- Icon Utilisateurs: groupe utilisateurs -->
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87M12 12a5 5 0 100-10 5 5 0 000 10z" />
                     </svg>
-                    Gestion utilisateurs
+                    Gestion Agence
                 </a>
             </nav>
             <div class="mt-auto text-xs text-gray-300 text-center pt-6">© 2025 AutoManager</div>
@@ -90,7 +90,7 @@
                         <td class="py-2 px-4 border"><fmt:formatNumber value="${m.prix}" type="currency" currencySymbol="FCFA" /></td>
                         <td class="py-2 px-4 border"><fmt:formatDate value="${m.dateMaintenance}" pattern="dd/MM/yyyy" /></td>
                         <td class="py-2 px-4 border text-center">
-                            <form action="${pageContext.request.contextPath}/TerminerMaintenanceServlet" method="post">
+                            <form action="${pageContext.request.contextPath}/RetourMaintenanceServlet" method="post">
                                 <input type="hidden" name="id" value="${m.id}" />
                                 <button type="submit" class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">Terminer</button>
                             </form>

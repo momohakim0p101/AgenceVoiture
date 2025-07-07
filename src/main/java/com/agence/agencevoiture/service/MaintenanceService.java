@@ -111,4 +111,12 @@ public class MaintenanceService {
         }
         return maintenanceDAO.trouverParVoiture(immatriculation.trim());
     }
+    public void mettreAJourMaintenance(Maintenance maintenance) {
+        maintenanceDAO.update(maintenance);
+    }
+
+    public List<Maintenance> listerMaintenancesNonTerminees() {
+        return maintenanceDAO.findMaintenancesEnCours();
+    }
+
 }

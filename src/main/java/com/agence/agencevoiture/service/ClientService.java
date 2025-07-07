@@ -122,4 +122,12 @@ public class ClientService {
         }
         return clientDAO.rechercherParNom(nom.trim());
     }
+
+    // ClientService.java
+    public List<Client> getClientsLesPlusFideles() {
+        return clientDAO.trouverClientsFideles();
+    }
+
+
+
 }
