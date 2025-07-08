@@ -84,7 +84,17 @@ public class ClientDAO {
         }
     }
 
+    public long compterClients() {
+        EntityManager em = emf.createEntityManager();
+        try {
+            return em.createQuery("SELECT COUNT(c) FROM Client c", Long.class).getSingleResult();
+        } finally {
+            em.close();
+        }
     }
+
+
+}
 
 
 

@@ -128,6 +128,9 @@ public class ClientService {
         return clientDAO.trouverClientsFideles();
     }
 
+    public int totalClients() {
+        return (int) clientDAO.compterClients();
+    }
 
 
 }

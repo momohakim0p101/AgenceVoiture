@@ -8,6 +8,7 @@
     <meta charset="UTF-8">
     <title>Mon Agence</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
 <body class="bg-gray-100 font-sans leading-normal tracking-normal">
 <div class="flex min-h-screen">
@@ -128,9 +129,8 @@
             </div>
         </section>
 
-        <!-- Section Réseaux sociaux -->
         <section>
-            <h2 class="text-2xl font-semibold mb-4">Suivez-nous</h2>
+            <h2 class="text-2xl font-semibold mb-4">Manager les réseaux</h2>
             <div class="flex space-x-4">
                 <a href="#" class="text-blue-600 text-2xl hover:text-blue-800">
                     <i class="fab fa-facebook"></i>
@@ -149,6 +149,5 @@
     </div>
 </div>
 <!-- Font Awesome -->
-<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </body>
 </html>

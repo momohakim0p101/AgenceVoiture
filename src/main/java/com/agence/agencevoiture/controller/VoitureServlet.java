@@ -152,7 +152,7 @@ public class VoitureServlet extends HttpServlet {
             return;
         }
 
-        boolean success = voitureService.supprimerVoitureSiNonRéservée(immatriculation);
+        boolean success = voitureService.supprimerVoitureSiNonReserveeActive(immatriculation);
         if (success) {
             redirigerSansErreur(resp);
         } else {

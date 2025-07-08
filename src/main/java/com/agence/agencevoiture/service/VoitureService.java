@@ -1,6 +1,8 @@
 package com.agence.agencevoiture.service;
 
+import com.agence.agencevoiture.dao.LocationDAO;
 import com.agence.agencevoiture.dao.VoitureDAO;
+import com.agence.agencevoiture.entity.Location;
 import com.agence.agencevoiture.entity.Voiture;
 
 import java.util.List;
@@ -117,15 +119,27 @@ public class VoitureService {
         return voitureDAO.findVoituresDisponibles();
     }
 
-    public boolean supprimerVoitureSiNonRéservée(String immatriculation) {
-        Voiture voiture = trouverVoitureImm(immatriculation);
+    private final LocationDAO locationDAO = new LocationDAO();
+
+    public boolean supprimerVoitureSiNonReserveeActive(String immatriculation) {
+        Voiture voiture = voitureDAO.trouverVoiture(immatriculation);
         if (voiture == null) return false;
 
-        // Vérifie si la voiture a des réservations
-        if (voiture.getLocations() != null && !voiture.getLocations().isEmpty()) {
+        // 1. Vérifier qu'aucune réservation n'est active
+        List<Location> reservations = voiture.getLocations();
+        boolean hasActive = reservations.stream()
+                .anyMatch(r -> r.getStatut() == Location.StatutLocation.EN_COURS
+                        || r.getStatut() == Location.StatutLocation.CONFIRMEE);
+        if (hasActive) {
             return false;
         }
 
+        // 2. Supprimer **toutes** les réservations (historiques inclus)
+        for (Location loc : reservations) {
+            locationDAO.supprimerLocation(loc);
+        }
+
+        // 3. Supprimer la voiture
         try {
             voitureDAO.supprimerVoiture(voiture);
             return true;
@@ -135,5 +149,12 @@ public class VoitureService {
         }
     }
 
+    public Long totalVoitures() {
+        return voitureDAO.compterVoitures();
+    }
+
+    public List<Object[]> voituresLesPlusLouees(int topN) {
+        return voitureDAO.trouverVoituresTopLoueés(topN);
+    }
 
 }

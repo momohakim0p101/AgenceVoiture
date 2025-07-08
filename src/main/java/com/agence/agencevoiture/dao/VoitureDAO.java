@@ -88,4 +88,14 @@ public class VoitureDAO {
             em.close();
         }
     }
+
+    public long compterVoitures() {
+        EntityManager em = emf.createEntityManager();
+        try {
+            return em.createQuery("SELECT COUNT(v) FROM Voiture v", Long.class).getSingleResult();
+        } finally {
+            em.close();
+        }
+    }
+
 }

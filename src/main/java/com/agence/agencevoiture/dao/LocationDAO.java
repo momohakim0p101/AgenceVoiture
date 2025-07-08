@@ -44,14 +44,18 @@ public class LocationDAO {
         return location;
     }
 
-    public void supprimerLocation(Location location){
+    public void supprimerLocation(Location loc) {
         EntityManager em = emf.createEntityManager();
-        em.getTransaction().begin();
-        location = em.merge(location);
-        em.remove(location);
-        em.getTransaction().commit();
-        em.close();
-
+        try {
+            em.getTransaction().begin();
+            Location managed = em.find(Location.class, loc.getIdReservation());
+            if (managed != null) {
+                em.remove(managed);
+            }
+            em.getTransaction().commit();
+        } finally {
+            em.close();
+        }
     }
 
     public List<Location> trouverTous(){
