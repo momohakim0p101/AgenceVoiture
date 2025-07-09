@@ -10,8 +10,22 @@ import org.eclipse.persistence.jpa.JpaEntityManagerFactory;
 
 import java.util.List;
 
+import static org.eclipse.persistence.jpa.JpaHelper.getEntityManager;
+
 
 public class ClientDAO {
+
+    private final EntityManager entityManager;
+    //on a ajoueter ça pour la recherche
+    public ClientDAO() {
+        this.entityManager = Persistence
+                .createEntityManagerFactory("Gestion_agence_voiture")
+                .createEntityManager();
+    }
+
+    private EntityManager getEntityManager() {
+        return emf.createEntityManager();
+    }
 
     private static  final JpaEntityManagerFactory emf = (JpaEntityManagerFactory) Persistence.createEntityManagerFactory("pu");
 
@@ -62,6 +76,29 @@ public class ClientDAO {
         em.close();
         return clients;
     }
+
+    public List<Client> findAll() {
+        return entityManager
+                .createQuery("SELECT c FROM Client c", Client.class)
+                .getResultList();
+    }
+
+    public List<Client> rechercherParNomPrenomOuCin(String motCle) {
+        EntityManager em = getEntityManager();
+        try {
+            return em.createQuery(
+                            "SELECT c FROM Client c WHERE " +
+                                    "LOWER(c.nom) LIKE :mc OR " +
+                                    "LOWER(c.prenom) LIKE :mc OR " +
+                                    "LOWER(c.cin) LIKE :mc", Client.class)
+                    .setParameter("mc", "%" + motCle + "%")
+                    .getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
+
 
 }
 

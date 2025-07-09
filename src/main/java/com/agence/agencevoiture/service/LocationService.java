@@ -177,7 +177,6 @@ public class LocationService {
     }
 
 
-
     public long compterTotalClients() {
         return em.createQuery("SELECT COUNT(c) FROM Client c", Long.class)
                 .getSingleResult();
@@ -254,6 +253,7 @@ public class LocationService {
         // À améliorer plus tard via paramètre dynamique ou en BDD
         return BigDecimal.valueOf(1_000_000); // Ex: 1 million F CFA
     }
+
     // Lister les locations encore actives
     public List<Location> listerLocationsEnCours() {
         return em.createQuery("SELECT l FROM Location l WHERE l.statut = :statut", Location.class)
@@ -286,6 +286,10 @@ public class LocationService {
                         "SELECT COUNT(DISTINCT l.client.id) FROM Location l", Long.class)
                 .getSingleResult();
         return count != null ? count.intValue() : 0;
+    }
+
+    public List<Location> rechercherParMarqueEtDate(String marque, LocalDate dateRecherche) {
+        return locationDAO.rechercherParMarqueEtDate(marque, dateRecherche);
     }
 
 }

@@ -2,18 +2,25 @@ package com.agence.agencevoiture.dao;
 
 
 import com.agence.agencevoiture.entity.Location;
+import com.agence.agencevoiture.utils.JPAUtil;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Persistence;
 import jakarta.persistence.TypedQuery;
 import org.eclipse.persistence.jpa.JpaEntityManagerFactory;
 
 
+import java.time.LocalDate;
 import java.util.List;
+
+import static org.eclipse.persistence.jpa.JpaHelper.getEntityManager;
 
 public class LocationDAO {
 
     private static final JpaEntityManagerFactory emf = (JpaEntityManagerFactory) Persistence.createEntityManagerFactory("pu");
 
+    private EntityManager getEntityManager() {
+        return JPAUtil.getEntityManagerFactory().createEntityManager();
+    }
     public void creerLocation(Location location){
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
@@ -68,4 +75,24 @@ public class LocationDAO {
      em.getTransaction().commit();
      em.close();
     }
+
+    public List<Location> rechercherParMarqueEtDate(String marque, LocalDate dateRecherche) {
+        EntityManager em = getEntityManager();
+        try {
+            return em.createQuery(
+                            "SELECT l FROM Location l " +
+                                    "WHERE (:marque IS NULL OR LOWER(l.voiture.marque) LIKE :marque) " +
+                                    "AND (:dateRecherche IS NULL OR l.dateDebut = :dateRecherche OR l.dateFin = :dateRecherche)",
+                            Location.class)
+                    .setParameter("marque", marque != null ? "%" + marque.toLowerCase() + "%" : null)
+                    .setParameter("dateRecherche", dateRecherche)
+                    .getResultList();
+
+        } finally {
+            em.close();
+        }
+    }
+
+
+
 }

@@ -131,4 +131,16 @@ public class ClientService {
                 .getSingleResult();
         return count != null ? count.intValue() : 0;
     }
+    //méthodes pour lister tout les clients
+    public List<Client> listerTousClients() {
+        return clientDAO.findAll();
+    }
+    public List<Client> rechercherParNomPrenomOuCin(String motCle) {
+        if (motCle == null || motCle.trim().isEmpty()) {
+            return clientDAO.findAll();
+        }
+        return clientDAO.rechercherParNomPrenomOuCin(motCle.trim().toLowerCase());
+    }
+
+
 }

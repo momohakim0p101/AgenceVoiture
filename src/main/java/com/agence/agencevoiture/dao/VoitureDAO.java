@@ -11,13 +11,20 @@ import org.eclipse.persistence.jpa.JpaEntityManagerFactory;
 
 import java.util.List;
 
+import static org.eclipse.persistence.jpa.JpaHelper.getEntityManager;
 
 
 public class VoitureDAO {
 
         private static final JpaEntityManagerFactory emf = (JpaEntityManagerFactory) Persistence.createEntityManagerFactory("pu");
 
-        public void creerVoiture(Voiture voiture){
+    private EntityManager getEntityManager() {
+        return jakarta.persistence.Persistence
+                .createEntityManagerFactory("Gestion_agence_voiture")
+                .createEntityManager();
+    }
+
+    public void creerVoiture(Voiture voiture){
             EntityManager em = emf.createEntityManager();
             em.getTransaction().begin();
             em.persist(voiture);
@@ -82,4 +89,23 @@ public class VoitureDAO {
             em.close();
         }
     }
+
+    public List<Voiture> rechercherParMarqueEtModele(String marque, String modele) {
+        EntityManager em = getEntityManager();
+        try {
+            return em.createQuery(
+                            "SELECT v FROM Voiture v WHERE " +
+                                    "(:marque IS NULL OR LOWER(v.marque) LIKE LOWER(CONCAT('%', :marque, '%'))) AND " +
+                                    "(:modele IS NULL OR LOWER(v.modele) LIKE LOWER(CONCAT('%', :modele, '%')))",
+                            Voiture.class)
+                    .setParameter("marque", marque != null && !marque.trim().isEmpty() ? marque : null)
+                    .setParameter("modele", modele != null && !modele.trim().isEmpty() ? modele : null)
+                    .getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
+
+
 }
