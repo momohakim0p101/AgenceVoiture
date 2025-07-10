@@ -37,7 +37,7 @@ public class RetournerVoitureServlet extends HttpServlet {
         // Validation des paramètres
         if (locationIdStr == null || locationIdStr.isEmpty() || dateRetourStr == null || dateRetourStr.isEmpty()) {
             session.setAttribute("erreur", "Tous les champs sont obligatoires.");
-            response.sendRedirect(request.getContextPath() + "/LocationServlet");
+            response.sendRedirect(request.getContextPath() + "/DashboardManagerServlet");
             return;
         }
 
@@ -46,7 +46,7 @@ public class RetournerVoitureServlet extends HttpServlet {
             locationId = Long.parseLong(locationIdStr);
         } catch (NumberFormatException e) {
             session.setAttribute("erreur", "ID de location invalide.");
-            response.sendRedirect(request.getContextPath() + "/LocationServlet");
+            response.sendRedirect(request.getContextPath() + "/DashboardManagerServlet");
             return;
         }
 
@@ -56,21 +56,21 @@ public class RetournerVoitureServlet extends HttpServlet {
             dateRetourEffectif = sdf.parse(dateRetourStr);
         } catch (ParseException e) {
             session.setAttribute("erreur", "Format de date de retour invalide.");
-            response.sendRedirect(request.getContextPath() + "/LocationServlet");
+            response.sendRedirect(request.getContextPath() + "/DashboardManagerServlet");
             return;
         }
 
         Location location = locationService.chercherParId(locationId);
         if (location == null) {
             session.setAttribute("erreur", "Location introuvable.");
-            response.sendRedirect(request.getContextPath() + "/LocationServlet");
+            response.sendRedirect(request.getContextPath() + "/DashboardManagerServlet");
             return;
         }
 
         // Validation : date de retour >= date de début
         if (dateRetourEffectif.before(location.getDateDebut())) {
             session.setAttribute("erreur", "La date de retour ne peut pas être antérieure à la date de début.");
-            response.sendRedirect(request.getContextPath() + "/LocationServlet");
+            response.sendRedirect(request.getContextPath() + "/DashboardManagerServlet");
             return;
         }
 
@@ -94,6 +94,6 @@ public class RetournerVoitureServlet extends HttpServlet {
         }
 
         // Rediriger vers LocationServlet pour recharger les données et afficher message
-        response.sendRedirect(request.getContextPath() + "/LocationServlet");
+        response.sendRedirect(request.getContextPath() + "/DashboardManagerServlet");
     }
 }

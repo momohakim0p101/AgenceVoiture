@@ -66,11 +66,9 @@ public class DashboardChefServlet extends HttpServlet {
         BigDecimal revenuMois = locationService.bilanFinancierMensuel(now.getYear(), now.getMonthValue());
 
         // --- 3. Clients actifs ---
-        long clientsActifs = locationService.compterClientsAyantLoué();
-        int totalClients = clientService.totalClients(); // méthode dans ClientService
-        int pourcentageClientsMois = totalClients > 0 ? (int) ((double) clientsActifs * 100 / totalClients) : 0;
-
-
+        int clientsActifs = locationService.nombreClientsActifsDuMois(now.getYear(), now.getMonthValue());
+        int totalClients = clientService.totalClients(); // méthode que tu dois définir si non encore faite
+        int pourcentageClientsMois = totalClients > 0 ? (clientsActifs * 100 / totalClients) : 0;
 
         // --- 4. Objectif et évolution ---
         BigDecimal objectifMensuel = locationService.objectifDuMois(); // méthode que tu dois définir ou hardcoder

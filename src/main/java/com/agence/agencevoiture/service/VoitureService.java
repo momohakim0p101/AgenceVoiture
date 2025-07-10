@@ -125,22 +125,22 @@ public class VoitureService {
         Voiture voiture = voitureDAO.trouverVoiture(immatriculation);
         if (voiture == null) return false;
 
-        // 1. Vérifier qu'aucune réservation n'est active
-        List<Location> reservations = voiture.getLocations();
-        boolean hasActive = reservations.stream()
+        // Vérifie s'il y a des réservations actives
+        boolean hasActive = voiture.getLocations().stream()
                 .anyMatch(r -> r.getStatut() == Location.StatutLocation.EN_COURS
                         || r.getStatut() == Location.StatutLocation.CONFIRMEE);
+
         if (hasActive) {
             return false;
         }
 
-        // 2. Supprimer **toutes** les réservations (historiques inclus)
-        for (Location loc : reservations) {
-            locationDAO.supprimerLocation(loc);
-        }
-
-        // 3. Supprimer la voiture
         try {
+            // Déconnecte manuellement la relation voiture -> location
+            for (Location loc : voiture.getLocations()) {
+                loc.setVoiture(null); // IMPORTANT
+                locationDAO.MiseAJour(loc); // Persist la modification
+            }
+
             voitureDAO.supprimerVoiture(voiture);
             return true;
         } catch (Exception e) {
@@ -148,6 +148,7 @@ public class VoitureService {
             return false;
         }
     }
+
 
     public Long totalVoitures() {
         return voitureDAO.compterVoitures();

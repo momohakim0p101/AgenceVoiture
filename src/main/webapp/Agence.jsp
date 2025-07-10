@@ -129,25 +129,63 @@
             </div>
         </section>
 
-        <section>
-            <h2 class="text-2xl font-semibold mb-4">Manager les réseaux</h2>
-            <div class="flex space-x-4">
-                <a href="#" class="text-blue-600 text-2xl hover:text-blue-800">
-                    <i class="fab fa-facebook"></i>
-                </a>
-                <a href="#" class="text-pink-500 text-2xl hover:text-pink-700">
-                    <i class="fab fa-instagram"></i>
-                </a>
-                <a href="#" class="text-blue-400 text-2xl hover:text-blue-600">
-                    <i class="fab fa-twitter"></i>
-                </a>
-                <a href="#" class="text-red-600 text-2xl hover:text-red-800">
-                    <i class="fab fa-youtube"></i>
-                </a>
+        <!-- Section Actions Utilisateur & Rapport -->
+        <section class="mt-12">
+            <h2 class="text-2xl font-semibold mb-6">Actions de gestion</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                <!-- Importer utilisateurs -->
+                <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-xl transition">
+                    <div class="flex items-center justify-between">
+                        <div class="text-blue-600 text-4xl">
+                            <i class="fas fa-file-import"></i>
+                        </div>
+                        <form action="${pageContext.request.contextPath}/ExporterVoitureActifServlet" method="post" enctype="multipart/form-data">
+                            <label class="cursor-pointer inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow">
+                                <i class="fas fa-upload mr-2"></i>Exporter
+                                <input type="file" name="file" class="hidden" onchange="this.form.submit()">
+                            </label>
+                        </form>
+                    </div>
+                    <p class="mt-4 text-gray-700 font-medium">Exporter tous les voitures en location vers un fichier CSV ou Excel.</p>
+                </div>
+
+                <!-- Exporter utilisateurs -->
+                <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-xl transition">
+                    <div class="flex items-center justify-between">
+                        <div class="text-green-600 text-4xl">
+                            <i class="fas fa-file-export"></i>
+                        </div>
+                        <form action="${pageContext.request.contextPath}/ExportClientActifServlet" method="get">
+                            <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow">
+                                <i class="fas fa-download mr-2"></i>Exporter
+                            </button>
+                        </form>
+                    </div>
+                    <p class="mt-4 text-gray-700 font-medium">Exporter tous les Clients actifs vers un fichier Excel ou PDF.</p>
+                </div>
+
+                <!-- Générer rapport -->
+                <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-xl transition">
+                    <div class="flex items-center justify-between">
+                        <div class="text-purple-600 text-4xl">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <form action="${pageContext.request.contextPath}/RapportMensuelServlet" method="get" target="_blank">
+                            <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded shadow">
+                                <i class="fas fa-file-alt mr-2"></i>Rapport
+                            </button>
+                        </form>
+                    </div>
+                    <p class="mt-4 text-gray-700 font-medium">Générer un rapport mensuel de l'état du parc automobile.</p>
+                </div>
+
             </div>
         </section>
+
+
     </div>
-</div>
+    </div>
 <!-- Font Awesome -->
 </body>
 </html>

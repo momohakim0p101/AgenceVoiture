@@ -1,8 +1,16 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.*, java.math.BigDecimal, java.text.DecimalFormat" %>
 <%@ page import="com.agence.agencevoiture.entity.*" %>
+<%@ page import="java.util.Date, java.text.SimpleDateFormat" %>
+<%@ page import="java.text.SimpleDateFormat, java.util.Locale" %>
+
+
+
 
 <%
+    SimpleDateFormat sdfPro = new SimpleDateFormat("EEEE dd MMMM yyyy", new Locale("fr", "FR"));
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    String todayStr = sdf.format(new Date());
     DecimalFormat df = new DecimalFormat("#,###");
     Utilisateur utilisateur = (Utilisateur) session.getAttribute("utilisateur");
     Long totalVoitures = (Long) request.getAttribute("totalVoitures");
@@ -101,6 +109,7 @@
                 </svg>
                 Gestion Agence
             </a>
+
         </nav>
         <div class="mt-auto text-xs text-gray-300 text-center pt-6">© 2025 AutoManager</div>
     </aside>
@@ -110,8 +119,8 @@
 <div class="flex-1 flex flex-col w-full">
     <!-- Topbar -->
     <header class="flex items-center justify-between bg-white shadow-md px-4 py-3 md:px-6 sticky top-0 z-10">
-        <button class="md:hidden text-blue-600 text-2xl" onclick="document.getElementById('sidebarMobile').classList.toggle('hidden')">
-            <i class="fas fa-bars"></i>
+        <button class="md:hidden text-blue-600 text-2xl focus:outline-none focus:ring-2 focus:ring-blue-500" onclick="document.getElementById('sidebarMobile').classList.toggle('hidden')">
+        <i class="fas fa-bars"></i>
         </button>
         <div class="text-lg font-semibold">Tableau de bord</div>
         <div class="hidden md:flex items-center gap-4">
@@ -120,17 +129,12 @@
                 <div><%= utilisateur != null ? utilisateur.getNom() : "Utilisateur" %></div>
                 <div class="text-xs text-gray-500"><%= utilisateur != null ? utilisateur.getRole() : "Rôle inconnu" %></div>
             </div>
-            <form method="get" action="${pageContext.request.contextPath}/LogoutServlet">
-                <button title="Déconnexion" class="text-gray-600 hover:text-red-600">
-                    <i class="fas fa-sign-out-alt"></i>
-                </button>
-            </form>
         </div>
     </header>
 
     <!-- Sidebar mobile -->
-    <div id="sidebarMobile" class="md:hidden hidden bg-blue-600 text-white px-4 py-4">
-        <nav class="flex flex-col gap-3">
+    <div id="sidebarMobile" class="md:hidden hidden fixed top-0 left-0 w-full h-full bg-blue-600 text-white z-50 px-6 py-6 overflow-auto">
+    <nav class="flex flex-col gap-3">
             <a href="${pageContext.request.contextPath}/DashboardManagerServlet" class="hover:underline">Dashboard</a>
             <a href="${pageContext.request.contextPath}/VoitureServlet" class="hover:underline">Voitures</a>
             <a href="${pageContext.request.contextPath}/ClientServlet" class="hover:underline">Clients</a>
@@ -143,10 +147,9 @@
     </div>
 
     <!-- Main content -->
-    <main class="p-4 md:p-6 space-y-6">
+    <main class="flex flex-col p-4 md:p-6 space-y-6">
 
-
-        <!-- Cartes statistiques -->
+    <!-- Cartes statistiques -->
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
             <div class="bg-white shadow rounded-lg p-6 flex flex-col justify-between">
                 <div class="flex justify-between items-center">
@@ -206,8 +209,8 @@
         </div>
 
         <!-- Section locations -->
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
-            <div class="flex items-center gap-2">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4 flex-wrap">
+        <div class="flex items-center gap-2">
                 <form action="NouvelleLocationServlet" method="get">
                     <button type="submit"
                             class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-md shadow transition">
@@ -226,8 +229,8 @@
 
 
         <!-- Champ de recherche en temps réel -->
-        <div class="mb-4 flex items-center gap-2">
-            <label for="searchLocation" class="font-medium text-gray-700">Rechercher une location :</label>
+        <div class="mb-4 flex flex-wrap items-center gap-2">
+        <label for="searchLocation" class="font-medium text-gray-700">Rechercher une location :</label>
             <input type="text" id="searchLocation" placeholder="Nom client, voiture, date, etc."
                    class="w-full max-w-md p-2 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
         </div>
@@ -240,7 +243,7 @@
         </h2>
         <div id="encoursTable" class="overflow-x-auto rounded shadow bg-white">
             <table class="min-w-full text-left border-collapse border border-gray-200">
-                <thead class="bg-gray-100">
+            <thead class="bg-gray-100">
                 <tr class="border-b border-gray-300">
                     <th class="px-4 py-3">Client</th>
                     <th class="px-4 py-3">Voiture</th>
@@ -261,8 +264,8 @@
                 <tr data-fin="<%= l.getDateFin() %>" class="border-b border-gray-200 hover:bg-blue-50 transition">
                     <td class="px-4 py-2"><%= l.getClient().getNom() %></td>
                     <td class="px-4 py-2"><%= l.getVoiture().getMarque() %></td>
-                    <td class="px-4 py-2"><%= l.getDateDebut() %></td>
-                    <td class="px-4 py-2"><%= l.getDateFin() %></td>
+                    <td class="px-4 py-2"><%= sdfPro.format(l.getDateDebut()) %></td>
+                    <td class="px-4 py-2"><%= sdfPro.format(l.getDateFin()) %></td>
                     <td class="px-4 py-2"><%= df.format(l.getMontantTotal()) %> F CFA</td>
                     <td class="px-4 py-2 font-semibold text-blue-600"><%= l.getStatut() %></td>
                     <td class="px-4 py-2 text-center space-x-2">
@@ -273,10 +276,18 @@
                             <input type="hidden" name="locationId" value="<%= l.getIdReservation() %>" />
                             <input type="hidden" name="dateRetourEffectif"
                                    value="<%= new java.text.SimpleDateFormat("yyyy-MM-dd").format(l.getDateFin()) %>" />
+                            <%
+                                String dateFinStr = sdf.format(l.getDateFin());
+                                boolean retourAujourdHui = todayStr.equals(dateFinStr);
+                                String btnColor = retourAujourdHui ? "bg-red-600 hover:bg-red-700" : "bg-green-600 hover:bg-green-700";
+                                String btnText = retourAujourdHui ? "Retour aujourd’hui" : "Retourner";
+                            %>
+
                             <button type="submit"
-                                    class="inline-flex items-center gap-1 bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm shadow transition">
-                                <i class="fas fa-undo"></i> Retourner
+                                    class="inline-flex items-center gap-1 <%= btnColor %> text-white px-3 py-1 rounded text-sm shadow transition">
+                                <i class="fas fa-undo"></i> <%= btnText %>
                             </button>
+
                         </form>
 
                         <!-- Bouton Relance e‑mail -->
@@ -319,7 +330,7 @@
         <div id="historiqueTable" class="hidden mt-8 overflow-x-auto rounded shadow bg-white">
             <h3 class="text-lg font-semibold mb-4 text-gray-700">Historique des locations</h3>
             <table class="min-w-full text-left border-collapse border border-gray-200">
-                <thead class="bg-gray-100">
+            <thead class="bg-gray-100">
                 <tr class="border-b border-gray-300">
                     <th class="px-4 py-3">Client</th>
                     <th class="px-4 py-3">Voiture</th>
