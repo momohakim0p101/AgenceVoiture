@@ -281,14 +281,11 @@ public class LocationService {
 
     // Total de clients ayant déjà loué
     public int totalClients() {
-        try {
-            TypedQuery<Long> query = em.createQuery(
-                    "SELECT COUNT(DISTINCT l.client.cin) FROM Location l", Long.class);
-            Long count = query.getSingleResult();
-            return count != null ? count.intValue() : 0;
-        } finally {
-            em.close(); // ✅ Bonne pratique : fermer l’EntityManager
-        }
+        TypedQuery<Long> query = em.createQuery(
+                "SELECT COUNT(DISTINCT l.client.cin) FROM Location l", Long.class);
+        Long count = query.getSingleResult();
+        return count != null ? count.intValue() : 0;
     }
+
 
 }

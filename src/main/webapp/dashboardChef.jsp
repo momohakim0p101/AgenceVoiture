@@ -1,10 +1,9 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.util.*, java.math.BigDecimal, java.text.DecimalFormat, java.text.SimpleDateFormat" %>
+<%@ page import="java.util.*, java.math.BigDecimal, java.text.DecimalFormat" %>
 <%@ page import="com.agence.agencevoiture.entity.*" %>
 
 <%
     DecimalFormat df = new DecimalFormat("#,###");
-    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
     Utilisateur utilisateur = (Utilisateur) session.getAttribute("utilisateur");
     Long totalVoitures = (Long) request.getAttribute("totalVoitures");
     totalVoitures = totalVoitures != null ? totalVoitures : 0L;
@@ -22,13 +21,6 @@
     objectifMensuel = objectifMensuel != null ? objectifMensuel : BigDecimal.ZERO;
     BigDecimal evolutionRevenu = (BigDecimal) request.getAttribute("evolutionRevenu");
     evolutionRevenu = evolutionRevenu != null ? evolutionRevenu : BigDecimal.ZERO;
-
-    // Récupération des résultats de recherche
-    List<Voiture> searchResultsVoitures = (List<Voiture>) request.getAttribute("searchResultsVoitures");
-    List<Client> searchResultsClients = (List<Client>) request.getAttribute("searchResultsClients");
-    List<Location> searchResultsLocations = (List<Location>) request.getAttribute("searchResultsLocations");
-    String searchType = (String) request.getAttribute("searchType");
-    String searchQuery = (String) request.getAttribute("searchQuery");
 %>
 
 <!DOCTYPE html>
@@ -57,6 +49,47 @@
             color: var(--text-dark);
         }
 
+        .header-gradient {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        .search-container {
+            position: relative;
+            width: 280px;
+        }
+
+        .search-input {
+            padding: 10px 16px 10px 40px;
+            width: 100%;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .search-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.8);
+        }
+
         .stat-card {
             background: var(--card-bg);
             border-radius: 16px;
@@ -64,24 +97,20 @@
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+        .hidden-row {
+            display: none;
         }
 
-        .card-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .section-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
         }
 
-        .active-tab {
-            border-bottom: 3px solid var(--primary);
-            color: var(--primary);
-            font-weight: 600;
+        @media (min-width: 1024px) {
+            .section-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
 
         .table-header {
@@ -89,18 +118,10 @@
             color: white;
         }
 
-        .chart-container {
-            background: var(--card-bg);
-            border-radius: 16px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            padding: 24px;
-        }
-
-        .header-gradient {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            border-radius: 16px;
-            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        .search-highlight {
+            background-color: #FEF08A;
+            padding: 0 2px;
+            border-radius: 2px;
         }
 
         .notification-dot {
@@ -111,63 +132,6 @@
             height: 10px;
             background-color: #EF4444;
             border-radius: 50%;
-        }
-
-        .progress-bar {
-            height: 8px;
-            border-radius: 4px;
-            overflow: hidden;
-            background-color: #E5E7EB;
-        }
-
-        .progress-fill {
-            height: 100%;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 20px;
-            color: var(--text-light);
-        }
-
-        .empty-state i {
-            font-size: 3rem;
-            margin-bottom: 15px;
-            color: #D1D5DB;
-        }
-
-        .search-results-section {
-            animation: fadeIn 0.5s ease-in-out;
-            border-left: 4px solid var(--primary);
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .search-type-badge {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background-color: var(--primary);
-            color: white;
-            border-radius: 9999px;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-            z-index: 10;
-        }
-
-        .status-badge {
-            padding: 0.25rem 0.5rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            text-transform: capitalize;
         }
     </style>
 </head>
@@ -201,7 +165,7 @@
 
     <!-- Main Content -->
     <main class="flex-1 p-8">
-        <!-- Header -->
+        <!-- Header avec barre de recherche stylisée -->
         <div class="header-gradient p-6 mb-8 rounded-2xl">
             <div class="flex justify-between items-center">
                 <div>
@@ -209,24 +173,15 @@
                     <p class="opacity-90 mt-1">Bienvenue, Chef d'agence</p>
                 </div>
                 <div class="flex items-center gap-4">
-                    <div class="relative">
-                        <form action="search" method="GET" class="flex items-center">
-                            <select name="type" class="rounded-l-lg bg-white bg-opacity-20 text-white pl-2 pr-8 py-2 focus:outline-none border-r border-white border-opacity-30">
-                                <option value="voiture" <%= "voiture".equals(searchType) ? "selected" : "" %>>Voitures</option>
-                                <option value="client" <%= "client".equals(searchType) ? "selected" : "" %>>Clients</option>
-                                <option value="location" <%= "location".equals(searchType) ? "selected" : "" %>>Locations</option>
-                            </select>
-                            <div class="relative flex-1">
-                                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-300"></i>
-                                <input type="text" name="q" placeholder="Rechercher..."
-                                       value="<%= searchQuery != null ? searchQuery : "" %>"
-                                       class="w-full pl-10 pr-4 py-2 rounded-r-lg bg-white bg-opacity-20 placeholder-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-30">
-                            </div>
-                            <button type="submit" class="ml-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
-                                <i class="fas fa-search"></i>
-                            </button>
-                        </form>
+                    <!-- Nouvelle barre de recherche stylisée -->
+                    <div class="search-container">
+                        <i class="fas fa-search search-icon"></i>
+                        <input id="globalSearch"
+                               type="text"
+                               placeholder="Rechercher modèle, locations..."
+                               class="search-input">
                     </div>
+
                     <div class="flex items-center gap-4">
                         <div class="relative">
                             <i class="fas fa-bell text-xl text-white"></i>
@@ -242,193 +197,6 @@
             </div>
         </div>
 
-        <!-- Résultats de recherche -->
-        <% if (searchResultsVoitures != null || searchResultsClients != null || searchResultsLocations != null) { %>
-        <div class="bg-white rounded-2xl shadow p-6 mb-8 search-results-section">
-            <h2 class="text-xl font-bold text-[var(--text-dark)] mb-4">
-                <i class="fas fa-search mr-2"></i>Résultats de recherche
-                <% if (searchQuery != null && !searchQuery.isEmpty()) { %>
-                pour "<%= searchQuery %>"
-                <% } %>
-            </h2>
-
-            <!-- Résultats Voitures -->
-            <% if (searchResultsVoitures != null) { %>
-            <% if (!searchResultsVoitures.isEmpty()) { %>
-            <h3 class="text-lg font-semibold mb-3 flex items-center">
-                <i class="fas fa-car mr-2 text-blue-500"></i> Voitures
-            </h3>
-            <div class="overflow-x-auto">
-                <table class="min-w-full">
-                    <thead>
-                    <tr class="table-header">
-                        <th class="px-4 py-3">Immatriculation</th>
-                        <th class="px-4 py-3">Marque</th>
-                        <th class="px-4 py-3">Modèle</th>
-                        <th class="px-4 py-3">Disponible</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <% for (Voiture voiture : searchResultsVoitures) { %>
-                    <tr>
-                        <td class="px-4 py-2 text-center"><%= voiture.getImmatriculation() %></td>
-                        <td class="px-4 py-2 text-center"><%= voiture.getMarque() %></td>
-                        <td class="px-4 py-2 text-center"><%= voiture.getModele() %></td>
-                        <td class="px-4 py-2 text-center">
-                                    <span class="status-badge <%= voiture.isDisponible() ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800" %>">
-                                        <%= voiture.isDisponible() ? "Disponible" : "Indisponible" %>
-                                    </span>
-                        </td>
-                    </tr>
-                    <% } %>
-                    </tbody>
-                </table>
-            </div>
-            <% } else { %>
-            <div class="empty-state py-4">
-                <i class="fas fa-car text-gray-300 text-3xl"></i>
-                <p>Aucune voiture trouvée</p>
-            </div>
-            <% } %>
-            <% } %>
-
-            <!-- Résultats Clients -->
-            <% if (searchResultsClients != null) { %>
-            <% if (!searchResultsClients.isEmpty()) { %>
-            <h3 class="text-lg font-semibold mt-6 mb-3 flex items-center">
-                <i class="fas fa-user mr-2 text-purple-500"></i> Clients
-            </h3>
-            <div class="overflow-x-auto">
-                <table class="min-w-full">
-                    <thead>
-                    <tr class="table-header">
-                        <th class="px-4 py-3">CIN</th>
-                        <th class="px-4 py-3">Nom</th>
-                        <th class="px-4 py-3">Prénom</th>
-                        <th class="px-4 py-3">Email</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <% for (Client client : searchResultsClients) { %>
-                    <tr>
-                        <td class="px-4 py-2 text-center"><%= client.getCin() %></td>
-                        <td class="px-4 py-2 text-center"><%= client.getNom() %></td>
-                        <td class="px-4 py-2 text-center"><%= client.getPrenom() %></td>
-                        <td class="px-4 py-2 text-center"><%= client.getEmail() %></td>
-                    </tr>
-                    <% } %>
-                    </tbody>
-                </table>
-            </div>
-            <% } else { %>
-            <div class="empty-state py-4">
-                <i class="fas fa-user text-gray-300 text-3xl"></i>
-                <p>Aucun client trouvé</p>
-            </div>
-            <% } %>
-            <% } %>
-
-            <!-- Résultats Locations -->
-            <% if (searchResultsLocations != null) { %>
-            <% if (!searchResultsLocations.isEmpty()) { %>
-            <h3 class="text-lg font-semibold mt-6 mb-3 flex items-center">
-                <i class="fas fa-key mr-2 text-green-500"></i> Locations
-            </h3>
-            <div class="overflow-x-auto">
-                <table class="min-w-full">
-                    <thead>
-                    <tr class="table-header">
-                        <th class="px-4 py-3">ID Réservation</th>
-                        <th class="px-4 py-3">Voiture</th>
-                        <th class="px-4 py-3">Client</th>
-                        <th class="px-4 py-3">Dates</th>
-                        <th class="px-4 py-3">Montant</th>
-                        <th class="px-4 py-3">Statut</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <% for (Location location : searchResultsLocations) { %>
-                    <tr>
-                        <td class="px-4 py-2 text-center"><%= location.getIdReservation() %></td>
-                        <td class="px-4 py-2 text-center">
-                            <% if (location.getVoiture() != null) { %>
-                            <%= location.getVoiture().getMarque() %> <%= location.getVoiture().getModele() %>
-                            <br><small class="text-gray-500"><%= location.getVoiture().getImmatriculation() %></small>
-                            <% } else { %>
-                            Voiture inconnue
-                            <% } %>
-                        </td>
-                        <td class="px-4 py-2 text-center">
-                            <% if (location.getClient() != null) { %>
-                            <%= location.getClient().getNom() %> <%= location.getClient().getPrenom() %>
-                            <br><small class="text-gray-500"><%= location.getClient().getCin() %></small>
-                            <% } else { %>
-                            Client inconnu
-                            <% } %>
-                        </td>
-                        <td class="px-4 py-2 text-center">
-                            <div class="text-sm">
-                                <div>Début: <%= location.getDateDebut() != null ? dateFormat.format(location.getDateDebut()) : "N/A" %></div>
-                                <div>Fin: <%= location.getDateFin() != null ? dateFormat.format(location.getDateFin()) : "N/A" %></div>
-                            </div>
-                        </td>
-                        <td class="px-4 py-2 text-center">
-                            <%= df.format(location.getMontantTotal()) %> F CFA
-                        </td>
-                        <td class="px-4 py-2 text-center">
-                            <%
-                                String statusClass = "";
-                                String statusText = "";
-                                if (location.getStatut() != null) {
-                                    switch(location.getStatut()) {
-                                        case CONFIRMEE:
-                                            statusClass = "bg-blue-100 text-blue-800";
-                                            statusText = "Confirmée";
-                                            break;
-                                        case TERMINEE:
-                                            statusClass = "bg-green-100 text-green-800";
-                                            statusText = "Terminée";
-                                            break;
-                                        case EN_COURS:
-                                            statusClass = "bg-yellow-100 text-yellow-800";
-                                            statusText = "En cours";
-                                            break;
-                                        case LOUE:
-                                            statusClass = "bg-purple-100 text-purple-800";
-                                            statusText = "Louée";
-                                            break;
-                                        case ANNULEE:
-                                            statusClass = "bg-red-100 text-red-800";
-                                            statusText = "Annulée";
-                                            break;
-                                        default:
-                                            statusClass = "bg-gray-100 text-gray-800";
-                                            statusText = location.getStatut().toString();
-                                    }
-                                } else {
-                                    statusClass = "bg-gray-100 text-gray-800";
-                                    statusText = "Inconnu";
-                                }
-                            %>
-                            <span class="status-badge <%= statusClass %>">
-                                        <%= statusText %>
-                                    </span>
-                        </td>
-                    </tr>
-                    <% } %>
-                    </tbody>
-                </table>
-            </div>
-            <% } else { %>
-            <div class="empty-state py-4">
-                <i class="fas fa-key text-gray-300 text-3xl"></i>
-                <p>Aucune location trouvée</p>
-            </div>
-            <% } %>
-            <% } %>
-        </div>
-        <% } %>
-
         <!-- Stats Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <div class="stat-card p-6">
@@ -442,10 +210,10 @@
                     </div>
                 </div>
                 <div class="mt-4 pt-3 border-t border-gray-100">
-            <span class="text-sm text-[var(--text-light)] flex items-center">
-                <i class="fas fa-chart-line text-green-500 mr-1"></i>
-                <%= totalVoitures > 0 ? (nbVoituresDispo * 100 / totalVoitures) : 0 %>% du parc
-            </span>
+                    <span class="text-sm text-[var(--text-light)] flex items-center">
+                        <i class="fas fa-chart-line text-green-500 mr-1"></i>
+                        <%= totalVoitures > 0 ? (nbVoituresDispo * 100 / totalVoitures) : 0 %>% du parc
+                    </span>
                 </div>
             </div>
 
@@ -460,10 +228,10 @@
                     </div>
                 </div>
                 <div class="mt-4 pt-3 border-t border-gray-100">
-            <span class="text-sm text-[var(--text-light)] flex items-center">
-                <i class="fas fa-chart-line text-red-500 mr-1"></i>
-                <%= totalVoitures > 0 ? (nbVoituresLouees * 100 / totalVoitures) : 0 %>% du parc
-            </span>
+                    <span class="text-sm text-[var(--text-light)] flex items-center">
+                        <i class="fas fa-chart-line text-red-500 mr-1"></i>
+                        <%= totalVoitures > 0 ? (nbVoituresLouees * 100 / totalVoitures) : 0 %>% du parc
+                    </span>
                 </div>
             </div>
 
@@ -478,10 +246,10 @@
                     </div>
                 </div>
                 <div class="mt-4 pt-3 border-t border-gray-100">
-            <span class="text-sm text-[var(--text-light)] flex items-center">
-                <i class="fas fa-arrow-up text-green-500 mr-1"></i>
-                <%= pourcentageClientsMois %>% ce mois
-            </span>
+                    <span class="text-sm text-[var(--text-light)] flex items-center">
+                        <i class="fas fa-arrow-up text-green-500 mr-1"></i>
+                        <%= pourcentageClientsMois %>% ce mois
+                    </span>
                 </div>
             </div>
 
@@ -496,24 +264,24 @@
                     </div>
                 </div>
                 <div class="mt-4 pt-3 border-t border-gray-100">
-            <span class="text-sm text-[var(--text-light)] flex items-center">
-                <i class="fas fa-arrow-up text-yellow-500 mr-1"></i>
-                Ce mois
-            </span>
+                    <span class="text-sm text-[var(--text-light)] flex items-center">
+                        <i class="fas fa-arrow-up text-yellow-500 mr-1"></i>
+                        Ce mois
+                    </span>
                 </div>
             </div>
         </div>
 
-
         <!-- Main Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="section-container mb-6">
             <!-- Section voitures populaires -->
             <div class="bg-white rounded-2xl shadow p-6">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-xl font-bold text-[var(--text-dark)]">Voitures les plus louées</h2>
+                    <p id="searchResults" class="text-sm text-gray-500"></p>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="min-w-full">
+                    <table class="min-w-full" id="voituresTable">
                         <thead>
                         <tr class="table-header">
                             <th class="text-left px-4 py-3 text-sm font-medium">Modèle</th>
@@ -528,7 +296,7 @@
                                 Long nbLoc = (Long) ligne[1];
                                 double taux = ((double) nbLoc / totalVoitures) * 100;
                         %>
-                        <tr>
+                        <tr data-model="<%= v.getModele().toLowerCase() %>" data-locations="<%= nbLoc %>">
                             <td class="px-4 py-2 text-sm"><%= v.getModele() %></td>
                             <td class="px-4 py-2 text-sm"><%= nbLoc %></td>
                             <td class="px-4 py-2 text-sm"><%= String.format("%.1f", taux) %>%</td>
@@ -563,7 +331,6 @@
                     </div>
                 </div>
 
-                <!-- Section graphique bilan financier -->
                 <div class="chart-container" style="position: relative; height: 40vh; width: 100%">
                     <canvas id="bilanChart"></canvas>
                 </div>
@@ -583,7 +350,6 @@
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
 
@@ -604,23 +370,68 @@
                 </div>
             </div>
         </div>
-
     </main>
 </div>
+
 <script>
-    const labelsJour = ${joursLabelsJson};
-    const dataJour = ${revenusJournaliersJson};
-    const labelsSemaine = ${semainesLabelsJson};
-    const dataSemaine = ${revenusHebdomadairesJson};
-    const labelsMois = ${labelsJson};
-    const dataMois = ${dataJson};
+    // Fonctionnalité de recherche
+    document.addEventListener('DOMContentLoaded', () => {
+        const searchInput = document.getElementById('globalSearch');
+        const tableRows = document.querySelectorAll('#voituresTable tbody tr');
+        const resultsInfo = document.getElementById('searchResults');
 
-    function formatNumber(number) {
-        return new Intl.NumberFormat('fr-FR').format(number);
-    }
+        // Fonction pour normaliser les textes (enlever accents)
+        const normalizeText = (text) => {
+            return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+        };
 
-    let chart = null;
+        // Fonction pour mettre en surbrillance les correspondances
+        const highlightMatches = (text, term) => {
+            if (!term) return text;
+            const regex = new RegExp(`(${term})`, 'gi');
+            return text.replace(regex, '<span class="search-highlight">$1</span>');
+        };
 
+        // Gestion de la recherche avec debounce
+        let searchTimeout;
+        searchInput.addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                const searchTerm = normalizeText(e.target.value.trim());
+                let visibleCount = 0;
+
+                tableRows.forEach(row => {
+                    if (row.cells.length === 0) return; // Skip empty rows
+
+                    const model = normalizeText(row.dataset.model);
+                    const locations = row.cells[1].textContent;
+                    const shouldShow = searchTerm === '' ||
+                        model.includes(searchTerm) ||
+                        locations.includes(searchTerm);
+
+                    if (shouldShow) {
+                        row.classList.remove('hidden-row');
+                        visibleCount++;
+
+                        // Mise en surbrillance
+                        if (searchTerm) {
+                            row.cells[0].innerHTML = highlightMatches(row.cells[0].textContent, searchTerm);
+                            row.cells[1].innerHTML = highlightMatches(row.cells[1].textContent, searchTerm);
+                        }
+                    } else {
+                        row.classList.add('hidden-row');
+                    }
+                });
+
+                // Mise à jour du compteur de résultats
+                if (resultsInfo) {
+                    resultsInfo.textContent = visibleCount + ' résultat(s) trouvé(s)';
+                }
+            }, 300);
+        });
+    });
+
+    // Graphique (fonction existante)
     function afficherGraphique(periode) {
         // Met à jour l'onglet actif
         document.querySelectorAll('#tabs-container button').forEach(btn => {
@@ -705,33 +516,13 @@
                 }
             }
         });
+
+
     }
 
-    // Affiche le graphique mensuel au chargement de la page
+    // Initialisation
     document.addEventListener('DOMContentLoaded', () => {
         afficherGraphique('mois');
-
-        // Animation et focus sur la recherche
-        const searchSection = document.querySelector('.search-results-section');
-        if (searchSection) {
-            searchSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-
-        // Mise à jour du badge de type de recherche
-        const searchTypeSelect = document.querySelector('select[name="type"]');
-        if (searchTypeSelect) {
-            const container = searchTypeSelect.parentElement;
-            container.style.position = 'relative';
-
-            const badge = document.createElement('div');
-            badge.className = 'search-type-badge';
-            badge.textContent = searchTypeSelect.value.charAt(0).toUpperCase();
-            container.appendChild(badge);
-
-            searchTypeSelect.addEventListener('change', () => {
-                badge.textContent = searchTypeSelect.value.charAt(0).toUpperCase();
-            });
-        }
     });
 </script>
 </body>

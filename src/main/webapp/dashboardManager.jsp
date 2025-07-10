@@ -111,7 +111,20 @@
             </a>
 
         </nav>
-        <div class="mt-auto text-xs text-gray-300 text-center pt-6">© 2025 AutoManager</div>
+        <div class="mt-auto">
+            <!-- Bouton Déconnexion -->
+            <a href="${pageContext.request.contextPath}/LogoutServlet"
+               class="flex items-center gap-2 px-3 py-2 mx-4 mb-2 rounded bg-red-500 hover:bg-red-600 text-white text-sm justify-center transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1" />
+                </svg>
+                Déconnexion
+            </a>
+            <!-- Copyright -->
+            <div class="text-xs text-gray-300 text-center pb-4">© 2025 AutoManager</div>
+        </div>
+
     </aside>
 </div>
 
